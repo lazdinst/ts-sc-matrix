@@ -32,6 +32,9 @@ app.use(bodyParser.json());
 const server = http.createServer(app);
 initializeSocketIO(server);
 
+import statusRoutes from './api/status';
+app.use('/api/status', statusRoutes);
+
 import gameHistory from './api/game_history';
 import unitsRoutes from './api/units';
 import rollRoutes from './api/roll';

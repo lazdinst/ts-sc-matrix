@@ -2,32 +2,20 @@ import styled from 'styled-components';
 
 import { Route, Routes, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import ServerStatusComponent from './containers/ServerStatus';
 
 const StyledApp = styled.div`
   background-color: #000;
 `;
 
 export function App() {
-  const [ serverStatus, setServer] = useState(false);
-
-  useEffect(() => {
-    fetch('http://localhost:3333/api/')
-      .then(res => {
-        if (res.status === 200) {
-          setServer(true);
-        }
-      })
-      .catch(err => {
-        setServer(false);
-      });
-  }, []);
-
   return (
     <StyledApp>
+      <ServerStatusComponent />
       <div role="navigation">
         <ul>
           <li>
-            <Link to="/">Home {serverStatus ? `Online` : `Offline`}</Link>
+            <Link to="/">Home</Link>
           </li>
           <li>
             <Link to="/page-2">Page 2</Link>

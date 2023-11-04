@@ -1,5 +1,5 @@
-import counterSlice from './counterSlice'; // Import your counterSlice
+import { serverStatus }  from './api';
 
 export {
-  counterSlice,
+  serverStatus,
 };
