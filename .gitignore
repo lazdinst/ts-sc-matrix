@@ -1,0 +1,6 @@
+
+.nx/installation
+.nx/cache
+node_modules
+.env
+dist
