@@ -1,10 +1,16 @@
 import React from "react";
+import SecondarySidebar from "../../components/SecondarySidebar";
 
 const HomePage = () => {
   return (
-    <div>
+    <>
+      <SecondarySidebar>
+        dfew
+      </SecondarySidebar>
+      <div>
       <h1>Hello, World!</h1>
-    </div>
+      </div>
+    </>
   );
 };
 

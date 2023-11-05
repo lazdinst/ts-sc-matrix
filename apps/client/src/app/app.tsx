@@ -5,6 +5,7 @@ import Sidebar from './containers/Sidebar';
 import Router from './router';
 
 const MainContent = styled.main`
+  display: flex;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -23,14 +24,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
-// <div role="navigation">
-// <ul>
-//   <li>
-//     <Link to="/">Home</Link>
-//   </li>
-//   <li>
-//     <Link to="/page-2">Page 2</Link>
-//   </li>
-// </ul>
-// </div>

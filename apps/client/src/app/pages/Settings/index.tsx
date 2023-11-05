@@ -1,5 +1,12 @@
-import React from "react";
+import ThemeManager from "../../containers/ThemeManager";
+
 const Settings = () => {
-  return <div>Settings</div>;
-};  
+  return (
+    <div>
+      <div>Settings</div>
+      <ThemeManager />
+    </div>
+  );
+};
+
 export default Settings;
