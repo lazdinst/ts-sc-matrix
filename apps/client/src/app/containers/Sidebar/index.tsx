@@ -1,24 +1,26 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTheme } from '../../styled';
-import { withRouter } from "react-router";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import shiva from '../../../assets/images/shiva.png';
+import Icon from '../../components/Icon';
 
-// Styled components for the sidebar
 const SidebarWrapper = styled.div`
-  width: 250px;
-  height: 100%;
+  width: 64px;
   background-color: ${(props) => props.theme.backgroundColor};
   color: ${(props) => props.theme.textColor};
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 20px;
 `;
 
-const Logo = styled.div`
-  font-size: 64px;
-  margin-bottom: 20px;
+const LogoContainer = styled.div`
+  padding: 0.5rem;
   color: ${(props) => props.theme.accentColor};
+`;
+
+const Logo = styled.img`
+  width: 100%;
 `;
 
 const Separator = styled.hr`
@@ -44,33 +46,30 @@ const MenuItemIcon = styled.div`
   color: ${(props) => props.theme.accentColor};
 `;
 
-// Icon component
-const Icon = styled.i`
-  font-size: ${(props) => props.size || '24px'};
-  color: ${(props) => props.color || '#fff'};
-`;
-
 const menuItems = [
-  { iconClass: 'fas fa-dice', text: 'Menu Item 1', route: '/menu-item-1' },
-  { iconClass: 'fas fa-coffee', text: 'Menu Item 2', route: '/menu-item-2' },
-  // Add more menu items as needed
+  { iconClass: 'dice', text: 'Menu Item 1', route: '/sc-roll' },
+  { iconClass: 'coffee', text: 'Menu Item 2', route: '/test' },
 ];
 
 const Sidebar: React.FC = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate(); // Get the navigate function
+
+  const handleMenuItemClick = (route: string) => {
+    navigate(route); // Use navigate to navigate
+  };
 
   return (
     <SidebarWrapper>
-      <Logo>
-        <Icon className="fas fa-dice"></Icon> {/* Replace with your logo icon */}
-      </Logo>
+      <LogoContainer>
+        <Logo src={shiva} alt="LogoContainer" />
+      </LogoContainer>
       <Separator />
       {menuItems.map((item, index) => (
         <MenuItem key={index} onClick={() => handleMenuItemClick(item.route)}>
           <MenuItemIcon>
-            <Icon className={item.iconClass}></Icon>
+            <Icon name={item.iconClass}></Icon>
           </MenuItemIcon>
-          {item.text}
         </MenuItem>
       ))}
     </SidebarWrapper>
