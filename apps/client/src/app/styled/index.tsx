@@ -1,6 +1,14 @@
 import React, { useContext, useState, useEffect, ReactNode } from 'react';
-import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './themes';
+
+const AppWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  background-color: ${(props) => props.theme.colors.background};
+`;
 
 const ThemeContext = React.createContext<{
   theme: typeof lightTheme | typeof darkTheme;
@@ -16,7 +24,7 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(lightTheme);
+  const [theme, setTheme] = useState(darkTheme);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === lightTheme ? darkTheme : lightTheme));
@@ -39,7 +47,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <StyledThemeProvider theme={theme}>{children}</StyledThemeProvider>
+      <StyledThemeProvider theme={theme}>
+        <AppWrapper>
+          {children}
+        </AppWrapper>
+        </StyledThemeProvider>
     </ThemeContext.Provider>
   );
 };
