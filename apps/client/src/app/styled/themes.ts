@@ -6,24 +6,14 @@ export interface Theme {
     text: string;
     primary: string;
     secondary: string;
-    headingPrimary: string;
-    headingSecondary: string;
-    buttonPrimaryBg: string;
-    buttonPrimaryText: string;
-    buttonSecondaryBg: string;
-    buttonSecondaryText: string;
-    inputBg: string;
-    inputText: string;
-    inputBorder: string;
-    panelPrimaryBg: string;
-    panelSecondaryBg: string;
+    accentColor: string;
     statusColors: {
       success: string;
       error: string;
       warning: string;
       info: string;
     };
-    semantic: {
+    surfaces: {
       navBg: string;
       mainBg: string;
       sectionBg: string;
@@ -66,6 +56,8 @@ const statusColors = {
   info: '#17a2b8',
 };
 
+const accentColor = '#007bff';
+
 const typography = {
   fontSizeSmall: '12px',
   fontSizeMedium: '16px',
@@ -100,23 +92,13 @@ export const darkTheme: Theme = {
   colors: {
     background: '#36393f',
     text: '#ffffff',
-    primary: '#7289da',
-    secondary: '#b9bbbe',
-    headingPrimary: '#ffffff',
-    headingSecondary: '#b9bbbe',
-    buttonPrimaryBg: '#7289da',
-    buttonPrimaryText: '#ffffff',
-    buttonSecondaryBg: '#414549',
-    buttonSecondaryText: '#ffffff',
-    inputBg: '#40444b',
-    inputText: '#ffffff',
-    inputBorder: '#2f3136',
-    panelPrimaryBg: '#202225',
-    panelSecondaryBg: '#2f3136',
+    primary: '#ededed',
+    secondary: '#80848e',
     statusColors: statusColors,
-    semantic: {
-      navBg: '#36393f',
-      mainBg: '#2f3136',
+    accentColor: accentColor,
+    surfaces: {
+      navBg: '#1e1f22',
+      mainBg: '#2b2d31',
       sectionBg: '#202225',
       articleBg: '#36393f',
     }
@@ -133,19 +115,8 @@ export const lightTheme: Theme = {
     text: '#333',
     primary: '#007bff',
     secondary: '#6c757d',
-    headingPrimary: '#333',
-    headingSecondary: '#6c757d',
-    buttonPrimaryBg: '#007bff',
-    buttonPrimaryText: '#fff',
-    buttonSecondaryBg: '#414549',
-    buttonSecondaryText: '#fff',
-    inputBg: '#fff',
-    inputText: '#333',
-    inputBorder: '#ccc',
-    panelPrimaryBg: '#f0f0f0',
-    panelSecondaryBg: '#ffffff',
     statusColors: statusColors,
-    semantic: {
+    surfaces: {
       navBg: '#007bff',
       mainBg: '#f0f0f0',
       sectionBg: '#ffffff',

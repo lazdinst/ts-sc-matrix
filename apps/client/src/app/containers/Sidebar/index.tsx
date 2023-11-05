@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import shivaDevil from '../../../assets/images/shiva-devil.png';
 import fire from '../../../assets/images/fire.gif';
 import Icon from '../../components/Icon';
+import Separator from '../../components/Separator';
+
 import { routes } from '../../router';
 
 const SidebarWrapper = styled.nav`
   width: 64px;
-  background-color: ${(props) => props.theme.colors.semantic.navBg};
+  background-color: ${(props) => props.theme.colors.surfaces.navBg};
   color: ${(props) => props.theme.textColor};
   display: flex;
   flex-direction: column;
@@ -38,20 +40,23 @@ const Logo = styled.img`
   }
 `;
 
-const Separator = styled.hr`
-  width: 80%;
-  border: 1px solid ${(props) => props.theme.accentColor};
-  margin-bottom: 20px;
-`;
-
 const MenuContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
+  
 `;
 
-const MenuList = styled.div`
+interface MenuListProps {
+  alignEnd?: boolean;
+}
+
+const MenuList = styled.div<MenuListProps>`
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: ${(props) => (props.alignEnd ? 'flex-end' : 'flex-start')};
 `;
 
 const MenuItem = styled.div`
@@ -60,13 +65,13 @@ const MenuItem = styled.div`
   padding: 10px;
   cursor: pointer;
   justify-content: center;
-  position: relative; /* Add this to make ::before position relative to MenuItem */
+  position: relative;
 
   &::before {
     content: '';
     width: 4px;
     height: 100%;
-    background-color: ${(props) => props.theme.colors.primary};
+    background-color: ${(props) => props.theme.colors.accentColor};
     position: absolute;
     left: 0;
     top: 0;
@@ -78,15 +83,10 @@ const MenuItem = styled.div`
   &.active::before {
     opacity: 1;
   }
-
-  &:hover {
-    background-color: ${(props) => props.theme.secondaryBackgroundColor};
-  }
 `;
 
 const MenuItemIcon = styled.div`
   font-size: 24px;
-  color: ${(props) => props.theme.accentColor};
 `;
 
 const menuItems = routes.map((route) => ({
@@ -118,7 +118,7 @@ const Sidebar: React.FC = () => {
             </MenuItem>
           ))}
         </MenuList>
-        <MenuList>
+        <MenuList alignEnd>
             <MenuItem onClick={() => handleMenuItemClick('profile')}>
               <MenuItemIcon>
                 <Icon name='astronaut'></Icon>

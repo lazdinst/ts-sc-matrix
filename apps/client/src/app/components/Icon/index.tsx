@@ -18,6 +18,7 @@ interface IconProps {
 }
 
 const StyledIcon = styled(FontAwesomeIcon)`
+  color: ${(props) => props.theme.colors.primary || 'inherit'};
 `;
 
 function Icon({ name }: IconProps) {
