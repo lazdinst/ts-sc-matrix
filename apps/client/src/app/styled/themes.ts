@@ -116,6 +116,7 @@ export const lightTheme: Theme = {
     primary: '#007bff',
     secondary: '#6c757d',
     statusColors: statusColors,
+    accentColor: accentColor,
     surfaces: {
       navBg: '#007bff',
       mainBg: '#f0f0f0',
