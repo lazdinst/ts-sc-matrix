@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchServerStatus, ServerStatusState } from '../../../redux/slices/api/serverStatus'; // Import the ServerStatusState type
+import { fetchServerStatus, ServerStatusState } from '../../../redux/slices/api/serverStatus';
 import { AppDispatch } from '../../../redux/store';
 
 const ServerStatusComponent = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const serverStatus = useSelector((state: { serverStatus: ServerStatusState }) => state.serverStatus); // Specify the state type
+  const serverStatus = useSelector((state: { serverStatus: ServerStatusState }) => state.serverStatus);
 
   useEffect(() => {
     dispatch(fetchServerStatus());

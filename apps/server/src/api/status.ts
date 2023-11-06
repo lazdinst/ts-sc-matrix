@@ -2,7 +2,8 @@ import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-router.get('/status', (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
+  console.log('GET /status')
   const serverStatus = {
     connected: true,
   };

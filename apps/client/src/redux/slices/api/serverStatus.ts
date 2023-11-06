@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { AsyncThunkAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 interface ServerStatusState {
@@ -13,24 +14,21 @@ const initialState: ServerStatusState = {
   loading: false,
 };
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'http://localhost:6969';
 
-export const fetchServerStatus = createAsyncThunk(
+interface ServerStatusResponse {
+  connected: boolean;
+}
+
+export const fetchServerStatus = createAsyncThunk<ServerStatusResponse, void>(
   'serverStatus/fetchServerStatus',
   async () => {
-    try {
-      const response = await axios.get(`${API_URL}/api/status`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.get<ServerStatusResponse>(`${API_URL}/api/status`);
+    return response.data;
   }
 );
 
-// Define the FetchServerStatusAction type
-import { AsyncThunkAction } from '@reduxjs/toolkit';
-
-export type FetchServerStatusAction = AsyncThunkAction<ServerStatusState, void, {}>;
+export type FetchServerStatusAction = AsyncThunkAction<ServerStatusState, void, object>;
 
 const serverStatus = createSlice({
   name: 'serverStatus',
