@@ -14,7 +14,8 @@ const initialState: ServerStatusState = {
   loading: false,
 };
 
-const API_URL = 'http://localhost:6969';
+const DEFAULT_API_URL = 'http://localhost:6969';
+const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
 interface ServerStatusResponse {
   connected: boolean;
@@ -23,7 +24,8 @@ interface ServerStatusResponse {
 export const fetchServerStatus = createAsyncThunk<ServerStatusResponse, void>(
   'serverStatus/fetchServerStatus',
   async () => {
-    const response = await axios.get<ServerStatusResponse>(`${API_URL}/api/status`);
+    const uri = `${API_URL}/api/status`;
+    const response = await axios.get<ServerStatusResponse>(uri);
     return response.data;
   }
 );
