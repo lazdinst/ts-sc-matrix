@@ -1,6 +1,8 @@
-import React, { useContext, useState, useEffect, ReactNode } from 'react';
+import React, { useContext, useEffect, ReactNode } from 'react';
 import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './themes';
+import { ThemeModeState, setThemeMode } from '../../redux/slices/theme/theme';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AppWrapper = styled.div`
   display: flex;
@@ -12,7 +14,6 @@ const AppWrapper = styled.div`
 
 const ThemeContext = React.createContext<{
   theme: typeof lightTheme | typeof darkTheme;
-  toggleTheme: () => void;
 } | undefined>(undefined);
 
 export const useTheme = () => {
@@ -24,30 +25,24 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(darkTheme);
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === lightTheme ? darkTheme : lightTheme));
-  };
+  const dispatch = useDispatch();
+  const mode = useSelector((state: { theme: ThemeModeState }) => state.theme.mode);
+  const selectedTheme = mode === 'dark' ? darkTheme : lightTheme;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-      setTheme(savedTheme === 'dark' ? darkTheme : lightTheme);
+      dispatch(setThemeMode(savedTheme as "light" | "dark"));
     } else {
-      // Use system preference as the default theme
       const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDarkMode ? darkTheme : lightTheme);
+      const nextMode = prefersDarkMode ? 'dark' : 'light';
+      dispatch(setThemeMode(nextMode));
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme === lightTheme ? 'light' : 'dark');
-  }, [theme]);
+  });
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <StyledThemeProvider theme={theme}>
+    <ThemeContext.Provider value={{ theme: selectedTheme }}>
+      <StyledThemeProvider theme={selectedTheme}>
         <AppWrapper>
           {children}
         </AppWrapper>

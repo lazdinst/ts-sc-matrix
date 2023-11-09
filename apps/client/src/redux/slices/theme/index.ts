@@ -1,5 +1,6 @@
-import themeSlice from './theme';
+import theme, { setThemeMode } from './theme';
 
 export {
-  themeSlice,
+  theme,
+  setThemeMode,
 };

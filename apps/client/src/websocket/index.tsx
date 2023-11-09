@@ -1,5 +1,11 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useDispatch } from 'react-redux';
+import {
+  connectWebSocket,
+  disconnectWebSocket,
+  receiveWebSocketMessage,
+} from '../redux/slices/websocket';
 
 interface WebSocketProviderProps {
   children: ReactNode;
@@ -7,54 +13,59 @@ interface WebSocketProviderProps {
 
 export const WebSocketContext = React.createContext<{
   socket: Socket | null;
-  isConnected: boolean;
-  messages: string[];
   sendMessage: (message: string) => void;
 } | null>(null);
 
 const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [messages, setMessages] = useState<string[]>([]);
+  const dispatch = useDispatch();
+  let socket: Socket | null = null; // Declare socket variable
 
-  useEffect(() => {
-    console.log('Connecting to websocket server...');
-    const newSocket = io('ws://localhost:5000');
+  const createSocket = () => {
+    socket = io('ws://localhost:5000');
+    console.log('Creating ws socket...');
 
-    newSocket.on('connect', () => {
-      setIsConnected(true);
+    socket.on('connect', () => {
+      console.log('Connected...');
+      dispatch(connectWebSocket());
       sendMessage('Hello world!');
     });
 
-    newSocket.on('disconnect', () => {
-      setIsConnected(false);
+    socket.on('disconnect', () => {
+      dispatch(disconnectWebSocket());
     });
 
-    newSocket.on('message', (message: string) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+    socket.on('message', (message: string) => {
+      dispatch(receiveWebSocketMessage(message));
     });
 
-    newSocket.on('error', (error) => {
+    socket.on('connections', (connections: { count: number }) => {
+      console.log('Connections:', connections);
+    });
+
+    socket.on('error', (error) => {
       console.error('WebSocket error:', error);
     });
-    
-    setSocket(newSocket);
+
+    return socket;
+  };
+
+  useEffect(() => {
+    console.log('Connecting to websocket server...');
+    const socket = createSocket();
 
     return () => {
-      if (newSocket.connected) {
-        newSocket.disconnect();
+      if (socket?.connected) {
+        socket.disconnect();
       }
     };
   }, []);
 
   const sendMessage = (message: string) => {
-    if (socket) {
-      socket.emit('sendMessage', message);
-    }
+    // You can dispatch any necessary actions here if needed.
   };
 
   return (
-    <WebSocketContext.Provider value={{ socket, isConnected, messages, sendMessage }}>
+    <WebSocketContext.Provider value={{ socket, sendMessage }}>
       {children}
     </WebSocketContext.Provider>
   );

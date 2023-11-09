@@ -5,11 +5,11 @@ const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 let io: SocketIoServer;
 
 export const initializeSocketIO = (server: any) => {
-  let totalConnections = 0; // Initialize the total connections count
+  let totalConnections = 0;
 
   io = new SocketIoServer(server, {
     cors: {
-      origin: allowedOrigins, // Reuse the allowed origins from your Express CORS settings
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -18,12 +18,14 @@ export const initializeSocketIO = (server: any) => {
   console.log("io Server Created");
 
   io.on("connection", (socket) => {
-    console.log("Client Connected: ", socket.id);
-    totalConnections++; // Increment the total connections count
-    io.emit('connections', { count: totalConnections }); // Send the updated count to all clients
+    console.log("New Client Connected: ", socket.id);
+    totalConnections++;
+    console.log("emmitting message to client", totalConnections);
+    io.emit('message', 'Hello, World!!');
+    io.emit('connections', { count: totalConnections });
     socket.on("disconnect", () => {
-      totalConnections--; // Increment the total connections count
-      io.emit('connections', { count: totalConnections }); // Send the updated count to all clients
+      totalConnections--;
+      io.emit('connections', { count: totalConnections });
       console.log("Client disconnected");
     });
   });

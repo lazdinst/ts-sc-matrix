@@ -1,7 +1,7 @@
 import { serverStatus }  from './api';
-import { themeSlice } from './theme';
+import { theme } from './theme';
 
 export {
   serverStatus,
-  themeSlice,
+  theme,
 };
