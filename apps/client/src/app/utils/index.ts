@@ -10,15 +10,15 @@ interface RaceSymbol {
 
 export function getSymbolImageByRace(race: string): RaceSymbol {
   let symbol: string = sc;
-  
+
   switch (race) {
-    case "protoss":
+    case 'protoss':
       symbol = protoss;
       break;
-    case "terran":
+    case 'terran':
       symbol = terran;
       break;
-    case "zerg":
+    case 'zerg':
       symbol = zerg;
       break;
     default:
@@ -26,4 +26,14 @@ export function getSymbolImageByRace(race: string): RaceSymbol {
   }
 
   return { race, symbol };
+}
+
+export function parseUnitName(unitName: string): string {
+  const words: string[] = unitName.split('_');
+  const capitalizedWords: string[] = words.map((word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+
+  const parsedName: string = capitalizedWords.join(' ');
+  return parsedName;
 }

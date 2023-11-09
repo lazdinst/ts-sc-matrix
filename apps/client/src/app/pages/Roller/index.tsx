@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { executeNewRoll } from '../../../redux/slices/roller/roller';
 import { ServerStatusState } from '../../../redux/slices/api/serverStatus';
-import Page from '../../components/Page';
-import Button from '../../components/Button';
+import { Page, Button, Section, Card } from '../../components';
 
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -22,25 +21,26 @@ const Roller: React.FC = () => {
 
   return (
     <Page
-      flexDirection="row"
+      id="roller-page"
+      flexDirection="column"
       justifyContent="center"
-      alignItems="flex-start"
+      alignItems="center"
       gap="16px"
     >
-      <h2>Roller</h2>
-      <div>{JSON.stringify(serverStatus)}</div>
-      <Button
-        isLoading={loading}
-        onClick={handleRollButtonClick}
-        disabled={loading}
-        variant="success"
-      >
-        Roll
-      </Button>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      {JSON.stringify(playerOne)}
-      {JSON.stringify(playerTwo)}
+      <Section justifyContent="center" alignItems="center" gap="16px">
+        <Card player={playerOne} />
+        <Card player={playerTwo} />
+      </Section>
+      <Section justifyContent="center">
+        <Button
+          isLoading={loading}
+          onClick={handleRollButtonClick}
+          disabled={loading}
+          variant="success"
+        >
+          Roll
+        </Button>
+      </Section>
     </Page>
   );
 };

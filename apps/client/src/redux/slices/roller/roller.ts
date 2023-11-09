@@ -6,50 +6,10 @@ import {
 } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-export interface RollerState {
-  loading: boolean;
-  error: string | null;
-  playerOne: {
-    name: string;
-    race: string;
-    units: Unit[];
-  };
-  playerTwo: {
-    name: string;
-    race: string;
-    units: Unit[];
-  };
-}
-
 const defaultPlayerRoll = {
   name: '',
   race: '',
   units: [],
-};
-
-export interface RollMessage {
-  playerOne: {
-    name: string;
-    race: string;
-    units: Unit[];
-  };
-  playerTwo: {
-    name: string;
-    race: string;
-    units: Unit[];
-  };
-}
-
-export interface RollerState extends RollMessage {
-  loading: boolean;
-  error: string | null;
-}
-
-const initialState: RollerState = {
-  loading: false,
-  error: null,
-  playerOne: defaultPlayerRoll,
-  playerTwo: defaultPlayerRoll,
 };
 
 export interface Unit {
@@ -61,6 +21,36 @@ export interface Unit {
   type: string;
   __v: number;
 }
+
+export interface Player {
+  name: string;
+  race: string;
+  units: Unit[];
+}
+
+export interface Roll {
+  playerOne: Player;
+  playerTwo: Player;
+}
+
+export interface RollerState {
+  loading: boolean;
+  error: string | null;
+  playerOne: Player;
+  playerTwo: Player;
+}
+
+export interface RollerState extends Roll {
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: RollerState = {
+  loading: false,
+  error: null,
+  playerOne: defaultPlayerRoll,
+  playerTwo: defaultPlayerRoll,
+};
 
 const DEFAULT_API_URL = 'http://localhost:6969';
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
@@ -74,13 +64,13 @@ export const executeNewRoll = createAsyncThunk(
   }
 );
 
-export const setRolls = createAction<RollMessage>('roller/setRolls');
+export const setRolls = createAction<Roll>('roller/setRolls');
 
 const rollerSlice = createSlice({
   name: 'roller',
   initialState,
   reducers: {
-    setRolls: (state, action: PayloadAction<RollMessage>) => {
+    setRolls: (state, action: PayloadAction<Roll>) => {
       return {
         ...state,
         playerOne: action.payload.playerOne,

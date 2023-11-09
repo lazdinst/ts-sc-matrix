@@ -1,33 +1,71 @@
 import React from 'react';
+import styled from 'styled-components';
+import { Player } from '../../../redux/slices/roller/roller';
+import { getSymbolImageByRace, parseUnitName } from '../../utils';
 
-interface Unit {
-  name: string;
+const Card = styled.div`
+  background: #2c2f33; /* Discord dark theme color */
+  border-radius: 2px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: calc(100% - 20px); /* 100% of its container minus some padding */
+  height: auto; /* Let it be dictated by its content, or set a percentage/vw value */
+  padding: 2vw; /* Using vw makes the padding responsive */
+  box-sizing: border-box;
+`;
+
+const CardImage = styled.img`
+  height: 25%;
+  width: auto;
+`;
+
+const CardHeader = styled.h3`
+  font-weight: bold;
+  text-align: center;
+  font-family: 'eurostile';
+  text-transform: uppercase;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 20px;
+  text-shadow: 0 0 9px #06f, 0 0 2px #fff;
+  margin: 10px 0;
+`;
+
+const UnitContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+`;
+
+const UnitDetails = styled.div``;
+const UnitName = styled.span``;
+
+interface CardComponentProps {
+  player: Player;
 }
 
-interface CardProps {
-  imageUrl: string;
-  imageAlt: string;
-  headerText: string;
-  units?: Unit[];
-}
-
-const Card: React.FC<CardProps> = ({ imageUrl, imageAlt, headerText, units }) => {
+const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
+  const { race, units, name } = player;
+  const { symbol } = getSymbolImageByRace(race);
+  const imageAlt = race;
   return (
-    <div className="card">
-      <img src={imageUrl} alt={imageAlt} />
-      <h3 className="card-header">{headerText}</h3>
-      <div className="flex-row-column">
-        {units && units.map((unit, index) => (
-          <div key={index}>
-            <span>{unit.name}</span>
-            <div className="icon-with-value">
-              {/* Add any content you want to display */}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardImage src={symbol} alt={imageAlt} />
+      <CardHeader>{race}</CardHeader>
+      <UnitContainer>
+        {units &&
+          units.map((unit, index) => (
+            <UnitDetails key={index}>
+              <UnitName>{parseUnitName(unit.name)}</UnitName>
+            </UnitDetails>
+          ))}
+      </UnitContainer>
+    </Card>
   );
-}
+};
 
-export default Card;
+export default CardComponent;
