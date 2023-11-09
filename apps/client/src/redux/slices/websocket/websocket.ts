@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface WebSocketState {
-  isConnected: boolean;
+  connected: boolean;
   messages: string[];
 }
 
 const initialState: WebSocketState = {
-  isConnected: false,
+  connected: false,
   messages: [],
 };
 
@@ -15,10 +15,10 @@ const websocketSlice = createSlice({
   initialState,
   reducers: {
     connectWebSocket: (state) => {
-      state.isConnected = true;
+      state.connected = true;
     },
     disconnectWebSocket: (state) => {
-      state.isConnected = false;
+      state.connected = false;
     },
     receiveWebSocketMessage: (state, action: PayloadAction<string>) => {
       state.messages.push(action.payload);

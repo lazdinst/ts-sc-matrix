@@ -1,19 +1,24 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../redux/store';
-import { fetchServerStatus, ServerStatusState } from '../../../redux/slices/api/serverStatus';
+import {
+  fetchServerStatus,
+  ServerStatusState,
+} from '../../../redux/slices/api/server';
 
 export const useServerConnection = () => {
   const dispatch: AppDispatch = useDispatch();
-  const serverStatus = useSelector((state: { serverStatus: ServerStatusState }) => state.serverStatus);
+  const server = useSelector(
+    (state: { server: ServerStatusState }) => state.server
+  );
 
   useEffect(() => {
     dispatch(fetchServerStatus());
   }, [dispatch]);
 
   return {
-    connected: serverStatus.connected,
-    error: serverStatus.error,
-    loading: serverStatus.loading,
+    connected: server.connected,
+    error: server.error,
+    loading: server.loading,
   };
 };

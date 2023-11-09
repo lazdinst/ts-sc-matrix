@@ -2,7 +2,8 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { executeNewRoll } from '../../../redux/slices/roller/roller';
-import { ServerStatusState } from '../../../redux/slices/api/serverStatus';
+import { ServerStatusState } from '../../../redux/slices/api/server';
+import { WebSocketState } from '../../../redux/slices/websocket/websocket';
 import { Page, Button, Section, Card } from '../../components';
 
 const Roller: React.FC = () => {
@@ -11,12 +12,17 @@ const Roller: React.FC = () => {
     (state: RootState) => state.roller
   );
 
-  const serverStatus = useSelector(
-    (state: { serverStatus: ServerStatusState }) => state.serverStatus
+  const server = useSelector(
+    (state: { server: ServerStatusState }) => state.server
+  );
+  const websocket = useSelector(
+    (state: { websocket: WebSocketState }) => state.websocket
   );
 
   const handleRollButtonClick = () => {
-    dispatch(executeNewRoll());
+    if (server.connected && websocket.connected) {
+      dispatch(executeNewRoll());
+    }
   };
 
   return (

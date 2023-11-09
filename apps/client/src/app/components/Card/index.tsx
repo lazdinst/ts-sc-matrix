@@ -4,15 +4,15 @@ import { Player } from '../../../redux/slices/roller/roller';
 import { getSymbolImageByRace, parseUnitName } from '../../utils';
 
 const Card = styled.div`
-  background: #2c2f33; /* Discord dark theme color */
+  background: #2c2f33;
   border-radius: 2px;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: calc(100% - 20px); /* 100% of its container minus some padding */
-  height: auto; /* Let it be dictated by its content, or set a percentage/vw value */
-  padding: 2vw; /* Using vw makes the padding responsive */
+  width: calc(100% - 20px);
+  height: auto;
+  padding: 2vw;
   box-sizing: border-box;
 `;
 
