@@ -28,6 +28,9 @@ export const initializeSocketIO = (server: any) => {
       io.emit('connections', { count: totalConnections });
       console.log("Client disconnected");
     });
+    socket.on("roll", () => {
+      console.log('Rolled')
+    });
   });
 
   // Add error handling for the Socket.IO server

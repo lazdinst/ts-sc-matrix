@@ -2,14 +2,23 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchServerStatus, ServerStatusState } from '../../../redux/slices/api/serverStatus';
 import { AppDispatch } from '../../../redux/store';
+import { useServerConnection } from './useServerConnection';
 
-const ServerStatusComponent = () => {
+interface ServerStatusComponentProps {
+  debug?: boolean;
+}
+
+const ServerStatusComponent: React.FC<ServerStatusComponentProps> = ({ debug }) => {
   const dispatch = useDispatch<AppDispatch>();
   const serverStatus = useSelector((state: { serverStatus: ServerStatusState }) => state.serverStatus);
 
   useEffect(() => {
     dispatch(fetchServerStatus());
   }, [dispatch]);
+
+  if (!debug) {
+    return null;
+  }
 
   return (
     <div>
@@ -22,4 +31,5 @@ const ServerStatusComponent = () => {
   );
 };
 
+export { useServerConnection };
 export default ServerStatusComponent;
