@@ -46,7 +46,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         <AppWrapper>
           {children}
         </AppWrapper>
-        </StyledThemeProvider>
+      </StyledThemeProvider>
     </ThemeContext.Provider>
   );
 };
