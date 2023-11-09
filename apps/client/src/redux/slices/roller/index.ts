@@ -1,6 +1,3 @@
-import roller, { fetchRolls } from './roller';
+import roller, { executeNewRoll, setRolls } from './roller';
 
-export {
-  roller,
-  fetchRolls,
-};
+export { roller, executeNewRoll, setRolls };

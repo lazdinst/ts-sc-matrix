@@ -1,24 +1,12 @@
-
-
-export interface Theme {
+export interface SharedTheme {
   colors: {
-    background: string;
-    text: string;
-    primary: string;
-    secondary: string;
-    accentColor: string;
     statusColors: {
       success: string;
       error: string;
       warning: string;
       info: string;
     };
-    surfaces: {
-      navBg: string;
-      mainBg: string;
-      sectionBg: string;
-      articleBg: string;
-    }
+    accentColor: string;
   };
   spacing: {
     unit: number;
@@ -49,11 +37,45 @@ export interface Theme {
   };
 }
 
+export interface Theme extends SharedTheme {
+  colors: {
+    background: string;
+    text: string;
+    primary: string;
+    secondary: string;
+    accentColor: string;
+    statusColors: {
+      success: string;
+      error: string;
+      warning: string;
+      info: string;
+    };
+    surfaces: {
+      navBg: string;
+      mainBg: string;
+      sectionBg: string;
+      articleBg: string;
+    };
+  };
+}
+
 const statusColors = {
   success: '#28a745',
   error: '#dc3545',
   warning: '#ffc107',
   info: '#17a2b8',
+};
+
+const buttonColors = {
+  primary: '#007bff',
+  secondary: '#6c757d',
+  success: '#28a745',
+  error: '#dc3545',
+  warning: '#ffc107',
+  info: '#17a2b8',
+  light: '#f8f9fa',
+  dark: '#343a40',
+  link: '#007bff',
 };
 
 const accentColor = '#007bff';
@@ -87,36 +109,41 @@ const spacing = {
   extraLarge: '32px',
 };
 
-// Dark mode theme
-export const darkTheme: Theme = {
+const sharedTheme = {
+  spacing: spacing,
+  typography: typography,
+  components: components,
   colors: {
+    accentColor: accentColor,
+    statusColors: statusColors,
+  },
+};
+
+export const darkTheme: Theme = {
+  ...sharedTheme,
+  colors: {
+    ...sharedTheme.colors,
     background: '#36393f',
     text: '#ffffff',
     primary: '#ededed',
     secondary: '#80848e',
-    statusColors: statusColors,
-    accentColor: accentColor,
     surfaces: {
       navBg: '#1e1f22',
       mainBg: '#2b2d31',
       sectionBg: '#202225',
       articleBg: '#36393f',
-    }
+    },
   },
-  spacing: spacing,
-  typography: typography,
-  components: components,
 };
 
-// Light mode theme
 export const lightTheme: Theme = {
+  ...sharedTheme,
   colors: {
+    ...sharedTheme.colors,
     background: '#f0f0f0',
     text: '#333',
     primary: '#007bff',
     secondary: '#6c757d',
-    statusColors: statusColors,
-    accentColor: accentColor,
     surfaces: {
       navBg: '#007bff',
       mainBg: '#f0f0f0',
@@ -124,7 +151,4 @@ export const lightTheme: Theme = {
       articleBg: '#f0f0f0',
     }
   },
-  spacing: spacing,
-  typography: typography,
-  components: components,
 };

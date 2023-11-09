@@ -1,48 +1,47 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchRolls } from '../../../redux/slices/roller/roller';
+import { executeNewRoll } from '../../../redux/slices/roller/roller';
+import { ServerStatusState } from '../../../redux/slices/api/serverStatus';
+import Page from '../../components/Page';
+import Button from '../../components/Button';
 
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { playerOneRoll, playerTwoRoll, loading, error } = useSelector(
+  const { playerOne, playerTwo, loading, error } = useSelector(
     (state: RootState) => state.roller
   );
 
+  const serverStatus = useSelector(
+    (state: { serverStatus: ServerStatusState }) => state.serverStatus
+  );
+
   const handleRollButtonClick = () => {
-    dispatch(fetchRolls());
+    dispatch(executeNewRoll());
   };
 
-
   return (
-    <div>
+    <Page
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="flex-start"
+      gap="16px"
+    >
       <h2>Roller</h2>
-      <button onClick={handleRollButtonClick} disabled={loading}>
+      <div>{JSON.stringify(serverStatus)}</div>
+      <Button
+        isLoading={loading}
+        onClick={handleRollButtonClick}
+        disabled={loading}
+        variant="success"
+      >
         Roll
-      </button>
+      </Button>
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error}</p>}
-      {playerOneRoll.length > 0 && (
-        <div>
-          <h3>Player One Roll:</h3>
-          <ul>
-            {playerOneRoll.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {playerTwoRoll.length > 0 && (
-        <div>
-          <h3>Player Two Roll:</h3>
-          <ul>
-            {playerTwoRoll.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+      {JSON.stringify(playerOne)}
+      {JSON.stringify(playerTwo)}
+    </Page>
   );
 };
 

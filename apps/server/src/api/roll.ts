@@ -14,7 +14,9 @@ router.get('/', async (req, res) => {
     res.json(rolls);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to retrieve rolls from the database' });
+    res
+      .status(500)
+      .json({ error: 'Failed to retrieve rolls from the database' });
   }
 });
 
@@ -29,7 +31,7 @@ router.post('/', async (req, res) => {
 
   try {
     const io = getIO();
-    io.emit('roll', [playerOne, playerTwo]);
+    io.emit('roll', { playerOne, playerTwo });
 
     res.json([playerOne, playerTwo]);
   } catch (err) {
