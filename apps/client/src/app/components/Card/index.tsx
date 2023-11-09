@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Player } from '../../../redux/slices/roller/roller';
 import { getSymbolImageByRace, parseUnitName } from '../../utils';
+import minerals from '../../../assets/images/minerals.gif';
+import vespene from '../../../assets/images/vespene.gif';
 
 const Card = styled.div`
   background: #2c2f33;
@@ -11,6 +13,7 @@ const Card = styled.div`
   flex-direction: column;
   align-items: center;
   width: calc(100% - 20px);
+  max-width: 300px;
   height: auto;
   padding: 2vw;
   box-sizing: border-box;
@@ -39,10 +42,26 @@ const UnitContainer = styled.div`
   flex-direction: column;
   gap: 5px;
   width: 100%;
+  color: ${(props) => props.theme.colors.primary || 'inherit'};
 `;
 
-const UnitDetails = styled.div``;
+const UnitDetails = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+`;
 const UnitName = styled.span``;
+
+const UnitResources = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const UnitResourceImg = styled.img`
+  margin-right: 6px;
+`;
 
 interface CardComponentProps {
   player: Player;
@@ -52,14 +71,34 @@ const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
   const { race, units, name } = player;
   const { symbol } = getSymbolImageByRace(race);
   const imageAlt = race;
+
+  const handleUnitClick = (id: string, name: string, index: number) => {
+    console.log('clicked', id);
+    if (index === 0) {
+      console.log('first unit');
+    }
+  };
+
   return (
     <Card>
       <CardImage src={symbol} alt={imageAlt} />
       <CardHeader>{race}</CardHeader>
+      <CardHeader>{name}</CardHeader>
       <UnitContainer>
         {units &&
           units.map((unit, index) => (
-            <UnitDetails key={index}>
+            <UnitDetails
+              key={unit._id}
+              onClick={() => handleUnitClick(unit._id, name, index)}
+            >
+              <UnitResources>
+                <UnitResourceImg src={minerals} alt="mins" />
+                {unit.mins}
+              </UnitResources>
+              <UnitResources>
+                <UnitResourceImg src={vespene} alt="vespene" />
+                {unit.gas}
+              </UnitResources>
               <UnitName>{parseUnitName(unit.name)}</UnitName>
             </UnitDetails>
           ))}
