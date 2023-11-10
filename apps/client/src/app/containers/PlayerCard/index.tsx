@@ -21,7 +21,7 @@ import {
   UnitType,
 } from '../../components/Card';
 
-const RadioButton = styled.input.attrs({ type: 'checkbox' })``;
+const CheckBox = styled.input.attrs({ type: 'checkbox' })``;
 
 interface RadioToggleButtonProps {
   id: string;
@@ -48,7 +48,7 @@ function RadioToggleButton({
 
   return (
     <label>
-      <RadioButton checked={selectedIds.includes(id)} onChange={handleToggle} />
+      <CheckBox checked={selectedIds.includes(id)} onChange={handleToggle} />
     </label>
   );
 }

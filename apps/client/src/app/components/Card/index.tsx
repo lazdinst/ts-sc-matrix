@@ -3,7 +3,7 @@ import { UnitTypes } from '../../../redux/slices/roller/roller';
 
 const Card = styled.div`
   background: #2c2f33;
-  border-radius: 2px;
+  border-radius: 4px;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -13,6 +13,7 @@ const Card = styled.div`
   height: auto;
   padding: 2vw;
   box-sizing: border-box;
+  border: 1px solid #23272a;
 `;
 
 const raceColors = {
@@ -64,10 +65,10 @@ const CardHeader = styled.h3<CardHeaderProps>`
 const CardSubHeader = styled.div`
   background-color: ${(props) =>
     props.theme.colors.surfaces.sectionBg || 'inherit'};
-  border-radius: 8px;
+  border-radius: 4px;
   margin: 10px 0;
   width: 100%;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
 
   & > h3 {
     font-weight: bold;
@@ -83,14 +84,19 @@ const CardSubHeader = styled.div`
 
 const UnitContainer = styled.div`
   display: flex;
+  background-color: ${(props) =>
+    props.theme.colors.surfaces.sectionBg || 'inherit'};
   flex-direction: column;
   gap: 5px;
   width: 100%;
   color: ${(props) => props.theme.colors.primary || 'inherit'};
+  border-radius: 4px;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
 `;
 
 const UnitWrapper = styled.div`
   display: flex;
+  margin: 0.25rem 0.5rem;
 `;
 
 const UnitDetails = styled.div`
@@ -105,6 +111,7 @@ const UnitActions = styled.div`
   display: flex;
   justify-content: flex-end;
   padding-right: 10px;
+  align-items: center;
 `;
 
 const UnitName = styled.div`
