@@ -1,32 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { randomFloat } from './utils';
-import Point from './Point';
+import MatrixLetter from './MatrixLetter';
 import settings from './settings';
+import charArr from './charArr';
 
-const CanvasContainer = styled.div`
+const fontSize = 8;
+
+const MatrixContainer = styled.div`
   display: flex;
   position: relative;
   width: 100%;
   height: 100%;
 `;
 
-const CanvasComponent = styled.canvas`
+const MatrixCanvasComponent = styled.canvas`
   display: block;
   position: absolute;
   top: 0;
   left: 0;
 `;
 
-export interface CanvasProps {
-  charArr: string[];
-  fontSize: number;
-}
-
-const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
+const Matrix: React.FC = () => {
   const canvas1Ref = useRef<HTMLCanvasElement | null>(null);
   const canvas2Ref = useRef<HTMLCanvasElement | null>(null);
-  const [pointMatrix, setPointMatrix] = useState<Point[]>([]);
+  const [pointMatrix, setPointMatrix] = useState<MatrixLetter[]>([]);
   const requestRef = useRef<number | null>(null);
 
   const cw = window.innerWidth;
@@ -72,12 +70,12 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
   };
 
   const generatePointMatrix = () => {
-    const matrix: Point[] = [];
+    const matrix: MatrixLetter[] = [];
     const {
       initial: { start, end },
     } = settings;
     for (let i = 0; i < maxColums; i++) {
-      matrix.push(new Point(i * fontSize, randomFloat(start, end)));
+      matrix.push(new MatrixLetter(i * fontSize, randomFloat(start, end)));
     }
 
     return matrix;
@@ -139,15 +137,15 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
   }, [pointMatrix]);
 
   return (
-    <CanvasContainer>
-      <CanvasComponent ref={canvas1Ref}>
+    <MatrixContainer>
+      <MatrixCanvasComponent ref={canvas1Ref}>
         Canvas is not supported in your browser.
-      </CanvasComponent>
-      <CanvasComponent ref={canvas2Ref}>
+      </MatrixCanvasComponent>
+      <MatrixCanvasComponent ref={canvas2Ref}>
         Canvas is not supported in your browser.
-      </CanvasComponent>
-    </CanvasContainer>
+      </MatrixCanvasComponent>
+    </MatrixContainer>
   );
 };
 
-export default Canvas;
+export default Matrix;

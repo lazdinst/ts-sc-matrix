@@ -1,7 +1,7 @@
 import { randomFloat, randomInt } from './utils';
 import settings from './settings';
 
-class Point {
+class MatrixLetter {
   private x: number;
   private y: number;
   private value = '';
@@ -40,4 +40,4 @@ class Point {
   }
 }
 
-export default Point;
+export default MatrixLetter;
