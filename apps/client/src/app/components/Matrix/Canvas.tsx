@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Point from './Point'; // Import the Point component you created
-import { randomFloat } from './utils';
 import styled from 'styled-components';
-import { get } from 'http';
+import { randomFloat } from './utils';
+import Point from './Point';
+import settings from './settings';
 
 const CanvasContainer = styled.div`
   display: flex;
@@ -18,9 +18,7 @@ const CanvasComponent = styled.canvas`
   left: 0;
 `;
 
-interface CanvasProps {
-  ctx1: CanvasRenderingContext2D | null;
-  cxtx2: CanvasRenderingContext2D | null;
+export interface CanvasProps {
   charArr: string[];
   fontSize: number;
 }
@@ -29,6 +27,7 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
   const canvas1Ref = useRef<HTMLCanvasElement | null>(null);
   const canvas2Ref = useRef<HTMLCanvasElement | null>(null);
   const [pointMatrix, setPointMatrix] = useState<Point[]>([]);
+  const requestRef = useRef<number | null>(null);
 
   const cw = window.innerWidth;
   const ch = window.innerHeight;
@@ -74,9 +73,11 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
 
   const generatePointMatrix = () => {
     const matrix: Point[] = [];
-
+    const {
+      initial: { start, end },
+    } = settings;
     for (let i = 0; i < maxColums; i++) {
-      matrix.push(new Point(i * fontSize, randomFloat(-500, 0)));
+      matrix.push(new Point(i * fontSize, randomFloat(start, end)));
     }
 
     return matrix;
@@ -87,7 +88,6 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
     ctx2: CanvasRenderingContext2D | null | undefined
   ) => {
     if (!ctx1 || !ctx2) {
-      console.log("Can't clear. No context");
       return;
     }
 
@@ -97,7 +97,6 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
     if (ctx2) {
       ctx2.clearRect(0, 0, cw, ch);
     }
-    console.log('Cleared');
   };
 
   const updatePointMatrix = (
@@ -105,31 +104,39 @@ const Canvas: React.FC<CanvasProps> = ({ charArr, fontSize }) => {
     ctx2: CanvasRenderingContext2D | null | undefined
   ) => {
     clearPointMatrix(ctx1, ctx2);
+    if (pointMatrix.length) {
+      let i = pointMatrix.length;
 
-    let i = pointMatrix.length;
-
-    while (i--) {
-      pointMatrix[i].draw(ctx1!, ctx2!, charArr, fontSize, ch);
+      while (i--) {
+        pointMatrix[i].draw(ctx1!, ctx2!, charArr, fontSize, ch);
+      }
     }
 
-    requestAnimationFrame(() => updatePointMatrix(ctx1, ctx2));
+    requestRef.current = requestAnimationFrame(() =>
+      updatePointMatrix(ctx1, ctx2)
+    );
   };
 
   useEffect(() => {
-    const { ctx1, ctx2 } = getCanvasContext();
     const { canvas1, canvas2 } = getCanvas();
-
     const pointMatrix = generatePointMatrix();
     setPointMatrix(pointMatrix);
 
     if (canvas1 && canvas2) {
       intializeCanvas(canvas1, canvas2);
     }
+  }, []);
 
-    clearPointMatrix(ctx1, ctx2);
+  useEffect(() => {
+    const { ctx1, ctx2 } = getCanvasContext();
     updatePointMatrix(ctx1, ctx2);
-    console.log(ctx1, ctx2);
-  }, [setPointMatrix]);
+
+    return () => {
+      if (requestRef.current !== null) {
+        cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [pointMatrix]);
 
   return (
     <CanvasContainer>

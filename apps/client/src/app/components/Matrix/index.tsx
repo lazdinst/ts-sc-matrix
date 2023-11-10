@@ -5,7 +5,7 @@ import charArr from './charArr';
 const MatrixEffect: React.FC = () => {
   return (
     <>
-      <Canvas charArr={charArr} fontSize={8} />
+      <Canvas charArr={charArr} fontSize={8} />;
     </>
   );
 };

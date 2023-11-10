@@ -1,4 +1,5 @@
 import { randomFloat, randomInt } from './utils';
+import settings from './settings';
 
 class Point {
   private x: number;
@@ -19,7 +20,7 @@ class Point {
     ch: number
   ) {
     this.value = charArr[randomInt(0, charArr.length - 1)].toUpperCase();
-    this.speed = randomFloat(0.5, 2);
+    this.speed = randomFloat(settings.speed.min, settings.speed.max);
 
     ctx2.fillStyle = 'rgba(255,255,255,0.8)';
     ctx2.font = `${fontSize}px san-serif`;
@@ -30,9 +31,11 @@ class Point {
     ctx1.fillText(this.value, this.x, this.y);
 
     this.y += this.speed;
+    console.log(this.y, ch);
+
     if (this.y > ch) {
-      this.y = randomFloat(-100, 0);
-      this.speed = randomFloat(2, 5);
+      this.y = randomFloat(settings.initial.start, settings.initial.end);
+      this.speed = randomFloat(settings.speed.min, settings.speed.max);
     }
   }
 }
