@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { UnitTypes } from '../../../redux/slices/roller/roller';
 
 const Card = styled.div`
   background: #2c2f33;
@@ -8,7 +9,7 @@ const Card = styled.div`
   flex-direction: column;
   align-items: center;
   width: calc(100% - 20px);
-  max-width: 400px;
+  max-width: 500px;
   height: auto;
   padding: 2vw;
   box-sizing: border-box;
@@ -88,18 +89,55 @@ const UnitContainer = styled.div`
   color: ${(props) => props.theme.colors.primary || 'inherit'};
 `;
 
+const UnitWrapper = styled.div`
+  display: flex;
+`;
+
 const UnitDetails = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 16px;
+  width: 100%;
 `;
-const UnitName = styled.span``;
+
+const UnitActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+`;
+
+const UnitName = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
+
+const typeColors = {
+  core: 'red',
+  harass: 'orange',
+  caster: 'yellow',
+  gnd_mass: 'green',
+  air_support: 'blue',
+  devastator: 'indigo',
+  air_mass: 'violet',
+  unknown: 'red',
+};
+
+export interface UnitTypeProps {
+  type?: UnitTypes;
+}
+
+const UnitType = styled.div<UnitTypeProps>`
+  font-size: 0.75rem;
+  color: ${(props) => (props.type ? typeColors[props.type] : 'red')};
+`;
 
 const UnitResources = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  min-width: 64px;
 `;
 
 const UnitResourceImg = styled.img`
@@ -118,4 +156,7 @@ export {
   UnitName,
   UnitResources,
   UnitResourceImg,
+  UnitActions,
+  UnitWrapper,
+  UnitType,
 };

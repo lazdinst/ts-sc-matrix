@@ -25,15 +25,23 @@ export interface SharedTheme {
     fontFamily: string;
   };
   components: {
-    buttonRadius: string;
-    buttonPadding: string;
-    buttonShadow: string;
+    button: {
+      text: string;
+      borderRadius: string;
+      padding: string;
+      boxShadow: string;
+      borderColor: string;
+    };
     inputBorderRadius: string;
     inputPadding: string;
     inputShadow: string;
     panelPadding: string;
     panelBorderRadius: string;
     panelShadow: string;
+    popover: {
+      borderRadius: string;
+      shadow: string;
+    };
   };
 }
 
@@ -88,13 +96,17 @@ const typography = {
   lineHeightSmall: '1.2',
   lineHeightMedium: '1.5',
   lineHeightLarge: '1.8',
-  fontFamily: 'Arial, sans-serif',
+  fontFamily: '"Times New Roman", sans-serif',
 };
 
 const components = {
-  buttonRadius: '4px',
-  buttonPadding: '10px 20px',
-  buttonShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+  button: {
+    text: '#ededed',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    borderColor: '#212121',
+  },
   inputBorderRadius: '4px',
   inputPadding: '8px',
   inputShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
@@ -150,7 +162,7 @@ export const lightTheme: Theme = {
     text: '#333',
     primary: '#007bff',
     secondary: '#6c757d',
-    borderColor: '#6c757d',
+    borderColor: '#424242',
     surfaces: {
       navBg: '#007bff',
       mainBg: '#f0f0f0',

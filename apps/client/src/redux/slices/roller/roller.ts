@@ -18,9 +18,20 @@ export interface Unit {
   name: string;
   mins: number;
   gas: number;
-  type: string;
+  type: UnitTypes;
   __v: number;
 }
+
+export type UnitTypes =
+  | 'core'
+  | 'harass'
+  | 'core'
+  | 'caster'
+  | 'gnd_mass'
+  | 'air_support'
+  | 'devastator'
+  | 'air_mass'
+  | 'unknown';
 
 export interface Player {
   name: string;

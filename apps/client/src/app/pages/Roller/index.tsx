@@ -48,16 +48,17 @@ const Roller: React.FC = () => {
           alignItems="center"
           gap="16px"
           width="100%"
+          padding="3rem 0rem"
         >
           <PlayerCard player={playerOne} />
           <PlayerCard player={playerTwo} />
         </Section>
-        <Section justifyContent="center">
+        <Section justifyContent="center" height="100%">
           <Button
             isLoading={loading}
             onClick={handleRollButtonClick}
             disabled={loading}
-            variant="success"
+            variant="primary"
           >
             Roll
           </Button>

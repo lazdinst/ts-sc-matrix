@@ -8,19 +8,45 @@ interface ButtonProps {
 const Button = styled.button<ButtonProps>`
   padding: 20px 100px 18px 100px;
   border: none;
-  border-radius: 4px;
   font-size: 16px;
+  font-family: 'eurostile';
   position: relative;
-  border-radius: 10px;
+  border-radius: ${(props) =>
+    props.theme.components.button.borderRadius || 'inherit'};
   transition: all 0.1s ease-in-out;
+  box-shadow: ${(props) => props.theme.components.button.boxShadow || 'none'};
   cursor: pointer;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid
+      ${(props) => props.theme.components.button.borderColor || 'inherit'};
+    border-radius: ${(props) =>
+      props.theme.components.button.borderRadius || 'inherit'};
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  &:active {
+    transform: translateY(2px);
+  }
+
+  &:active::before {
+    opacity: 1;
+  }
 
   ${(props) => {
     const { theme, variant, isLoading } = props;
 
     let styles = {
-      backgroundColor: theme.colors.primary || 'inherit',
-      color: theme.colors.white || 'inherit',
+      backgroundColor: theme.colors.accentColor || 'inherit',
+      color: theme.components.button.text || 'inherit',
     };
 
     switch (variant) {
@@ -31,7 +57,6 @@ const Button = styled.button<ButtonProps>`
         break;
       case 'success':
         styles.backgroundColor = theme.colors.statusColors.success;
-        styles.color = theme.colors.primary || 'inherit';
         break;
       case 'error':
         styles.backgroundColor = theme.colors.statusColors.error;
