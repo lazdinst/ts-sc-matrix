@@ -7,6 +7,17 @@ export interface SharedTheme {
       info: string;
     };
     accentColor: string;
+    neutrals: {
+      100: string;
+      200: string;
+      300: string;
+      400: string;
+      500: string;
+      600: string;
+      700: string;
+      800: string;
+      900: string;
+    };
   };
   spacing: {
     unit: number;
@@ -116,6 +127,17 @@ const sharedTheme = {
   colors: {
     accentColor: accentColor,
     statusColors: statusColors,
+    neutrals: {
+      100: '#121212',
+      200: '#282828',
+      300: '#3f3f3f',
+      400: '#575757',
+      500: '#717171',
+      600: '#8b8b8b',
+      700: '#616161',
+      800: '#424242',
+      900: '#212121',
+    },
   },
 };
 
@@ -149,6 +171,6 @@ export const lightTheme: Theme = {
       mainBg: '#f0f0f0',
       sectionBg: '#ffffff',
       articleBg: '#f0f0f0',
-    }
+    },
   },
 };

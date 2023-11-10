@@ -13,7 +13,7 @@ const Card = styled.div`
   flex-direction: column;
   align-items: center;
   width: calc(100% - 20px);
-  max-width: 300px;
+  max-width: 350px;
   height: auto;
   padding: 2vw;
   box-sizing: border-box;
@@ -32,9 +32,31 @@ const CardHeader = styled.h3`
   color: #fff;
   text-transform: uppercase;
   font-weight: 500;
-  font-size: 20px;
-  text-shadow: 0 0 9px #06f, 0 0 2px #fff;
+  font-size: 26px;
+  text-shadow: 0 0 9px ${(props) => props.theme.colors.accentColor || 'inherit'},
+    0 0 2px ${(props) => props.theme.colors.primary || 'inherit'};
   margin: 10px 0;
+`;
+
+const CardSubHeader = styled.div`
+  background-color: ${(props) =>
+    props.theme.colors.surfaces.sectionBg || 'inherit'};
+  border-radius: 8px;
+  margin: 10px 0;
+  width: 100%;
+  & > h3 {
+    font-weight: bold;
+    text-align: center;
+    font-family: 'eurostile';
+    text-transform: uppercase;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 18px;
+    text-shadow: 0 0 9px
+        ${(props) => props.theme.colors.accentColor || 'inherit'},
+      0 0 2px ${(props) => props.theme.colors.primary || 'inherit'};
+  }
 `;
 
 const UnitContainer = styled.div`
@@ -83,12 +105,14 @@ const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
     <Card>
       <CardImage src={symbol} alt={imageAlt} />
       <CardHeader>{race}</CardHeader>
-      <CardHeader>{name}</CardHeader>
+      <CardSubHeader>
+        <h3>{name}</h3>
+      </CardSubHeader>
       <UnitContainer>
         {units &&
           units.map((unit, index) => (
             <UnitDetails
-              key={unit._id}
+              key={`${name}${unit._id}`}
               onClick={() => handleUnitClick(unit._id, name, index)}
             >
               <UnitResources>
