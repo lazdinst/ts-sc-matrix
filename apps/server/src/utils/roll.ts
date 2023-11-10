@@ -1,4 +1,3 @@
-import { roll } from '.';
 import { IUnit } from '../models/Unit';
 
 function rollRace(): string {
