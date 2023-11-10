@@ -111,17 +111,21 @@ const UnitName = styled.div`
   display: flex;
   width: 100%;
   flex-direction: column;
+  & > span {
+    font-family: 'eurostile';
+    font-size: 1.25rem;
+  }
 `;
 
 const typeColors = {
-  core: 'red',
-  harass: 'orange',
-  caster: 'yellow',
-  gnd_mass: 'green',
-  air_support: 'blue',
-  devastator: 'indigo',
-  air_mass: 'violet',
-  unknown: 'red',
+  core: '#F04747',
+  harass: '#FAA61A',
+  caster: '#f0ce47',
+  gnd_mass: '#43B581',
+  air_support: '#4785f0',
+  devastator: '#4a47f0',
+  air_mass: '#9e47f0',
+  unknown: '#d747f0',
 };
 
 export interface UnitTypeProps {
@@ -129,8 +133,12 @@ export interface UnitTypeProps {
 }
 
 const UnitType = styled.div<UnitTypeProps>`
-  font-size: 0.75rem;
   color: ${(props) => (props.type ? typeColors[props.type] : 'red')};
+  font-size: 1rem;
+  font-family: 'eurostile';
+  font-weight: 600;
+  letter-spacing: 0.05rem;
+  font-variant: small-caps;
 `;
 
 const UnitResources = styled.div`
@@ -138,6 +146,7 @@ const UnitResources = styled.div`
   justify-content: flex-start;
   align-items: center;
   min-width: 64px;
+  font-family: 'eurostile';
 `;
 
 const UnitResourceImg = styled.img`

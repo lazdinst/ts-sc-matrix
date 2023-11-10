@@ -4,8 +4,7 @@ import { Player } from '../../../redux/slices/roller/roller';
 import { getSymbolImageByRace, parseUnitName } from '../../utils';
 import minerals from '../../../assets/images/minerals.gif';
 import vespene from '../../../assets/images/vespene.gif';
-
-import Popover from '../../components/Popoover';
+import { UnitTypes } from '../../../redux/slices/roller/roller';
 import {
   Card,
   CardImage,
@@ -68,18 +67,27 @@ function splitPlayer(name: string) {
   }
 }
 
-function getUnitSummary(unit: any) {
-  const removeKeys = ['__v', '_id'];
-  const unitSummary = Object.keys(unit)
-    .filter((key) => {
-      if (!removeKeys.includes(key)) {
-        return `${key}: ${unit[key]}`;
-      }
-    })
-    .map((key) => {
-      return <>{`${key}:${unit[key]} `}</>;
-    });
-  return unitSummary;
+function getUnitTypeDisplayName(type: UnitTypes) {
+  const unitTypeDisplayNameMap = {
+    core: 'core',
+    harass: 'harass',
+    caster: 'caster',
+    gnd_mass: 'ground massive',
+    air_support: 'air support',
+    devastator: 'devastator',
+    air_mass: 'air massive',
+    unknown: 'unknown',
+  };
+
+  function capitalizeWords(type: string) {
+    return type
+      .split(' ')
+      .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+      .join(' ');
+  }
+
+  const displayName = capitalizeWords(unitTypeDisplayNameMap[type]);
+  return displayName;
 }
 
 const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
@@ -114,10 +122,10 @@ const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
                   {unit.gas}
                 </UnitResources>
                 <UnitName>
-                  <Popover position="right" content={unit.type}>
-                    {parseUnitName(unit.name)}
-                  </Popover>
-                  <UnitType type={unit.type}>{unit.type}</UnitType>
+                  <span>{parseUnitName(unit.name)}</span>
+                  <UnitType type={unit.type}>
+                    {getUnitTypeDisplayName(unit.type)}
+                  </UnitType>
                 </UnitName>
               </UnitDetails>
               <UnitActions>
