@@ -1,5 +1,3 @@
-import serverStatus from './serverStatus';
+import server from './server';
 
-export {
-  serverStatus,
-};
+export { server };

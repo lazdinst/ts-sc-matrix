@@ -22,7 +22,7 @@ interface ServerStatusResponse {
 }
 
 export const fetchServerStatus = createAsyncThunk<ServerStatusResponse, void>(
-  'serverStatus/fetchServerStatus',
+  'server/fetchServerStatus',
   async () => {
     const uri = `${API_URL}/api/status`;
     const response = await axios.get<ServerStatusResponse>(uri);
@@ -30,10 +30,14 @@ export const fetchServerStatus = createAsyncThunk<ServerStatusResponse, void>(
   }
 );
 
-export type FetchServerStatusAction = AsyncThunkAction<ServerStatusState, void, object>;
+export type FetchServerStatusAction = AsyncThunkAction<
+  ServerStatusState,
+  void,
+  object
+>;
 
-const serverStatus = createSlice({
-  name: 'serverStatus',
+const server = createSlice({
+  name: 'server',
   initialState,
   reducers: {
     connected: (state) => {
@@ -67,5 +71,5 @@ const serverStatus = createSlice({
 });
 
 export type { ServerStatusState };
-export const { connected, disconnected, setError, clearError } = serverStatus.actions;
-export default serverStatus.reducer;
+export const { connected, disconnected, setError, clearError } = server.actions;
+export default server.reducer;

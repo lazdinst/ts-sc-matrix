@@ -1,11 +1,12 @@
-import React, { ReactNode } from "react";
-import styled from "styled-components";
+import React, { ReactNode } from 'react';
+import styled from 'styled-components';
 
 const Main = styled.main`
   display: flex;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  height: 100%;
 `;
 
 interface MainComponentProps {

@@ -1,9 +1,17 @@
-html, body {
-    margin: 0;
-    padding: 0;
-  }
+@font-face {
+  font-family: 'eurostile';
+  font-weight: 900;
+  src: local('eurostile'),
+    url(./src/assets/fonts/Eurostile_Extended_Regular.ttf) format('truetype');
+}
 
-  body {
-    background-color: #000;
-    font-family: Arial, sans-serif;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #000;
+  font-family: 'Roboto', sans-serif;
+}

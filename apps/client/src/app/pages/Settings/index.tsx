@@ -2,10 +2,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import ThemeManager from '../../containers/ThemeManager';
 import ServerStatusComponent from '../../containers/ServerStatus';
-import { WebSocketState } from '../../../redux/slices/websocket';
+import { WebSocketState } from '../../../redux/slices/websocket/websocket';
 
 const Settings = () => {
-  const websocketState = useSelector((state: { websocket: WebSocketState }) => state.websocket);
+  const websocketState = useSelector(
+    (state: { websocket: WebSocketState }) => state.websocket
+  );
 
   return (
     <div>
@@ -13,10 +15,13 @@ const Settings = () => {
       <hr />
       <ThemeManager />
       <hr />
-      <ServerStatusComponent />
+      <ServerStatusComponent debug />
       <div>
         <h2>WebSocket State:</h2>
-        <p>Connection Status: {websocketState?.isConnected ? 'Connected' : 'Disconnected'}</p>
+        <p>
+          Connection Status:{' '}
+          {websocketState?.connected ? 'Connected' : 'Disconnected'}
+        </p>
       </div>
     </div>
   );

@@ -1,50 +1,110 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAction,
+  createAsyncThunk,
+  PayloadAction,
+} from '@reduxjs/toolkit';
 import axios from 'axios';
 
-interface RollerState {
+const defaultPlayerRoll = {
+  name: '',
+  race: '',
+  units: [],
+};
+
+export interface Unit {
+  _id: string;
+  race: string;
+  name: string;
+  mins: number;
+  gas: number;
+  type: UnitTypes;
+  __v: number;
+}
+
+export type UnitTypes =
+  | 'core'
+  | 'harass'
+  | 'core'
+  | 'caster'
+  | 'gnd_mass'
+  | 'air_support'
+  | 'devastator'
+  | 'air_mass'
+  | 'unknown';
+
+export interface Player {
+  name: string;
+  race: string;
+  units: Unit[];
+}
+
+export interface Roll {
+  playerOne: Player;
+  playerTwo: Player;
+}
+
+export interface RollerState {
   loading: boolean;
   error: string | null;
-  playerOneRoll: string[];
-  playerTwoRoll: string[];
+  playerOne: Player;
+  playerTwo: Player;
+}
+
+export interface RollerState extends Roll {
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: RollerState = {
   loading: false,
   error: null,
-  playerOneRoll: [],
-  playerTwoRoll: [],
+  playerOne: defaultPlayerRoll,
+  playerTwo: defaultPlayerRoll,
 };
 
 const DEFAULT_API_URL = 'http://localhost:6969';
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
-export const fetchRolls = createAsyncThunk('roller/fetchRolls', async () => {
-  const uri = `${API_URL}/api/roll`;
-  const response = await axios.post(uri);
-  return response.data;
-});
+export const executeNewRoll = createAsyncThunk(
+  'roller/executeNewRoll',
+  async () => {
+    const uri = `${API_URL}/api/roll`;
+    const response = await axios.post(uri);
+    return response.data;
+  }
+);
+
+export const setRolls = createAction<Roll>('roller/setRolls');
 
 const rollerSlice = createSlice({
   name: 'roller',
   initialState,
-  reducers: {},
+  reducers: {
+    setRolls: (state, action: PayloadAction<Roll>) => {
+      return {
+        ...state,
+        playerOne: action.payload.playerOne,
+        playerTwo: action.payload.playerTwo,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchRolls.pending, (state) => {
+      .addCase(executeNewRoll.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchRolls.fulfilled, (state, action) => {
+      .addCase(executeNewRoll.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.playerOneRoll = action.payload[0];
-        state.playerTwoRoll = action.payload[1];
       })
-      .addCase(fetchRolls.rejected, (state, action) => {
+      .addCase(executeNewRoll.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'An error occurred while fetching rolls.';
-        state.playerOneRoll = [];
-        state.playerTwoRoll = [];
+        state.error =
+          action.error.message || 'An error occurred while fetching rolls.';
+        state.playerOne = defaultPlayerRoll;
+        state.playerTwo = defaultPlayerRoll;
       });
   },
 });

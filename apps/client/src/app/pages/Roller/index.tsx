@@ -1,48 +1,70 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchRolls } from '../../../redux/slices/roller/roller';
+import { executeNewRoll } from '../../../redux/slices/roller/roller';
+import { ServerStatusState } from '../../../redux/slices/api/server';
+import { WebSocketState } from '../../../redux/slices/websocket/websocket';
+import {
+  Page,
+  Button,
+  Section,
+  Card,
+  SecondarySidebar,
+} from '../../components';
+
+import PlayerCard from '../../containers/PlayerCard';
 
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { playerOneRoll, playerTwoRoll, loading, error } = useSelector(
+  const { playerOne, playerTwo, loading, error } = useSelector(
     (state: RootState) => state.roller
   );
 
+  const server = useSelector(
+    (state: { server: ServerStatusState }) => state.server
+  );
+  const websocket = useSelector(
+    (state: { websocket: WebSocketState }) => state.websocket
+  );
+
   const handleRollButtonClick = () => {
-    dispatch(fetchRolls());
+    if (server.connected && websocket.connected) {
+      dispatch(executeNewRoll());
+    }
   };
 
-
   return (
-    <div>
-      <h2>Roller</h2>
-      <button onClick={handleRollButtonClick} disabled={loading}>
-        Roll
-      </button>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      {playerOneRoll.length > 0 && (
-        <div>
-          <h3>Player One Roll:</h3>
-          <ul>
-            {playerOneRoll.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {playerTwoRoll.length > 0 && (
-        <div>
-          <h3>Player Two Roll:</h3>
-          <ul>
-            {playerTwoRoll.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    <>
+      <SecondarySidebar>dfew</SecondarySidebar>
+      <Page
+        id="roller-page"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap="16px"
+      >
+        <Section
+          justifyContent="space-evenly"
+          alignItems="center"
+          gap="16px"
+          width="100%"
+          padding="3rem 0rem"
+        >
+          <PlayerCard player={playerOne} />
+          <PlayerCard player={playerTwo} />
+        </Section>
+        <Section justifyContent="center" height="100%">
+          <Button
+            isLoading={loading}
+            onClick={handleRollButtonClick}
+            disabled={loading}
+            variant="primary"
+          >
+            Roll
+          </Button>
+        </Section>
+      </Page>
+    </>
   );
 };
 

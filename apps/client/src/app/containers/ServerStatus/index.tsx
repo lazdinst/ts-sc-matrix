@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchServerStatus, ServerStatusState } from '../../../redux/slices/api/serverStatus';
+import {
+  fetchServerStatus,
+  ServerStatusState,
+} from '../../../redux/slices/api/server';
 import { AppDispatch } from '../../../redux/store';
 import { useServerConnection } from './useServerConnection';
 
@@ -8,13 +11,19 @@ interface ServerStatusComponentProps {
   debug?: boolean;
 }
 
-const ServerStatusComponent: React.FC<ServerStatusComponentProps> = ({ debug }) => {
+const ServerStatusComponent: React.FC<ServerStatusComponentProps> = ({
+  debug,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const serverStatus = useSelector((state: { serverStatus: ServerStatusState }) => state.serverStatus);
+  const server = useSelector(
+    (state: { server: ServerStatusState }) => state.server
+  );
 
-  useEffect(() => {
-    dispatch(fetchServerStatus());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   if (debug) {
+  //     dispatch(fetchServerStatus());
+  //   }
+  // }, [dispatch, debug]); // Add dispatch and debug to the dependency array
 
   if (!debug) {
     return null;
@@ -23,13 +32,17 @@ const ServerStatusComponent: React.FC<ServerStatusComponentProps> = ({ debug }) 
   return (
     <div>
       <h2>Server Status</h2>
-      {serverStatus.loading && <p>Loading...</p>}
-      {serverStatus.error && <p>Error: {serverStatus.error}</p>}
-      {serverStatus.connected && <p>Connected</p>}
-      {!serverStatus.connected && <p>Disconnected</p>}
+      <button type="button" onClick={() => dispatch(fetchServerStatus())}>
+        Refresh
+      </button>
+      {server.loading && <p>Loading...</p>}
+      {server.error && <p>Error: {server.error}</p>}
+      {server.connected && <p>Connected</p>}
+      {!server.connected && <p>Disconnected</p>}
     </div>
   );
 };
 
 export { useServerConnection };
 export default ServerStatusComponent;
+1;
