@@ -12,6 +12,8 @@ import {
   SecondarySidebar,
 } from '../../components';
 
+import PlayerCard from '../../containers/PlayerCard';
+
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { playerOne, playerTwo, loading, error } = useSelector(
@@ -47,8 +49,8 @@ const Roller: React.FC = () => {
           gap="16px"
           width="100%"
         >
-          <Card player={playerOne} />
-          <Card player={playerTwo} />
+          <PlayerCard player={playerOne} />
+          <PlayerCard player={playerTwo} />
         </Section>
         <Section justifyContent="center">
           <Button

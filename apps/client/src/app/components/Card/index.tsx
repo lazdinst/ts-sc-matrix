@@ -1,9 +1,4 @@
-import React from 'react';
 import styled from 'styled-components';
-import { Player } from '../../../redux/slices/roller/roller';
-import { getSymbolImageByRace, parseUnitName } from '../../utils';
-import minerals from '../../../assets/images/minerals.gif';
-import vespene from '../../../assets/images/vespene.gif';
 
 const Card = styled.div`
   background: #2c2f33;
@@ -13,18 +8,42 @@ const Card = styled.div`
   flex-direction: column;
   align-items: center;
   width: calc(100% - 20px);
-  max-width: 350px;
+  max-width: 400px;
   height: auto;
   padding: 2vw;
   box-sizing: border-box;
 `;
 
-const CardImage = styled.img`
+const raceColors = {
+  zerg: 'purple',
+  terran: 'red',
+  protoss: 'cyan',
+};
+
+export type ShadowColor = 'zerg' | 'terran' | 'protoss';
+
+export interface CardImageProps {
+  shadowColor?: ShadowColor;
+}
+
+const CardImage = styled.img<CardImageProps>`
   height: 25%;
   width: auto;
+  filter: drop-shadow(
+      0 0 0.25rem
+        ${(props) =>
+          props.shadowColor
+            ? raceColors[props.shadowColor]
+            : props.theme.colors.accentColor}
+    )
+    drop-shadow(0 0 0.75rem black);
 `;
 
-const CardHeader = styled.h3`
+export interface CardHeaderProps {
+  textShadow?: 'zerg' | 'terran' | 'protoss';
+}
+
+const CardHeader = styled.h3<CardHeaderProps>`
   font-weight: bold;
   text-align: center;
   font-family: 'eurostile';
@@ -32,9 +51,12 @@ const CardHeader = styled.h3`
   color: #fff;
   text-transform: uppercase;
   font-weight: 500;
-  font-size: 26px;
-  text-shadow: 0 0 9px ${(props) => props.theme.colors.accentColor || 'inherit'},
-    0 0 2px ${(props) => props.theme.colors.primary || 'inherit'};
+  font-size: 2rem;
+  text-shadow: 0 0 1.25rem
+    ${(props) =>
+      props.textShadow
+        ? raceColors[props.textShadow]
+        : props.theme.colors.accentColor};
   margin: 10px 0;
 `;
 
@@ -44,6 +66,8 @@ const CardSubHeader = styled.div`
   border-radius: 8px;
   margin: 10px 0;
   width: 100%;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+
   & > h3 {
     font-weight: bold;
     text-align: center;
@@ -52,10 +76,7 @@ const CardSubHeader = styled.div`
     color: #fff;
     text-transform: uppercase;
     font-weight: 500;
-    font-size: 18px;
-    text-shadow: 0 0 9px
-        ${(props) => props.theme.colors.accentColor || 'inherit'},
-      0 0 2px ${(props) => props.theme.colors.primary || 'inherit'};
+    font-size: 1.25rem;
   }
 `;
 
@@ -85,50 +106,16 @@ const UnitResourceImg = styled.img`
   margin-right: 6px;
 `;
 
-interface CardComponentProps {
-  player: Player;
-}
+export default Card;
 
-const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
-  const { race, units, name } = player;
-  const { symbol } = getSymbolImageByRace(race);
-  const imageAlt = race;
-
-  const handleUnitClick = (id: string, name: string, index: number) => {
-    console.log('clicked', id);
-    if (index === 0) {
-      console.log('first unit');
-    }
-  };
-
-  return (
-    <Card>
-      <CardImage src={symbol} alt={imageAlt} />
-      <CardHeader>{race}</CardHeader>
-      <CardSubHeader>
-        <h3>{name}</h3>
-      </CardSubHeader>
-      <UnitContainer>
-        {units &&
-          units.map((unit, index) => (
-            <UnitDetails
-              key={`${name}${unit._id}`}
-              onClick={() => handleUnitClick(unit._id, name, index)}
-            >
-              <UnitResources>
-                <UnitResourceImg src={minerals} alt="mins" />
-                {unit.mins}
-              </UnitResources>
-              <UnitResources>
-                <UnitResourceImg src={vespene} alt="vespene" />
-                {unit.gas}
-              </UnitResources>
-              <UnitName>{parseUnitName(unit.name)}</UnitName>
-            </UnitDetails>
-          ))}
-      </UnitContainer>
-    </Card>
-  );
+export {
+  Card,
+  CardImage,
+  CardHeader,
+  CardSubHeader,
+  UnitContainer,
+  UnitDetails,
+  UnitName,
+  UnitResources,
+  UnitResourceImg,
 };
-
-export default CardComponent;

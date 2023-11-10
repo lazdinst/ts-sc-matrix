@@ -7,17 +7,6 @@ export interface SharedTheme {
       info: string;
     };
     accentColor: string;
-    neutrals: {
-      100: string;
-      200: string;
-      300: string;
-      400: string;
-      500: string;
-      600: string;
-      700: string;
-      800: string;
-      900: string;
-    };
   };
   spacing: {
     unit: number;
@@ -55,6 +44,7 @@ export interface Theme extends SharedTheme {
     primary: string;
     secondary: string;
     accentColor: string;
+    borderColor: string;
     statusColors: {
       success: string;
       error: string;
@@ -111,6 +101,10 @@ const components = {
   panelPadding: '20px',
   panelBorderRadius: '8px',
   panelShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  popover: {
+    borderRadius: '4px',
+    shadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+  },
 };
 const spacing = {
   unit: 8,
@@ -127,17 +121,6 @@ const sharedTheme = {
   colors: {
     accentColor: accentColor,
     statusColors: statusColors,
-    neutrals: {
-      100: '#121212',
-      200: '#282828',
-      300: '#3f3f3f',
-      400: '#575757',
-      500: '#717171',
-      600: '#8b8b8b',
-      700: '#616161',
-      800: '#424242',
-      900: '#212121',
-    },
   },
 };
 
@@ -149,6 +132,7 @@ export const darkTheme: Theme = {
     text: '#ffffff',
     primary: '#ededed',
     secondary: '#80848e',
+    borderColor: '#80848e',
     surfaces: {
       navBg: '#1e1f22',
       mainBg: '#2b2d31',
@@ -166,6 +150,7 @@ export const lightTheme: Theme = {
     text: '#333',
     primary: '#007bff',
     secondary: '#6c757d',
+    borderColor: '#6c757d',
     surfaces: {
       navBg: '#007bff',
       mainBg: '#f0f0f0',
@@ -174,3 +159,15 @@ export const lightTheme: Theme = {
     },
   },
 };
+
+// neutrals: {
+//   100: '#121212',
+//   200: '#282828',
+//   300: '#3f3f3f',
+//   400: '#575757',
+//   500: '#717171',
+//   600: '#8b8b8b',
+//   700: '#616161',
+//   800: '#424242',
+//   900: '#212121',
+// },
