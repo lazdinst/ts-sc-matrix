@@ -5,9 +5,15 @@ import Sidebar from './containers/Sidebar';
 import Main from './components/Main';
 import Loader from './components/Loader';
 import { useServerConnection } from './containers/ServerStatus';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
+import Auth from './pages/Auth';
 
 const App: React.FC = () => {
   const { connected, error, loading } = useServerConnection();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.user.isAuthenticated
+  );
 
   let content = null;
 
@@ -21,10 +27,14 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider>
-      <Sidebar />
-      <Main>
-        { content }
-      </Main>
+      {isAuthenticated ? (
+        <>
+          <Sidebar />
+          <Main>{content}</Main>
+        </>
+      ) : (
+        <Auth />
+      )}
     </ThemeProvider>
   );
 };
