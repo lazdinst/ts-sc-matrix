@@ -21,7 +21,7 @@ function rollUnit(units: IUnit[], previousUnits: string[]): IUnit {
     return null;
   }
 
-  if (!previousUnits) {
+  if (!previousUnits.length) {
     const coreUnits = units.filter((unit) => unit.type === 'core');
     return coreUnits[Math.floor(Math.random() * coreUnits.length)];
   }
@@ -43,22 +43,15 @@ export function performRoll(
 ): { name: string; race: string; units: IUnit[] } {
   const race = rollRace();
   const unitsByRace = units.filter((unit) => unit.race === race);
+  const ROLL_COUNT = 4;
   const unavailableUnits = [];
-  const rolledUnits = [];
-  const ROLL_COUNT = 3;
 
-  const coreUnit = rollUnit(unitsByRace, null);
-  unavailableUnits.push(coreUnit.name);
-  rolledUnits.push(coreUnit);
-
-  for (let i = 0; i < ROLL_COUNT; i++) {
+  const rolledUnits = Array.from({ length: ROLL_COUNT }, () => {
     const roll = rollUnit(unitsByRace, unavailableUnits);
     unavailableUnits.push(roll.name);
-    rolledUnits.push(roll);
-  }
+    return roll;
+  });
 
-  console.log(unavailableUnits);
-  console.log(rolledUnits);
   const playerRoll = {
     name: playerName,
     race,
