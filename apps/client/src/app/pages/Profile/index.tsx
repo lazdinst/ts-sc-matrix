@@ -1,11 +1,8 @@
-import React from "react";
+import React from 'react';
+import Matrix from '../../components/Matrix';
 
 const Profile = () => {
-    return (
-        <div>
-            Profile
-        </div>
-    )
+  return <Matrix />;
 };
 
 export default Profile;
