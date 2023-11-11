@@ -6,7 +6,7 @@ export function randomFloat(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
-export function intializeCanvas(
+export function setCanvasDimensions(
   canvas: HTMLCanvasElement,
   width: number,
   height: number
@@ -29,7 +29,7 @@ export function clearPointMatrix(
     return;
   }
 
-  letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
   letterTrailCanvasContext.fillRect(0, 0, width, height);
 
   if (letterCanvasContext) {

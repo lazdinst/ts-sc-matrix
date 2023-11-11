@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { randomFloat, intializeCanvas, clearPointMatrix } from './utils';
+import { randomFloat, setCanvasDimensions, clearPointMatrix } from './utils';
 import MatrixLetter from './MatrixLetter';
 import settings from './settings';
 
@@ -24,7 +24,7 @@ const MatrixCanvasComponent = styled.canvas`
 const Matrix: React.FC = () => {
   const letterTrailCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const letterCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [pointMatrix, setPointMatrix] = useState<MatrixLetter[]>([]);
+  const [matrixLetters, setMatrixLetters] = useState<MatrixLetter[]>([]);
   const requestRef = useRef<number | null>(null);
   const [canvasWidth, setCanvasWidth] = useState<number>(0);
   const [canvasHeight, setCanvasHeight] = useState<number>(0);
@@ -55,7 +55,7 @@ const Matrix: React.FC = () => {
     };
   };
 
-  const generatePointMatrix = (columnCount: number) => {
+  const generateMatrixLetters = (columnCount: number) => {
     const matrix: MatrixLetter[] = [];
     const {
       position: { start, end },
@@ -79,11 +79,11 @@ const Matrix: React.FC = () => {
       canvasWidth,
       canvasHeight
     );
-    if (pointMatrix.length) {
-      let i = pointMatrix.length;
+    if (matrixLetters.length) {
+      let i = matrixLetters.length;
       if (letterTrailCanvasContext && letterCanvasContext) {
         while (i--) {
-          pointMatrix[i].draw(
+          matrixLetters[i].draw(
             letterTrailCanvasContext,
             letterCanvasContext,
             canvasHeight
@@ -98,21 +98,21 @@ const Matrix: React.FC = () => {
   };
 
   useEffect(() => {
-    setCanvasWidth(window.innerWidth);
+    const { letterTrailCanvas, letterCanvas } = getCanvas();
     setCanvasHeight(window.innerHeight);
+    setCanvasWidth(window.innerWidth);
     setMaxColumns(window.innerWidth / fontSize);
+
+    if (letterTrailCanvas && letterCanvas) {
+      setCanvasDimensions(letterTrailCanvas, window.innerWidth, canvasHeight);
+      setCanvasDimensions(letterCanvas, window.innerWidth, canvasHeight);
+    }
   }, []);
 
   useEffect(() => {
-    const { letterTrailCanvas, letterCanvas } = getCanvas();
-    const pointMatrix = generatePointMatrix(maxColumns);
-    setPointMatrix(pointMatrix);
-
-    if (letterTrailCanvas && letterCanvas) {
-      intializeCanvas(letterTrailCanvas, window.innerWidth, canvasHeight);
-      intializeCanvas(letterCanvas, window.innerWidth, canvasHeight);
-    }
-  }, [setPointMatrix, canvasWidth, canvasHeight, maxColumns]);
+    const matrix = generateMatrixLetters(maxColumns);
+    setMatrixLetters(matrix);
+  }, [setMatrixLetters, maxColumns]);
 
   useEffect(() => {
     const { letterTrailCanvasContext, letterCanvasContext } =
@@ -124,7 +124,7 @@ const Matrix: React.FC = () => {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [pointMatrix]);
+  }, [matrixLetters]);
 
   return (
     <MatrixContainer>

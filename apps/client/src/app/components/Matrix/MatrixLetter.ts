@@ -1,38 +1,63 @@
 import { randomFloat, randomInt } from './utils';
 import settings from './settings';
 import data from './data';
-import { set } from 'mongoose';
+
+const letterColors = {};
 
 class MatrixLetter {
   private column: number;
   private verticalPostion: number;
   private letter = '';
+  private boost = false;
   private speed = 0;
+  private letterCanvas: CanvasRenderingContext2D | null | undefined;
+  private letterTrailCanvas: CanvasRenderingContext2D | null | undefined;
 
-  constructor(column: number, verticalPostion: number) {
+  constructor(
+    column: number,
+    verticalPostion: number
+    // letterCanvas: CanvasRenderingContext2D,
+    // letterTrailCanvas: CanvasRenderingContext2D
+  ) {
     this.column = column;
     this.verticalPostion = verticalPostion;
+
+    // TODO working on this boosting feature
+    this.boost = randomFloat(0.1, 10) > 9.9;
+    console.log(this.boost);
   }
+  private setCanvasMatrix() {
+    console.log('setCanvasMatrix');
+  }
+  private getRandomLetter() {
+    this.letter = data[randomInt(0, data.length - 1)].toUpperCase();
+  }
+
+  private resetLetterPosition() {
+    this.verticalPostion = randomFloat(
+      settings.position.start,
+      settings.position.end
+    );
+    this.speed = randomFloat(settings.speed.min, settings.speed.max);
+  }
+
+  // private sendLetterToCanvas() {
+  //   letterCanvas.fillStyle = 'rgba(255,255,255,1)';
+  //   letterCanvas.font = `${settings.letterSize}px san-serif`;
+  //   letterCanvas.fillText(this.letter, this.column, this.verticalPostion);
+  // }
+
+  // sendLetterTrailToCanvas() {
+
+  // sendRandomBackgroundLetterToCanvas() {
 
   public draw(
     letterTrailCanvas: CanvasRenderingContext2D,
     letterCanvas: CanvasRenderingContext2D,
     height: number
   ) {
-    this.letter = data[randomInt(0, data.length - 1)].toUpperCase();
+    this.getRandomLetter();
     this.speed = randomFloat(settings.speed.min, settings.speed.max);
-
-    // const count = 10;
-    // for (let i = 0; i < count; i++) {
-    //   const letter = data[randomInt(0, data.length - 1)].toUpperCase();
-    //   letterCanvas.fillStyle = `rgba(255,255,255,${i / count})`;
-    //   letterCanvas.font = `${settings.letterSize}px san-serif`;
-    //   letterCanvas.fillText(
-    //     letter,
-    //     this.column,
-    //     this.verticalPostion - settings.letterSize
-    //   );
-    // }
 
     letterCanvas.fillStyle = 'rgba(255,255,255,1)';
     letterCanvas.font = `${settings.letterSize}px san-serif`;
@@ -42,28 +67,18 @@ class MatrixLetter {
     letterTrailCanvas.font = `${settings.letterSize}px san-serif`;
     letterTrailCanvas.fillText(this.letter, this.column, this.verticalPostion);
 
-    letterTrailCanvas.fillStyle = 'black';
+    letterTrailCanvas.fillStyle = 'rgba(0,0,0,0.7)';
     letterTrailCanvas.fillRect(
       this.column,
-      this.verticalPostion - 175,
+      this.verticalPostion - 100,
       settings.letterSize,
       3 // 3 is the best value for the trail
     );
 
     this.verticalPostion += this.speed;
-    if (this.verticalPostion - 150 > height) {
-      this.verticalPostion = randomFloat(
-        settings.position.start,
-        settings.position.end
-      );
 
-      letterTrailCanvas.fillStyle = '#000';
-      letterTrailCanvas.fillRect(
-        this.column,
-        0,
-        settings.letterSize,
-        window.innerHeight
-      );
+    if (this.verticalPostion - 100 > height) {
+      this.resetLetterPosition();
       this.speed = randomFloat(settings.speed.min, settings.speed.max);
     }
   }
