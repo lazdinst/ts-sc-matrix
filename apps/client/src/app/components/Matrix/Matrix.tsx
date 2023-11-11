@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { randomFloat, setCanvasDimensions, clearPointMatrix } from './utils';
+import { randomFloat } from './utils';
 import MatrixLetter from './MatrixLetter';
 import settings from './settings';
 
@@ -26,9 +26,11 @@ const Matrix: React.FC = () => {
   const letterCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [matrixLetters, setMatrixLetters] = useState<MatrixLetter[]>([]);
   const requestRef = useRef<number | null>(null);
-  const [canvasWidth, setCanvasWidth] = useState<number>(0);
-  const [canvasHeight, setCanvasHeight] = useState<number>(0);
-  const [maxColumns, setMaxColumns] = useState<number>(0);
+  const [canvasWidth, setCanvasWidth] = useState<number>(window.innerWidth);
+  const [canvasHeight, setCanvasHeight] = useState<number>(window.innerHeight);
+  const [maxColumns, setMaxColumns] = useState<number>(
+    window.innerWidth / fontSize
+  );
 
   const getCanvasContext = () => {
     const letterTrailCanvas = letterTrailCanvasRef.current;
@@ -41,7 +43,28 @@ const Matrix: React.FC = () => {
     };
   };
 
-  const getCanvas = (): {
+  // const setCanvasDimensions = () => {
+  //   const { letterTrailCanvas, letterCanvas } = getCanvasElements();
+  //   if (letterTrailCanvas && letterCanvas) {
+  //     setCanvasWidth(window.innerWidth);
+  //     setCanvasHeight(window.innerHeight);
+  //     setMaxColumns(window.innerWidth / fontSize);
+  //   }
+  // };
+
+  const setCanvasDimensionAttributes = (
+    canvas: HTMLCanvasElement,
+    width: number,
+    height: number
+  ) => {
+    if (canvas) {
+      canvas.setAttribute('width', width.toString());
+      canvas.setAttribute('height', height.toString());
+    }
+    return;
+  };
+
+  const getCanvasElements = (): {
     letterTrailCanvas: HTMLCanvasElement | null;
     letterCanvas: HTMLCanvasElement | null;
   } => {
@@ -97,21 +120,43 @@ const Matrix: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    const { letterTrailCanvas, letterCanvas } = getCanvas();
-    setCanvasHeight(window.innerHeight);
-    setCanvasWidth(window.innerWidth);
-    setMaxColumns(window.innerWidth / fontSize);
-
-    if (letterTrailCanvas && letterCanvas) {
-      setCanvasDimensions(letterTrailCanvas, window.innerWidth, canvasHeight);
-      setCanvasDimensions(letterCanvas, window.innerWidth, canvasHeight);
+  const clearPointMatrix = (
+    letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined,
+    letterCanvasContext: CanvasRenderingContext2D | null | undefined,
+    width: number,
+    height: number
+  ) => {
+    console.log('clearPointMatrix');
+    if (!letterTrailCanvasContext || !letterCanvasContext) {
+      return;
     }
-  }, []);
+
+    letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    letterTrailCanvasContext.fillRect(0, 0, width, height);
+
+    if (letterCanvasContext) {
+      letterCanvasContext.clearRect(0, 0, width, height);
+    }
+  };
 
   useEffect(() => {
+    const { letterTrailCanvas, letterCanvas } = getCanvasElements();
+
     const matrix = generateMatrixLetters(maxColumns);
     setMatrixLetters(matrix);
+
+    if (letterTrailCanvas && letterCanvas) {
+      setCanvasDimensionAttributes(
+        letterTrailCanvas,
+        window.innerWidth,
+        canvasHeight
+      );
+      setCanvasDimensionAttributes(
+        letterCanvas,
+        window.innerWidth,
+        canvasHeight
+      );
+    }
   }, [setMatrixLetters, maxColumns]);
 
   useEffect(() => {
