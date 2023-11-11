@@ -1,40 +1,40 @@
 import { randomFloat, randomInt } from './utils';
 import settings from './settings';
+import data from './data';
 
 class MatrixLetter {
-  private x: number;
-  private y: number;
-  private value = '';
+  private column: number;
+  private verticalPostion: number;
+  private letter = '';
   private speed = 0;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  constructor(column: number, verticalPostion: number) {
+    this.column = column;
+    this.verticalPostion = verticalPostion;
   }
 
   public draw(
-    ctx1: CanvasRenderingContext2D,
-    ctx2: CanvasRenderingContext2D,
-    charArr: string[],
-    fontSize: number,
-    ch: number
+    letterTrailCanvas: CanvasRenderingContext2D,
+    letterCanvas: CanvasRenderingContext2D,
+    canvasHeight: number
   ) {
-    this.value = charArr[randomInt(0, charArr.length - 1)].toUpperCase();
+    this.letter = data[randomInt(0, data.length - 1)].toUpperCase();
     this.speed = randomFloat(settings.speed.min, settings.speed.max);
 
-    ctx2.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx2.font = `${fontSize}px san-serif`;
-    ctx2.fillText(this.value, this.x, this.y);
+    letterCanvas.fillStyle = 'rgba(255,255,255,0.8)';
+    letterCanvas.font = `${settings.letterSize}px san-serif`;
+    letterCanvas.fillText(this.letter, this.column, this.verticalPostion);
 
-    ctx1.fillStyle = '#0F0';
-    ctx1.font = `${fontSize}px san-serif`;
-    ctx1.fillText(this.value, this.x, this.y);
+    letterTrailCanvas.fillStyle = '#0F0';
+    letterTrailCanvas.font = `${settings.letterSize}px san-serif`;
+    letterTrailCanvas.fillText(this.letter, this.column, this.verticalPostion);
 
-    this.y += this.speed;
-    console.log(this.y, ch);
-
-    if (this.y > ch) {
-      this.y = randomFloat(settings.initial.start, settings.initial.end);
+    this.verticalPostion += this.speed;
+    if (this.verticalPostion > canvasHeight) {
+      this.verticalPostion = randomFloat(
+        settings.position.start,
+        settings.position.end
+      );
       this.speed = randomFloat(settings.speed.min, settings.speed.max);
     }
   }

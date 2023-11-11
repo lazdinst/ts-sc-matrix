@@ -1,10 +1,10 @@
 import React from 'react';
-import Canvas from './Canvas';
+import Matrix from './Matrix';
 
 const MatrixEffect: React.FC = () => {
   return (
     <>
-      <Canvas />;
+      <Matrix />;
     </>
   );
 };

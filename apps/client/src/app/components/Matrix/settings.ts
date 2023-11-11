@@ -1,6 +1,6 @@
-const settings = {
+export default {
   //https://codepen.io/riazxrazor/pen/Gjomdp
-  initial: {
+  position: {
     start: -1000,
     end: 0,
   },
@@ -8,6 +8,5 @@ const settings = {
     min: 0.01,
     max: 5,
   },
+  letterSize: 10,
 };
-
-export default settings;
