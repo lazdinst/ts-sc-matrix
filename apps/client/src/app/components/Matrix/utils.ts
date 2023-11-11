@@ -5,6 +5,7 @@ export function randomInt(min: number, max: number) {
 export function randomFloat(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
+
 export function intializeCanvas(
   canvas: HTMLCanvasElement,
   width: number,
@@ -23,6 +24,7 @@ export function clearPointMatrix(
   width: number,
   height: number
 ) {
+  console.log('clearPointMatrix');
   if (!letterTrailCanvasContext || !letterCanvasContext) {
     return;
   }

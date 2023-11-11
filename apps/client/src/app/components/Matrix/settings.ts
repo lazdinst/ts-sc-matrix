@@ -8,5 +8,5 @@ export default {
     min: 0.01,
     max: 5,
   },
-  letterSize: 10,
+  letterSize: 14,
 };

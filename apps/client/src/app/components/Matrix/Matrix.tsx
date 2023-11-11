@@ -19,10 +19,11 @@ const MatrixCanvasComponent = styled.canvas`
   top: 0;
   left: 0;
 `;
+// background-color: black;
 
 const Matrix: React.FC = () => {
-  const canvas1Ref = useRef<HTMLCanvasElement | null>(null);
-  const canvas2Ref = useRef<HTMLCanvasElement | null>(null);
+  const letterTrailCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const letterCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [pointMatrix, setPointMatrix] = useState<MatrixLetter[]>([]);
   const requestRef = useRef<number | null>(null);
   const [canvasWidth, setCanvasWidth] = useState<number>(0);
@@ -30,9 +31,9 @@ const Matrix: React.FC = () => {
   const [maxColumns, setMaxColumns] = useState<number>(0);
 
   const getCanvasContext = () => {
-    const letterTrailCanvas = canvas1Ref.current;
+    const letterTrailCanvas = letterTrailCanvasRef.current;
     const letterTrailCanvasContext = letterTrailCanvas?.getContext('2d');
-    const letterCanvas = canvas2Ref.current;
+    const letterCanvas = letterCanvasRef.current;
     const letterCanvasContext = letterCanvas?.getContext('2d');
     return {
       letterTrailCanvasContext,
@@ -44,8 +45,9 @@ const Matrix: React.FC = () => {
     letterTrailCanvas: HTMLCanvasElement | null;
     letterCanvas: HTMLCanvasElement | null;
   } => {
-    const letterTrailCanvas = canvas1Ref.current as HTMLCanvasElement | null;
-    const letterCanvas = canvas2Ref.current as HTMLCanvasElement | null;
+    const letterTrailCanvas =
+      letterTrailCanvasRef.current as HTMLCanvasElement | null;
+    const letterCanvas = letterCanvasRef.current as HTMLCanvasElement | null;
 
     return {
       letterTrailCanvas,
@@ -79,13 +81,14 @@ const Matrix: React.FC = () => {
     );
     if (pointMatrix.length) {
       let i = pointMatrix.length;
-
-      while (i--) {
-        pointMatrix[i].draw(
-          letterTrailCanvasContext!,
-          letterCanvasContext!,
-          canvasHeight
-        );
+      if (letterTrailCanvasContext && letterCanvasContext) {
+        while (i--) {
+          pointMatrix[i].draw(
+            letterTrailCanvasContext,
+            letterCanvasContext,
+            canvasHeight
+          );
+        }
       }
     }
 
@@ -95,32 +98,21 @@ const Matrix: React.FC = () => {
   };
 
   useEffect(() => {
-    const { letterTrailCanvas, letterCanvas } = getCanvas();
-
-    // set canvas width and height
     setCanvasWidth(window.innerWidth);
     setCanvasHeight(window.innerHeight);
     setMaxColumns(window.innerWidth / fontSize);
-
-    const pointMatrix = generatePointMatrix(window.innerWidth);
-    setPointMatrix(pointMatrix);
-
-    // if (letterTrailCanvas && letterCanvas) {
-    //   console.log('intialize canvas', canvasWidth, canvasHeight);
-    //   intializeCanvas(letterTrailCanvas, canvasWidth, canvasHeight);
-    //   intializeCanvas(letterCanvas, canvasWidth, canvasHeight);
-    // }
-  }, [setPointMatrix]);
+  }, []);
 
   useEffect(() => {
     const { letterTrailCanvas, letterCanvas } = getCanvas();
+    const pointMatrix = generatePointMatrix(maxColumns);
+    setPointMatrix(pointMatrix);
 
     if (letterTrailCanvas && letterCanvas) {
-      console.log('intialize canvas', canvasWidth, canvasHeight);
       intializeCanvas(letterTrailCanvas, window.innerWidth, canvasHeight);
       intializeCanvas(letterCanvas, window.innerWidth, canvasHeight);
     }
-  }, [canvasWidth, canvasHeight]);
+  }, [setPointMatrix, canvasWidth, canvasHeight, maxColumns]);
 
   useEffect(() => {
     const { letterTrailCanvasContext, letterCanvasContext } =
@@ -136,10 +128,10 @@ const Matrix: React.FC = () => {
 
   return (
     <MatrixContainer>
-      <MatrixCanvasComponent ref={canvas1Ref}>
+      <MatrixCanvasComponent ref={letterTrailCanvasRef}>
         Canvas is not supported in your browser.
       </MatrixCanvasComponent>
-      <MatrixCanvasComponent ref={canvas2Ref}>
+      <MatrixCanvasComponent ref={letterCanvasRef}>
         Canvas is not supported in your browser.
       </MatrixCanvasComponent>
     </MatrixContainer>
