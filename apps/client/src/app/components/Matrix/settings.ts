@@ -5,8 +5,8 @@ export default {
     end: 0,
   },
   speed: {
-    min: 0.01,
-    max: 10,
+    min: 0.1, // 0.01
+    max: 1,
   },
   letterSize: 14,
 };
