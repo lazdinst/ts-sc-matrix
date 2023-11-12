@@ -1,11 +1,10 @@
 import React from 'react';
-import Canvas from './Canvas'; // Import the Canvas component (placeholder)
-import charArr from './charArr';
+import Matrix from './Matrix';
 
 const MatrixEffect: React.FC = () => {
   return (
     <>
-      <Canvas charArr={charArr} fontSize={8} />;
+      <Matrix />;
     </>
   );
 };
