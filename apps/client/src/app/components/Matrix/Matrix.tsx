@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { randomFloat } from './utils';
 import MatrixLetter from './MatrixLetter';
 import settings from './settings';
-import { set } from 'mongoose';
 
 const fontSize = 10;
 
@@ -45,10 +44,6 @@ const Matrix: React.FC = () => {
       letterCanvasContext,
       letterTrailCanvasContext,
     };
-  };
-
-  const sleep = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
   const setCanvasDimensions = () => {

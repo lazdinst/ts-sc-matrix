@@ -9,4 +9,5 @@ export default {
     max: 1,
   },
   letterSize: 14,
+  font: 'monospace',
 };
