@@ -1,9 +1,6 @@
 import { randomFloat, randomInt } from './utils';
 import settings from './settings';
 import data from './data';
-import { off } from 'process';
-
-const letterColors = {};
 
 class MatrixLetter {
   private column: number;
@@ -16,7 +13,7 @@ class MatrixLetter {
   private letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined;
   private canvasHeight: number;
   private offset = settings.letterSize;
-  private letterTrailLength = 10;
+  private letterTrailLength = 30;
   private drawDelay = 20; // 20 is the best value for the trail
   private currentDrawDelay = 0;
   private delayedStart = false;
@@ -35,7 +32,6 @@ class MatrixLetter {
     this.letterTrailCanvasContext = letterTrailCanvasContext;
     this.getRandomLetter();
 
-    this.letterTrailLength = 20;
     this.offset = this.letterTrailLength * settings.letterSize;
 
     this.resetBoost();
@@ -55,7 +51,7 @@ class MatrixLetter {
   }
 
   private resetBoost() {
-    this.boost = randomFloat(0.1, 10) > 9;
+    this.boost = randomFloat(0.1, 10) > 6;
   }
 
   private resetLetterPosition() {
@@ -71,11 +67,11 @@ class MatrixLetter {
     context: CanvasRenderingContext2D,
     color?: string
   ) {
-    context.fillStyle = color ?? 'rgba(255,255,255,1)';
+    context.fillStyle = color ?? settings.letterColor;
     context.font = `${settings.letterSize}px ${settings.font}`;
     context.fillText(letter, this.column, this.verticalPostion);
 
-    context.shadowColor = 'white';
+    context.shadowColor = settings.letterColor;
     context.shadowOffsetX = 0;
     context.shadowOffsetY = 0;
     context.shadowBlur = 10;
@@ -86,18 +82,16 @@ class MatrixLetter {
     canvas: CanvasRenderingContext2D,
     color?: string
   ) {
-    canvas.fillStyle = color ?? '#0F0';
     canvas.font = `${settings.letterSize}px ${settings.font}`;
-
     letters.forEach((letter, index) => {
-      const isRandomLetterChange = randomFloat(0, 1) > 0.99;
+      const isRandomLetterChange = randomFloat(0, 1) > 0.95;
       if (isRandomLetterChange) {
         letters[index] = this.getRandomLetter();
       }
+      const letterOpacity = (letters.length - index) / letters.length;
+      // hsl(152 100% 50% / 0.5)
 
-      canvas.fillStyle = `rgba(0,255,0,${
-        (letters.length - index) / letters.length
-      })`;
+      canvas.fillStyle = `rgba(0,255, 136,${letterOpacity})`;
       canvas.fillText(
         letters[index],
         this.column,
@@ -105,16 +99,31 @@ class MatrixLetter {
       );
     });
 
-    canvas.fillStyle = 'rgba(0,0,0,0.7)';
-    canvas.fillRect(
-      this.column,
-      this.verticalPostion,
-      settings.letterSize,
-      3 // 3 is the best value for the trail
-    );
+    // canvas.fillStyle = 'rgba(0,0,0,0.7)';
+    // canvas.fillRect(
+    //   this.column,
+    //   this.verticalPostion,
+    //   settings.letterSize,
+    //   3 // 3 is the best value for the trail
+    // );
   }
 
   // sendRandomBackgroundLetterToCanvas() {
+
+  private clearLetterCanvas() {
+    if (!this.letterTrailCanvasContext || !this.letterCanvasContext) {
+      throw new Error('Canvas contexts are not available.');
+      return;
+    }
+
+    this.letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    this.letterTrailCanvasContext.fillRect(
+      this.column,
+      this.verticalPostion,
+      64,
+      this.canvasHeight
+    );
+  }
 
   public draw(boost?: number) {
     if (!this.delayedStart) {
@@ -130,10 +139,11 @@ class MatrixLetter {
       }
       this.currentDrawDelay++;
 
-      this.speed = randomFloat(settings.speed.min, settings.speed.max);
+      // this makes a bad blur
+      // this.speed = randomFloat(settings.speed.min, settings.speed.max);
 
       if (this.boost) {
-        const boostSpeed = randomInt(1, 5);
+        const boostSpeed = randomInt(1, 2);
         this.speed += boostSpeed;
         console.log(boostSpeed);
       }
@@ -145,14 +155,13 @@ class MatrixLetter {
       if (this.letterTrailCanvasContext) {
         this.sendLetterTrailToCanvas(
           this.letters,
-          this.letterTrailCanvasContext,
-          '#0F0'
+          this.letterTrailCanvasContext
         );
       }
     }
 
     this.verticalPostion += this.speed;
-
+    this.clearLetterCanvas();
     if (this.verticalPostion - this.offset > this.canvasHeight) {
       this.resetLetterPosition();
       this.resetDelayedStart();
@@ -168,7 +177,8 @@ class MatrixLetter {
     }
 
     if (this.letterTrailCanvasContext) {
-      this.letterTrailCanvasContext.fillStyle = '#003300'; // #004700
+      this.letterTrailCanvasContext.fillStyle =
+        settings.maxtrixBackgroundLetters;
       this.letterTrailCanvasContext.font = `${settings.letterSize}px ${settings.font}`;
       this.letterTrailCanvasContext.fillText(
         letter,
