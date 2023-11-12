@@ -13,7 +13,7 @@ class MatrixLetter {
   private letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined;
   private canvasHeight: number;
   private offset = settings.letterSize;
-  private letterTrailLength = 30;
+  private letterTrailLength = 20;
   private drawDelay = 20; // 20 is the best value for the trail
   private currentDrawDelay = 0;
   private delayedStart = false;
@@ -67,45 +67,66 @@ class MatrixLetter {
     context: CanvasRenderingContext2D,
     color?: string
   ) {
+    context.shadowColor = settings.letterColor;
+    context.shadowBlur = 5;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
+
     context.fillStyle = color ?? settings.letterColor;
     context.font = `${settings.letterSize}px ${settings.font}`;
     context.fillText(letter, this.column, this.verticalPostion);
 
-    context.shadowColor = settings.letterColor;
+    // Reset the shadow properties (optional)
+    context.shadowColor = 'transparent';
+    context.shadowBlur = 0;
     context.shadowOffsetX = 0;
     context.shadowOffsetY = 0;
-    context.shadowBlur = 10;
   }
 
   private sendLetterTrailToCanvas(
     letters: string[],
-    canvas: CanvasRenderingContext2D,
+    context: CanvasRenderingContext2D,
     color?: string
   ) {
-    canvas.font = `${settings.letterSize}px ${settings.font}`;
+    context.font = `${settings.letterSize}px ${settings.font}`;
+
     letters.forEach((letter, index) => {
-      const isRandomLetterChange = randomFloat(0, 1) > 0.95;
-      if (isRandomLetterChange) {
-        letters[index] = this.getRandomLetter();
+      if (index > 0) {
+        const isRandomLetterChange = randomFloat(0, 1) > 0.99;
+        if (isRandomLetterChange) {
+          letters[index] = this.getRandomLetter();
+        }
+
+        // Calculate the lightness based on the index within the desired range (50% to 100%)
+        const minLightness = 50;
+        const maxLightness = 100;
+        const letterOpacity = (letters.length - index) / letters.length;
+        const lightness =
+          minLightness + (maxLightness - minLightness) * letterOpacity;
+
+        const fillStyle = `hsl(152, 100%, ${lightness}%)`;
+
+        context.shadowColor = '#0f0';
+        context.shadowBlur = 5;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+
+        // Use the calculated lightness in the HSL color
+        context.fillStyle = fillStyle;
+
+        context.fillText(
+          letters[index],
+          this.column,
+          this.verticalPostion - index * settings.letterSize
+        );
+
+        // Reset the shadow properties (optional)
+        context.shadowColor = 'transparent';
+        context.shadowBlur = 0;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
       }
-      const letterOpacity = (letters.length - index) / letters.length;
-      // hsl(152 100% 50% / 0.5)
-
-      canvas.fillStyle = `rgba(0,255, 136,${letterOpacity})`;
-      canvas.fillText(
-        letters[index],
-        this.column,
-        this.verticalPostion - index * settings.letterSize
-      );
     });
-
-    // canvas.fillStyle = 'rgba(0,0,0,0.7)';
-    // canvas.fillRect(
-    //   this.column,
-    //   this.verticalPostion,
-    //   settings.letterSize,
-    //   3 // 3 is the best value for the trail
-    // );
   }
 
   // sendRandomBackgroundLetterToCanvas() {
@@ -115,7 +136,6 @@ class MatrixLetter {
       throw new Error('Canvas contexts are not available.');
       return;
     }
-
     this.letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
     this.letterTrailCanvasContext.fillRect(
       this.column,
@@ -126,6 +146,8 @@ class MatrixLetter {
   }
 
   public draw(boost?: number) {
+    // this.clearLetterCanvas();
+
     if (!this.delayedStart) {
       if (this.currentDrawDelay > this.drawDelay) {
         this.firstLetter = this.getRandomLetter();
@@ -138,9 +160,6 @@ class MatrixLetter {
         }
       }
       this.currentDrawDelay++;
-
-      // this makes a bad blur
-      // this.speed = randomFloat(settings.speed.min, settings.speed.max);
 
       if (this.boost) {
         const boostSpeed = randomInt(1, 2);

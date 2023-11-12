@@ -6,7 +6,7 @@ export default {
   },
   speed: {
     min: 1, // 0.01
-    max: 5,
+    max: 2, // 5
   },
   letterSize: 18,
   font: 'monospace',
