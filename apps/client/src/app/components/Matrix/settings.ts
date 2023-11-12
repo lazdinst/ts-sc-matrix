@@ -5,7 +5,7 @@ export default {
     end: 0,
   },
   speed: {
-    min: 0.5, // 0.01
+    min: 1, // 0.01
     max: 5,
   },
   letterSize: 18,

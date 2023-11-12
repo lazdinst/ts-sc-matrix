@@ -88,10 +88,10 @@ class MatrixLetter {
       if (isRandomLetterChange) {
         letters[index] = this.getRandomLetter();
       }
-      canvas.fillStyle = color ?? settings.letterTrailColor;
-      canvas.fillStyle = `rgba(0,255, 136,${
-        (letters.length - index) / letters.length
-      })`;
+      const letterOpacity = (letters.length - index) / letters.length;
+      // hsl(152 100% 50% / 0.5)
+
+      canvas.fillStyle = `rgba(0,255, 136,${letterOpacity})`;
       canvas.fillText(
         letters[index],
         this.column,
@@ -110,6 +110,21 @@ class MatrixLetter {
 
   // sendRandomBackgroundLetterToCanvas() {
 
+  private clearLetterCanvas() {
+    if (!this.letterTrailCanvasContext || !this.letterCanvasContext) {
+      throw new Error('Canvas contexts are not available.');
+      return;
+    }
+
+    this.letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    this.letterTrailCanvasContext.fillRect(
+      this.column,
+      this.verticalPostion,
+      64,
+      this.canvasHeight
+    );
+  }
+
   public draw(boost?: number) {
     if (!this.delayedStart) {
       if (this.currentDrawDelay > this.drawDelay) {
@@ -124,6 +139,7 @@ class MatrixLetter {
       }
       this.currentDrawDelay++;
 
+      // this makes a bad blur
       // this.speed = randomFloat(settings.speed.min, settings.speed.max);
 
       if (this.boost) {
@@ -145,7 +161,7 @@ class MatrixLetter {
     }
 
     this.verticalPostion += this.speed;
-
+    this.clearLetterCanvas();
     if (this.verticalPostion - this.offset > this.canvasHeight) {
       this.resetLetterPosition();
       this.resetDelayedStart();
