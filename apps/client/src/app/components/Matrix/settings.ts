@@ -5,9 +5,12 @@ export default {
     end: 0,
   },
   speed: {
-    min: 0.1, // 0.01
-    max: 1,
+    min: 0.5, // 0.01
+    max: 5,
   },
-  letterSize: 14,
+  letterSize: 18,
   font: 'monospace',
+  letterColor: '#FFFFFF',
+  letterTrailColor: '#003300',
+  maxtrixBackgroundLetters: '#003300',
 };
