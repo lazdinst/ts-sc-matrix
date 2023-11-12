@@ -25,6 +25,9 @@ const Matrix: React.FC = () => {
   const letterTrailCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const letterCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [matrixLetters, setMatrixLetters] = useState<MatrixLetter[]>([]);
+  const [matrixLettersBackground, setMatrixLettersBackground] = useState<
+    MatrixLetter[]
+  >([]);
   const requestRef = useRef<number | null>(null);
   const [canvasWidth, setCanvasWidth] = useState<number>(window.innerWidth);
   const [canvasHeight, setCanvasHeight] = useState<number>(window.innerHeight);
@@ -38,19 +41,31 @@ const Matrix: React.FC = () => {
     const letterCanvas = letterCanvasRef.current;
     const letterCanvasContext = letterCanvas?.getContext('2d');
     return {
-      letterTrailCanvasContext,
       letterCanvasContext,
+      letterTrailCanvasContext,
     };
   };
 
-  // const setCanvasDimensions = () => {
-  //   const { letterTrailCanvas, letterCanvas } = getCanvasElements();
-  //   if (letterTrailCanvas && letterCanvas) {
-  //     setCanvasWidth(window.innerWidth);
-  //     setCanvasHeight(window.innerHeight);
-  //     setMaxColumns(window.innerWidth / fontSize);
-  //   }
-  // };
+  const setCanvasDimensions = () => {
+    const { letterTrailCanvas, letterCanvas } = getCanvasElements();
+
+    if (letterTrailCanvas && letterCanvas) {
+      setCanvasWidth(window.innerWidth);
+      setCanvasHeight(window.innerHeight);
+      setMaxColumns(window.innerWidth / fontSize);
+
+      setCanvasDimensionAttributes(
+        letterTrailCanvas,
+        window.innerWidth,
+        window.innerHeight
+      );
+      setCanvasDimensionAttributes(
+        letterCanvas,
+        window.innerWidth,
+        window.innerHeight
+      );
+    }
+  };
 
   const setCanvasDimensionAttributes = (
     canvas: HTMLCanvasElement,
@@ -79,91 +94,81 @@ const Matrix: React.FC = () => {
   };
 
   const generateMatrixLetters = (columnCount: number) => {
-    const matrix: MatrixLetter[] = [];
-    const {
-      position: { start, end },
-    } = settings;
-    for (let i = 0; i < columnCount; i++) {
-      const column = i * fontSize;
-      const randomStartPostion = randomFloat(start, end);
-      matrix.push(new MatrixLetter(column, randomStartPostion));
-    }
+    try {
+      const matrix: MatrixLetter[] = [];
+      const { letterCanvasContext, letterTrailCanvasContext } =
+        getCanvasContext();
 
-    return matrix;
+      if (!letterCanvasContext || !letterTrailCanvasContext) {
+        throw new Error('Canvas contexts are not available.');
+      }
+
+      const {
+        position: { start, end },
+      } = settings;
+
+      for (let i = 0; i < columnCount; i++) {
+        const column = i * fontSize;
+        const randomStartPostion = randomFloat(start, end);
+
+        matrix.push(
+          new MatrixLetter(
+            column,
+            canvasHeight,
+            randomStartPostion,
+            letterCanvasContext,
+            letterTrailCanvasContext
+          )
+        );
+      }
+
+      return matrix;
+    } catch (error) {
+      console.error('Error in generateMatrixLetters:', error);
+      return [];
+    }
   };
 
-  const updatePointMatrix = (
-    letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined,
-    letterCanvasContext: CanvasRenderingContext2D | null | undefined
-  ) => {
-    clearPointMatrix(
-      letterTrailCanvasContext,
-      letterCanvasContext,
-      canvasWidth,
-      canvasHeight
-    );
+  const executeLoop = () => {
+    clearCanvas();
     if (matrixLetters.length) {
       let i = matrixLetters.length;
-      if (letterTrailCanvasContext && letterCanvasContext) {
-        while (i--) {
-          matrixLetters[i].draw(
-            letterTrailCanvasContext,
-            letterCanvasContext,
-            canvasHeight
-          );
-        }
+      while (i--) {
+        matrixLetters[i].draw();
+        matrixLettersBackground[i].drawBackground(1000);
       }
     }
-
-    requestRef.current = requestAnimationFrame(() =>
-      updatePointMatrix(letterTrailCanvasContext, letterCanvasContext)
-    );
+    requestRef.current = requestAnimationFrame(() => executeLoop());
   };
 
-  const clearPointMatrix = (
-    letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined,
-    letterCanvasContext: CanvasRenderingContext2D | null | undefined,
-    width: number,
-    height: number
-  ) => {
-    console.log('clearPointMatrix');
+  const clearCanvas = () => {
+    const { letterCanvasContext, letterTrailCanvasContext } =
+      getCanvasContext();
+
     if (!letterTrailCanvasContext || !letterCanvasContext) {
+      throw new Error('Canvas contexts are not available.');
       return;
     }
 
     letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    letterTrailCanvasContext.fillRect(0, 0, width, height);
+    letterTrailCanvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
 
     if (letterCanvasContext) {
-      letterCanvasContext.clearRect(0, 0, width, height);
+      letterCanvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     }
   };
 
   useEffect(() => {
-    const { letterTrailCanvas, letterCanvas } = getCanvasElements();
-
     const matrix = generateMatrixLetters(maxColumns);
     setMatrixLetters(matrix);
+    const matrixBackground = generateMatrixLetters(maxColumns);
+    setMatrixLettersBackground(matrixBackground);
 
-    if (letterTrailCanvas && letterCanvas) {
-      setCanvasDimensionAttributes(
-        letterTrailCanvas,
-        window.innerWidth,
-        canvasHeight
-      );
-      setCanvasDimensionAttributes(
-        letterCanvas,
-        window.innerWidth,
-        canvasHeight
-      );
-    }
-  }, [setMatrixLetters, maxColumns]);
+    setCanvasDimensions();
+  }, [setMatrixLetters, setMatrixLettersBackground, maxColumns]);
 
   useEffect(() => {
-    const { letterTrailCanvasContext, letterCanvasContext } =
-      getCanvasContext();
-    updatePointMatrix(letterTrailCanvasContext, letterCanvasContext);
-
+    executeLoop();
     return () => {
       if (requestRef.current !== null) {
         cancelAnimationFrame(requestRef.current);
