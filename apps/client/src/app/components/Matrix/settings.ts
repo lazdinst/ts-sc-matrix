@@ -1,16 +1,20 @@
-export default {
-  //https://codepen.io/riazxrazor/pen/Gjomdp
-  position: {
-    start: -1000,
-    end: 0,
-  },
-  speed: {
-    min: 1, // 0.01
-    max: 2, // 5
-  },
-  letterSize: 18,
-  font: 'monospace',
-  letterColor: '#FFFFFF',
-  letterTrailColor: '#003300',
-  maxtrixBackgroundLetters: '#003300',
+//https://codepen.io/riazxrazor/pen/Gjomdp
+
+export const fps = 15;
+export const position = {
+  start: -1000,
+  end: 0,
+};
+export const speed = {
+  min: 0.01, // 0.01
+  max: 5, // 5
+};
+export const letterSize = 16;
+export const font = 'monospace';
+export const letterColor = '#FFFFFF';
+export const letterTrailColor = `hsl(152, 100%, 50%)`; // Todo: change to function to return gradient color
+export const maxtrixBackgroundLetters = '#003300';
+export const lightness = {
+  high: 70,
+  low: 50,
 };
