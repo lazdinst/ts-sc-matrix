@@ -68,7 +68,6 @@ class MatrixLetter {
     this.boostSpeed = 1;
 
     if (randomFloat(0.1, 10) > 9) {
-      console.log('boost');
       this.boost = true;
       this.boostSpeed = randomInt(5, 5);
     }

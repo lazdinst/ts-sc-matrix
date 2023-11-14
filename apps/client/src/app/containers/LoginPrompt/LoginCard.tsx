@@ -30,9 +30,7 @@ const LoginForm = styled.form`
   /* Add your styling for the login form here */
 `;
 
-const LoginInputContainer = styled.div`
-  padding: 0.5rem;
-`;
+const LoginInputContainer = styled.div``;
 
 const InputLabel = styled.label``;
 
