@@ -56,6 +56,7 @@ class MatrixRain extends React.Component<MatrixProps> {
 
   private columnCount: number;
   private matrixLetters: MatrixLetter[];
+  private matrixLettersLayer2: MatrixLetter[];
   private matrixBackgroundLetters: MatrixLetter[];
   private canvasWidth: number;
   private canvasHeight: number;
@@ -66,6 +67,7 @@ class MatrixRain extends React.Component<MatrixProps> {
     this.columnCount = 0;
     this.requestAnmationRefId = 0;
     this.matrixLetters = [];
+    this.matrixLettersLayer2 = [];
     this.matrixBackgroundLetters = [];
     this.letterRef = React.createRef();
     this.letterCanvas = null;
@@ -209,6 +211,7 @@ class MatrixRain extends React.Component<MatrixProps> {
         let i = this.matrixLetters.length;
         while (i--) {
           this.matrixLetters[i].draw();
+          // this.matrixLettersLayer2[i].draw();
           this.matrixBackgroundLetters[i].drawBackground();
         }
       }
@@ -219,6 +222,7 @@ class MatrixRain extends React.Component<MatrixProps> {
   componentDidMount(): void {
     this.initializeMatrix();
     this.generateMatrixLetters(this.matrixLetters);
+    // this.generateMatrixLetters(this.matrixLettersLayer2);
     this.generateMatrixLetters(this.matrixBackgroundLetters);
     this.animate(0);
   }

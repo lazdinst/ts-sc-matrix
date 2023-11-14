@@ -69,7 +69,7 @@ class MatrixLetter {
 
     if (randomFloat(0.1, 10) > 9) {
       this.boost = true;
-      this.boostSpeed = randomInt(5, 5);
+      this.boostSpeed = randomInt(2, 4);
     }
   }
 
@@ -157,7 +157,7 @@ class MatrixLetter {
     );
   }
 
-  public draw(boost?: number) {
+  public draw(color?: string) {
     // this.clearLetterCanvas();
 
     // this.ctx.textAlign = 'center';
@@ -186,7 +186,10 @@ class MatrixLetter {
       }
     }
 
-    this.verticalPostion = this.verticalPostion + this.fontSize;
+    console.log(this.boost);
+    console.log(this.boostSpeed);
+    this.verticalPostion =
+      this.verticalPostion + this.fontSize * this.boostSpeed;
     this.clearLetterCanvas();
 
     if (

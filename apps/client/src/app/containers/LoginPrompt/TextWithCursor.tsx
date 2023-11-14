@@ -22,6 +22,7 @@ const StyledTextWithCursor = styled.div<StyledTextWithCursorProps>`
   line-height: 1.2rem;
   color: rgb(0, 255, 136, 0.5);
   font-family: courier;
+  text-shadow: 1px 1px 2px rgb(0, 255, 136, 0.5), 1px 1px 2px #000;
   & > span {
     font-family: courier;
     font-size: 1rem;
