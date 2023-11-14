@@ -1,6 +1,6 @@
 //https://codepen.io/riazxrazor/pen/Gjomdp
 
-export const fps = 15;
+export const fps = 20;
 export const position = {
   start: -1000,
   end: 0,

@@ -9,6 +9,7 @@ class MatrixLetter {
   private letters: string[] = [];
   private fontSize = letterSize;
   private boost = false;
+  private boostSpeed = 0;
   private speed = 0;
   private letterContext: CanvasRenderingContext2D | null | undefined;
   private letterTrailContext: CanvasRenderingContext2D | null | undefined;
@@ -63,7 +64,14 @@ class MatrixLetter {
   }
 
   private resetBoost() {
-    this.boost = randomFloat(0.1, 10) > 6;
+    this.boost = false;
+    this.boostSpeed = 1;
+
+    if (randomFloat(0.1, 10) > 9) {
+      console.log('boost');
+      this.boost = true;
+      this.boostSpeed = randomInt(5, 5);
+    }
   }
 
   private resetLetterPosition() {
@@ -85,7 +93,8 @@ class MatrixLetter {
     context.fillStyle = color ?? letterColor;
     context.font = `${letterSize}px ${font}`;
 
-    context.fillText(letter, this.column, this.verticalPostion - this.fontSize);
+    const verticalPostion = this.verticalPostion - this.fontSize;
+    context.fillText(letter, this.column, verticalPostion);
 
     // Reset the shadow properties (optional)
     context.shadowColor = 'transparent';
@@ -108,7 +117,7 @@ class MatrixLetter {
           letters[index] = this.getRandomLetter();
         }
 
-        // Calculate the lightness based on the index within the desired range (50% to 100%)
+        // Calculate the lightness
         const minLightness = lightness.low;
         const maxLightness = lightness.high;
         const letterOpacity = (letters.length - index) / letters.length;
@@ -121,13 +130,11 @@ class MatrixLetter {
         context.shadowOffsetX = 0;
         context.shadowOffsetY = 0;
 
-        // Use the calculated lightness in the HSL color
         context.fillStyle = fillStyle;
         context.textAlign = 'center';
         const verticalPostion = this.verticalPostion - (index + 1) * letterSize;
         context.fillText(letters[index], this.column, verticalPostion);
 
-        // Reset the shadow properties (optional)
         context.shadowColor = 'transparent';
         context.shadowBlur = 0;
         context.shadowOffsetX = 0;
@@ -153,7 +160,6 @@ class MatrixLetter {
 
   public draw(boost?: number) {
     // this.clearLetterCanvas();
-    console.log('draw');
 
     // this.ctx.textAlign = 'center';
     // this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
@@ -171,12 +177,6 @@ class MatrixLetter {
         }
       }
       this.currentDrawDelay++;
-
-      if (this.boost) {
-        const boostSpeed = randomInt(1, 2);
-        this.speed += boostSpeed;
-        console.log(boostSpeed);
-      }
 
       if (this.letterContext) {
         this.sendLetterToCanvas(this.firstLetter, this.letterContext);
@@ -204,23 +204,17 @@ class MatrixLetter {
   public drawBackground(boost?: number) {
     const letter = this.getRandomLetter();
 
-    if (this.backgroundContext) {
-      this.backgroundContext.fillStyle = '#0F0';
-      this.backgroundContext.font = `${letterSize}px ${font}`;
-      this.backgroundContext.fillText(
+    if (this.letterContext) {
+      this.letterContext.fillStyle = 'rgba(0, 255, 0, 0.1)';
+      this.letterContext.font = `${letterSize}px ${font}`;
+      this.letterContext.fillText(
         letter,
         this.column,
         this.verticalPostion - letterSize
       );
-      // this.backgroundContext.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      // this.backgroundContext.fillRect(0, 0, 1000, this.canvasHeight);
     }
 
-    this.verticalPostion += this.speed + 3;
-
-    if (this.verticalPostion - (boost ?? 0) > this.canvasHeight) {
-      this.resetLetterPosition();
-    }
+    this.verticalPostion = randomInt(0, this.canvasHeight);
   }
 }
 

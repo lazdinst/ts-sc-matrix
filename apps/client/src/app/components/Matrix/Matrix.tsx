@@ -156,7 +156,6 @@ class MatrixRain extends React.Component<MatrixProps> {
     const ctx = this.getCanvasContextFromRef(ref);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-    console.log('Clearing canvas success');
   };
 
   generateMatrixLetters = (matrix: MatrixLetter[]) => {
@@ -210,6 +209,7 @@ class MatrixRain extends React.Component<MatrixProps> {
         let i = this.matrixLetters.length;
         while (i--) {
           this.matrixLetters[i].draw();
+          this.matrixBackgroundLetters[i].drawBackground();
         }
       }
     });
@@ -219,7 +219,7 @@ class MatrixRain extends React.Component<MatrixProps> {
   componentDidMount(): void {
     this.initializeMatrix();
     this.generateMatrixLetters(this.matrixLetters);
-    // this.generateMatrixLetters(this.matrixBackgroundLetters);
+    this.generateMatrixLetters(this.matrixBackgroundLetters);
     this.animate(0);
   }
 
@@ -236,13 +236,13 @@ class MatrixRain extends React.Component<MatrixProps> {
       <MainContainer>
         <ChildredContainer>{children}</ChildredContainer>
         <MatrixContainer>
+          <MatrixCanvasComponent ref={this.backgroundRef}>
+            Canvas is not supported in your browser.
+          </MatrixCanvasComponent>
           <MatrixCanvasComponent ref={this.letterTrailRef}>
             Canvas is not supported in your browser.
           </MatrixCanvasComponent>
           <MatrixCanvasComponent ref={this.letterRef}>
-            Canvas is not supported in your browser.
-          </MatrixCanvasComponent>
-          <MatrixCanvasComponent ref={this.backgroundRef}>
             Canvas is not supported in your browser.
           </MatrixCanvasComponent>
         </MatrixContainer>
