@@ -186,8 +186,6 @@ class MatrixLetter {
       }
     }
 
-    console.log(this.boost);
-    console.log(this.boostSpeed);
     this.verticalPostion =
       this.verticalPostion + this.fontSize * this.boostSpeed;
     this.clearLetterCanvas();

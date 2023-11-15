@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
-import CLI from './CLI';
-const SKIP_ANIMATION = false;
+import CLI from '../CLI';
+
+const SKIP_ANIMATION = true;
 
 const TerminalContainer = styled.div`
   font-size: 0.75rem;
@@ -15,12 +16,16 @@ const TerminalContainer = styled.div`
   overflow-y: auto;
 `;
 
-const Terminal: React.FC = () => {
+interface TerminalProps {
+  callback: () => void;
+}
+
+const Terminal: React.FC<TerminalProps> = () => {
   const [isPromptReady, setPromptReady] = useState<boolean>(false);
   const startAnimation = SKIP_ANIMATION || isPromptReady;
 
   return (
-    <TerminalContainer>
+    <TerminalContainer id="terminal-container">
       {/* <TextWithCursor callback={setPromptReady} /> */}
       {startAnimation ? <CLI /> : <TextWithCursor callback={setPromptReady} />}
     </TerminalContainer>
