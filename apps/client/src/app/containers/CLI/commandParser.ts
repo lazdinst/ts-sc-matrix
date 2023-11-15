@@ -1,8 +1,9 @@
+import { dispatch } from '../../../redux/store';
 import { STATES } from './constants';
+import { isUserRegistered } from '../../../redux/slices/user/user';
 
-export const parseCommand = (
+export const parseCommand = async (
   cmd: string,
-  checkUsernameExists: any,
   updateSystemState: any,
   clearCommand: any
 ) => {
@@ -22,7 +23,9 @@ export const parseCommand = (
         updateSystemState(STATES.PASSWORD);
         const username = cmdParts[1];
         console.log('username', username);
-        const userExists = checkUsernameExists(username);
+
+        const userExists = await isUserRegistered(username);
+
         console.log('userExists', userExists);
         if (!userExists) {
           updateSystemState(STATES.PASSWORD);

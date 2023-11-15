@@ -1,4 +1,14 @@
-### Notes:
+### JWT Generation:
+
+- Built into node via crypto. Add to .env as JWT_SECRET.
+
+```const crypto = require('crypto');
+const randomBytes = crypto.randomBytes(32);
+console.log(randomBytes.toString('hex'));
+```
+
+## Notes:
+
     // Terran
     // Core Units - Marine, Marauder
     // Harass -  Hellion, Banshees, Cyclone
@@ -20,7 +30,7 @@
     // Zerg
     // Core Units - Zerglings, Roach, Hydra
     // Harass - Banelings
-    // Devastators - Mutalisk, Swarm Host, 
+    // Devastators - Mutalisk, Swarm Host,
     // Casters - Infestor, Viper,
     // Massives - Ultralisk, Luker
     // Air Massives - Brood

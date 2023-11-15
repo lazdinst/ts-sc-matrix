@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../../redux/store';
 import { login, register, logout } from '../../../redux/slices/user';
-import { checkUsernameExists } from '../../../redux/slices/user/user';
 import { User } from '../../../redux/slices/user/types';
 import { Command, CLIProps, CLIState } from './types';
 import { STATES } from './constants';
@@ -69,14 +68,12 @@ class CLI extends React.Component<CLIProps, CLIState> {
   };
 
   handleCommand = async (cmd: string) => {
-    const { checkUsernameExists } = this.props;
     const { SYSTEM_STATE } = this.state;
     if (!cmd) throw new Error('No command provided');
 
     if (SYSTEM_STATE === STATES.INIT) {
       const { cmdType, status, responses } = await parseCommand(
         cmd,
-        checkUsernameExists,
         this.updateSystemState,
         this.clearCommand
       );
@@ -229,7 +226,6 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
       login: login,
-      checkUsernameExists: checkUsernameExists,
     },
     dispatch
   );

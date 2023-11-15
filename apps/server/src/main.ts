@@ -13,12 +13,15 @@ import statusRoutes from './api/status';
 import gameHistory from './api/game_history';
 import unitsRoutes from './api/units';
 import rollRoutes from './api/roll';
+import userRoutes from './api/user';
 
 (async () => {
   try {
     connectDB();
 
-    const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
+    const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(
+      ','
+    );
 
     const corsOptions: cors.CorsOptions = {
       origin: (origin, callback) => {
@@ -44,6 +47,7 @@ import rollRoutes from './api/roll';
     app.use('/api/game_history', gameHistory);
     app.use('/api/units', unitsRoutes);
     app.use('/api/roll', rollRoutes);
+    app.use('/api/user', userRoutes);
 
     app.use(express.static(path.join(__dirname, '../../dist/apps/client')));
     app.get('*', (req, res) => {
