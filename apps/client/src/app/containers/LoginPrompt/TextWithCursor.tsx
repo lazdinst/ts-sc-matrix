@@ -23,9 +23,10 @@ const StyledTextWithCursor = styled.div<StyledTextWithCursorProps>`
   color: rgb(0, 255, 136, 0.5);
   font-family: courier;
   text-shadow: 1px 1px 2px rgb(0, 255, 136, 0.5), 1px 1px 2px #000;
+  background-color: rgb(0, 0, 0, 0.9);
   & > span {
     font-family: courier;
-    font-size: 1rem;
+    font-size: 1.25rem;
   }
 
   &::after {

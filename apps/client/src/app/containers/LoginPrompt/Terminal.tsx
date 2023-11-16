@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
 import CLI from '../CLI';
 
-const SKIP_ANIMATION = true;
+const SKIP_ANIMATION = false;
 
 const TerminalContainer = styled.div`
   font-size: 0.75rem;
@@ -25,10 +25,15 @@ const Terminal: React.FC<TerminalProps> = () => {
   const startAnimation = SKIP_ANIMATION || isPromptReady;
 
   return (
-    <TerminalContainer id="terminal-container">
-      {/* <TextWithCursor callback={setPromptReady} /> */}
-      {startAnimation ? <CLI /> : <TextWithCursor callback={setPromptReady} />}
-    </TerminalContainer>
+    <div>
+      {startAnimation ? (
+        <TerminalContainer id="terminal-container">
+          <CLI />
+        </TerminalContainer>
+      ) : (
+        <TextWithCursor callback={setPromptReady} />
+      )}
+    </div>
   );
 };
 

@@ -7,7 +7,7 @@ class MatrixLetter {
   private verticalPostion: number;
   private firstLetter = '';
   private letters: string[] = [];
-  private fontSize = letterSize;
+  private fontSize: number;
   private boost = false;
   private boostSpeed = 0;
   private speed = 0;
@@ -26,7 +26,8 @@ class MatrixLetter {
     canvasHeight: number,
     letterContext: CanvasRenderingContext2D,
     letterTrailContext: CanvasRenderingContext2D,
-    backgroundContext: CanvasRenderingContext2D
+    backgroundContext: CanvasRenderingContext2D,
+    fontSize?: number
   ) {
     this.column = column;
     this.canvasHeight = canvasHeight;
@@ -35,7 +36,7 @@ class MatrixLetter {
     this.letterTrailContext = letterTrailContext;
     this.backgroundContext = backgroundContext;
     this.getRandomLetter();
-
+    this.fontSize = fontSize || letterSize;
     this.offset = this.letterTrailLength * letterSize;
 
     this.resetBoost();
@@ -90,7 +91,7 @@ class MatrixLetter {
 
     context.textAlign = 'center';
     context.fillStyle = color ?? letterColor;
-    context.font = `${letterSize}px ${font}`;
+    context.font = `${this.fontSize}px ${font}`;
 
     const verticalPostion = this.verticalPostion - this.fontSize;
     context.fillText(letter, this.column, verticalPostion);
@@ -107,7 +108,7 @@ class MatrixLetter {
     context: CanvasRenderingContext2D,
     color?: string
   ) {
-    context.font = `${letterSize}px ${font}`;
+    context.font = `${this.fontSize}px ${font}`;
 
     letters.forEach((letter, index) => {
       if (index > 0) {
@@ -123,7 +124,6 @@ class MatrixLetter {
         const l = minLightness + (maxLightness - minLightness) * letterOpacity;
 
         const fillStyle = `hsl(152, 100%, ${l}%)`;
-
         context.shadowColor = `hsl(152, 100%, ${l}%)`;
         context.shadowBlur = 5;
         context.shadowOffsetX = 0;
@@ -131,7 +131,8 @@ class MatrixLetter {
 
         context.fillStyle = fillStyle;
         context.textAlign = 'center';
-        const verticalPostion = this.verticalPostion - (index + 1) * letterSize;
+        const verticalPostion =
+          this.verticalPostion - (index + 1) * this.fontSize;
         context.fillText(letters[index], this.column, verticalPostion);
 
         context.shadowColor = 'transparent';
@@ -152,7 +153,7 @@ class MatrixLetter {
     this.letterTrailContext.fillRect(
       this.column,
       this.verticalPostion,
-      letterSize,
+      this.fontSize,
       this.canvasHeight
     );
   }
@@ -206,11 +207,11 @@ class MatrixLetter {
 
     if (this.letterContext) {
       this.letterContext.fillStyle = 'rgba(0, 255, 0, 0.1)';
-      this.letterContext.font = `${letterSize}px ${font}`;
+      this.letterContext.font = `${this.fontSize}px ${font}`;
       this.letterContext.fillText(
         letter,
         this.column,
-        this.verticalPostion - letterSize
+        this.verticalPostion - this.fontSize
       );
     }
 

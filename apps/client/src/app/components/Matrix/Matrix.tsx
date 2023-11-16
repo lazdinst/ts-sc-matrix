@@ -160,7 +160,7 @@ class MatrixRain extends React.Component<MatrixProps> {
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   };
 
-  generateMatrixLetters = (matrix: MatrixLetter[]) => {
+  generateMatrixLetters = (matrix: MatrixLetter[], size?: number) => {
     try {
       if (
         !this.letterContext ||
@@ -178,7 +178,8 @@ class MatrixRain extends React.Component<MatrixProps> {
             this.canvasHeight,
             this.letterContext,
             this.letterTrailContext,
-            this.backgroundContext
+            this.backgroundContext,
+            size ? size : letterSize
           )
         );
       }
@@ -222,7 +223,7 @@ class MatrixRain extends React.Component<MatrixProps> {
   componentDidMount(): void {
     this.initializeMatrix();
     this.generateMatrixLetters(this.matrixLetters);
-    // this.generateMatrixLetters(this.matrixLettersLayer2);
+    // this.generateMatrixLetters(this.matrixLettersLayer2, 18);
     this.generateMatrixLetters(this.matrixBackgroundLetters);
     this.animate(0);
   }
