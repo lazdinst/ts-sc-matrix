@@ -10,77 +10,77 @@ export const parseCommand = async (
   const cmdParts = cmd.split(' ');
   const commandStart = cmdParts[0];
 
-  switch (commandStart) {
-    case 'help':
-      return {
-        cmdType: 'HELP',
-        cmd: cmd,
-        status: 'error',
-        responses: [`Did you think it would be that easy?`],
-      };
-    case 'login':
-      if (cmdParts.length === 2) {
-        const username = cmdParts[1];
-        const userExists = await isUserRegistered(username);
-        if (!userExists) {
-          updateSystemState(STATES.INIT);
-          return {
-            cmdType: 'LOGIN',
-            cmd: cmd,
-            status: 'error',
-            responses: [`User does not exist`, `register a new user.`],
-          };
-        }
+  if (commandStart === 'register') {
+    // Do something
+    const username = cmdParts[1];
+    const userExists = await isUserRegistered(username);
+    return {
+      cmdType: 'UNKNOWN',
+      cmd: cmd,
+      status: 'error',
+      responses: [`Unknown cmd executed: ${cmd}`],
+    };
+  }
 
-        updateSystemState(STATES.PASSWORD);
-        return {
-          cmdType: 'LOGIN',
-          cmd: cmd,
-          status: 'success',
-          responses: [`Logging in as: ${username}`, `Enter Password:`],
-        };
-      } else {
-        const numberOfArguments = cmdParts.length;
+  if (commandStart === 'login') {
+    if (cmdParts.length === 2) {
+      const username = cmdParts[1];
+      const userExists = await isUserRegistered(username);
+      if (!userExists) {
         updateSystemState(STATES.INIT);
         return {
           cmdType: 'LOGIN',
           cmd: cmd,
-          status: 'warning',
-          responses: [
-            `Invalid input...Expected 1 argument, received ${numberOfArguments} arguments.`,
-          ],
+          status: 'error',
+          responses: [`user does not exist`, `register a new user.`],
         };
       }
-    case 'register':
-      clearCommand();
+
+      updateSystemState(STATES.PASSWORD);
       return {
-        cmdType: 'CLEAR',
-        cmd: cmd,
-        status: 'error',
-        responses: [``],
-      };
-    case 'clear':
-      clearCommand();
-      return {
-        cmdType: 'CLEAR',
-        cmd: cmd,
-        status: 'error',
-        responses: [``],
-      };
-    case 'overwhelming':
-      return {
-        cmdType: 'OVERWHELMING',
+        cmdType: 'LOGIN',
         cmd: cmd,
         status: 'success',
-        responses: [`Getting there`],
+        responses: [`logging in as: ${username}`, `password:`],
       };
-    default:
+    } else {
+      const numberOfArguments = cmdParts.length;
       updateSystemState(STATES.INIT);
       return {
-        cmdType: 'UNKNOWN',
+        cmdType: 'LOGIN',
         cmd: cmd,
-        status: 'error',
-        responses: [`Unknown cmd executed: ${cmd}`],
+        status: 'warning',
+        responses: [
+          `invalid input...expected 1 argument, received ${numberOfArguments} arguments.`,
+        ],
       };
+    }
   }
+
+  if (commandStart === 'help') {
+    return {
+      cmdType: 'HELP',
+      cmd: cmd,
+      status: 'info',
+      responses: [`register <username>`, `login <username>`],
+    };
+  }
+
+  if (commandStart === 'clear') {
+    // Do something
+    return {
+      cmdType: 'UNKNOWN',
+      cmd: cmd,
+      status: 'error',
+      responses: [`Unknown cmd executed: ${cmd}`],
+    };
+  }
+
+  updateSystemState(STATES.INIT);
+  return {
+    cmdType: 'UNKNOWN',
+    cmd: cmd,
+    status: 'error',
+    responses: [`Unknown cmd executed: ${cmd}`],
+  };
 };

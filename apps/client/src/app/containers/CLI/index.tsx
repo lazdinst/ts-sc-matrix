@@ -90,24 +90,12 @@ class CLI extends React.Component<CLIProps, CLIState> {
       const hashedPassword = bcrypt.hashSync(cmd, 10);
     }
 
-    switch (SYSTEM_STATE) {
-      case STATES.INIT:
-        //do nothing
-        break;
-      case STATES.LOGIN:
-        //do nothing
-        break;
-      case STATES.PASSWORD:
-        //do nothing
-        break;
-      case STATES.AUTHENTICATING:
-        //do nothing
-        break;
-      case STATES.REGISTER:
-        //do nothing
-        break;
-      default:
-        throw new Error('Invalid system state');
+    if (SYSTEM_STATE === STATES.REGISTER) {
+      const hashedPassword = bcrypt.hashSync(cmd, 10);
+      const user: User = {
+        username: 'test',
+        password: hashedPassword,
+      };
     }
   };
 
