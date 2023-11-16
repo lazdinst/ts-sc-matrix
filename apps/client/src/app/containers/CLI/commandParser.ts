@@ -20,22 +20,19 @@ export const parseCommand = async (
       };
     case 'login':
       if (cmdParts.length === 2) {
-        updateSystemState(STATES.PASSWORD);
         const username = cmdParts[1];
-        console.log('username', username);
-
         const userExists = await isUserRegistered(username);
-
-        console.log('userExists', userExists);
         if (!userExists) {
-          updateSystemState(STATES.PASSWORD);
+          updateSystemState(STATES.INIT);
           return {
             cmdType: 'LOGIN',
             cmd: cmd,
             status: 'error',
-            responses: [`User does not exist`],
+            responses: [`User does not exist`, `register a new user.`],
           };
         }
+
+        updateSystemState(STATES.PASSWORD);
         return {
           cmdType: 'LOGIN',
           cmd: cmd,
@@ -44,12 +41,13 @@ export const parseCommand = async (
         };
       } else {
         const numberOfArguments = cmdParts.length;
+        updateSystemState(STATES.INIT);
         return {
           cmdType: 'LOGIN',
           cmd: cmd,
           status: 'warning',
           responses: [
-            `Invalid input...Expected 1 argument, received ${numberOfArguments} arguments`,
+            `Invalid input...Expected 1 argument, received ${numberOfArguments} arguments.`,
           ],
         };
       }
@@ -77,6 +75,7 @@ export const parseCommand = async (
         responses: [`Getting there`],
       };
     default:
+      updateSystemState(STATES.INIT);
       return {
         cmdType: 'UNKNOWN',
         cmd: cmd,

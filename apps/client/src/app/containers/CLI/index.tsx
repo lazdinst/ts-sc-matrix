@@ -71,17 +71,17 @@ class CLI extends React.Component<CLIProps, CLIState> {
     const { SYSTEM_STATE } = this.state;
     if (!cmd) throw new Error('No command provided');
 
+    const { cmdType, status, responses } = await parseCommand(
+      cmd,
+      this.updateSystemState,
+      this.clearCommand
+    );
+
+    if (!cmdType || !status || !responses) {
+      throw new Error('Invalid command');
+    }
+
     if (SYSTEM_STATE === STATES.INIT) {
-      const { cmdType, status, responses } = await parseCommand(
-        cmd,
-        this.updateSystemState,
-        this.clearCommand
-      );
-
-      if (!cmdType || !status || !responses) {
-        throw new Error('Invalid command');
-      }
-
       this.updateCommandOutputs({ cmd, cmdType, status, responses });
       this.clearInput();
     }
@@ -109,53 +109,6 @@ class CLI extends React.Component<CLIProps, CLIState> {
       default:
         throw new Error('Invalid system state');
     }
-
-    // if (SYSTEM_STATE === STATES.INIT) {
-    //   if (cmdType !== 'CLEAR') {
-    //     this.setState((prevState) => ({
-    //       outputs: [...prevState.outputs, { cmd, cmdType, status, responses }],
-    //     }));
-    //   }
-
-    //   this.setState({
-    //     inputText: '',
-    //   });
-    // }
-
-    // if (SYSTEM_STATE === STATES.LOGIN) {
-    //   // here
-    // }
-
-    // if (SYSTEM_STATE === STATES.PASSWORD) {
-    //   // here
-    //   console.log(cmd);
-
-    //   const output = {
-    //     cmdType: 'PASSWORD',
-    //     cmd: 'password',
-    //     status: 'error',
-    //     responses: [`Authenticating...`],
-    //   };
-
-    //   this.setState((prevState) => ({
-    //     inputText: '',
-    //     SYSTEM_STATE: STATES.AUTHENTICATING,
-    //     outputs: [...prevState.outputs, output],
-    //   }));
-
-    //   this.setState((prevState) => ({
-    //     SYSTEM_STATE: STATES.INIT,
-    //     outputs: [
-    //       ...prevState.outputs,
-    //       {
-    //         cmdType: 'PASSWORD',
-    //         cmd: 'password',
-    //         status: 'error',
-    //         responses: [`Authentication Failed`],
-    //       },
-    //     ],
-    //   }));
-    // }
   };
 
   clearCommand = () => {
@@ -192,6 +145,7 @@ class CLI extends React.Component<CLIProps, CLIState> {
     const { inputText, outputs, SYSTEM_STATE } = this.state;
     return (
       <CLIContainer onClick={this.setInputFocus}>
+        <div>{SYSTEM_STATE}</div>
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}
