@@ -45,38 +45,42 @@ export default user.reducer;
 
 export const isUserRegistered = async (username: string) => {
   try {
-    const uri = `${API_URL}/api/check-username/${username}`;
+    const uri = `${API_URL}/api/user/check-username/${username}`;
     const response = await axios.get(uri);
-    if (response.data.exists) {
+    console.log(response);
+    if (response) {
       return true;
-    } else {
-      return false;
     }
   } catch (error) {
-    console.error(error);
-    return false;
+    return true;
   }
 };
 
-export const registerUser =
-  (username: string, password: string) => async (dispatch: Dispatch) => {
-    try {
-      const response = await axios.post('/api/register', {
-        username,
-        password,
-      });
-      const token = response.data.token;
-      setAuthTokenLocalStorage(token);
-      dispatch(
-        register({ id: response.data.id, username: response.data.username })
-      );
+export const registerUser = (user: User) => async (dispatch: Dispatch) => {
+  const { username, password } = user;
+  try {
+    const uri = `${API_URL}/api/user/register`;
+    const response = await axios.post(uri, {
+      username,
+      password,
+    });
+    const token = response.data.token;
+    setAuthTokenLocalStorage(token);
+    const registeredUser: User = {
+      id: response.data.id,
+      username: response.data.username,
+      password: '',
+    };
+    dispatch(register(registeredUser));
 
-      dispatch(setRegistrationError(null));
-    } catch (error) {
-      console.error(error);
-      dispatch(setRegistrationError('Registration failed. Please try again.'));
-    }
-  };
+    dispatch(setRegistrationError(null));
+    return true;
+  } catch (error) {
+    console.error(error);
+    dispatch(setRegistrationError('Registration failed. Please try again.'));
+    return false;
+  }
+};
 
 // actions
 export const setAuthTokenLocalStorage = (token: string | null) => {
@@ -94,6 +98,3 @@ export const selectIsAuthenticated = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectUser = (state: RootState) => state.user.user;
-
-export const selectIsCheckingUsername = (state: RootState) =>
-  state.user.isCheckingUsername;

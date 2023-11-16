@@ -9,7 +9,7 @@ export type Command = {
 
 export interface CLIProps {
   login: (user: User) => void;
-  register: (user: User) => void;
+  registerUser: (user: User) => void;
   logout: () => void;
   checkUsernameExists: (username: string) => void;
 }
@@ -19,4 +19,5 @@ export interface CLIState {
   inputs: any[];
   inputText: string;
   SYSTEM_STATE: string;
+  user: string;
 }
