@@ -1,16 +1,16 @@
-import { STATES } from './constants';
-import { isUserRegistered } from '../../../redux/slices/user/user';
+import { STATES } from '../../../redux/slices/cli';
+import {
+  isUserRegistered,
+  setIsLoggingIn,
+  setIsRegistering,
+} from '../../../redux/slices/user/user';
 
-interface Response {
-  cmdType: string;
-  cmd: string;
-  status: string;
-  responses: string[];
-}
+import { setCLIState } from '../../../redux/slices/cli/cli';
+
+import { Response } from './types';
 
 export const parseCommand = async (
   cmd: string,
-  updateSystemState: (state: string) => void,
   updateUser: (user: string) => void,
   clearCommand: () => void
 ) => {
@@ -27,14 +27,15 @@ export const parseCommand = async (
     const username = cmdParts[1];
     const userExists = await isUserRegistered(username);
     if (userExists) {
-      updateSystemState(STATES.INIT);
+      setCLIState(STATES.INIT);
       response.responses = [`user already exists`, `login instead.`];
       response.status = 'error';
       return response;
     }
+    // set redux action for registering user
 
     updateUser(username);
-    updateSystemState(STATES.PASSWORD);
+    setCLIState(STATES.PASSWORD);
     response.responses = [`Registering new user: ${username}`, `password:`];
     response.status = 'info';
     return response;
@@ -52,18 +53,22 @@ export const parseCommand = async (
       const username = cmdParts[1];
       const userExists = await isUserRegistered(username);
       if (!userExists) {
-        updateSystemState(STATES.INIT);
+        setCLIState(STATES.INIT);
         response.responses = [`user does not exist`, `register instead.`];
         return response;
       }
 
-      updateSystemState(STATES.PASSWORD);
+      // Get redux axtion got logging in
+      setIsLoggingIn(true);
+      updateUser(username);
+      setCLIState(STATES.PASSWORD);
       response.responses = [`logging in as: ${username}`, `password:`];
       response.status = 'success';
       return response;
     } else {
       const numberOfArguments = cmdParts.length;
-      updateSystemState(STATES.INIT);
+      setIsLoggingIn(false);
+      setCLIState(STATES.INIT);
       response.responses = [
         `invalid input...expected 1 argument, received ${numberOfArguments} arguments.`,
       ];
@@ -91,7 +96,7 @@ export const parseCommand = async (
     };
   }
 
-  updateSystemState(STATES.INIT);
+  setCLIState(STATES.INIT);
   return {
     cmdType: 'UNKNOWN',
     cmd: cmd,

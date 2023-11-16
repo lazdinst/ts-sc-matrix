@@ -4,7 +4,7 @@ import { fadeIn } from '../../styled/animations';
 export const CLIContainer = styled.div`
   font-size: 1rem;
   font-family: courier;
-  padding: 0.5rem;
+  height: 400px;
   overflow-y: auto;
   opacity: 0; /* Start with opacity 0 */
   animation: ${fadeIn} 0.5s ease-in-out forwards; /* Apply the animation */

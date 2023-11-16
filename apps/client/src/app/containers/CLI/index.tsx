@@ -1,12 +1,11 @@
 import React from 'react';
-import bcrypt from 'bcryptjs';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../../redux/store';
-import { login, registerUser, logout } from '../../../redux/slices/user';
+import { loginUser, registerUser, logout } from '../../../redux/slices/user';
 import { User } from '../../../redux/slices/user/types';
 import { Command, CLIProps, CLIState } from './types';
-import { STATES } from './constants';
+import { STATES } from '../../../redux/slices/cli';
 import { parseCommand } from './commandParser';
 import {
   CLIContainer,
@@ -25,7 +24,6 @@ class CLI extends React.Component<CLIProps, CLIState> {
       outputs: [],
       inputs: [],
       inputText: '',
-      SYSTEM_STATE: STATES.INIT,
       user: '',
     };
     this.AuthTimeOut = null;
@@ -36,10 +34,6 @@ class CLI extends React.Component<CLIProps, CLIState> {
     this.setState((prevState) => ({
       outputs: [...prevState.outputs, cmd],
     }));
-  };
-
-  updateSystemState = (SYSTEM_STATE: string) => {
-    this.setState({ SYSTEM_STATE });
   };
 
   updateUser = (user: string) => {
@@ -60,6 +54,26 @@ class CLI extends React.Component<CLIProps, CLIState> {
     this.clearInput();
   };
 
+  handleLoginUser = async (cmd: string) => {
+    const { loginUser } = this.props;
+    const { user } = this.state;
+    const userAttempt: User = {
+      id: '',
+      username: user,
+      password: cmd,
+    };
+
+    try {
+      const loginStatus = await loginUser(userAttempt);
+      if (!loginStatus) {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      console.log('handle login use failed', error);
+    }
+    this.clearInput();
+  };
+
   clearInput = () => {
     this.setState({ inputText: '' });
   };
@@ -73,9 +87,10 @@ class CLI extends React.Component<CLIProps, CLIState> {
 
   handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { inputText, SYSTEM_STATE } = this.state;
+    const { inputText } = this.state;
+    const { cliState } = this.props;
     let cmd = inputText.trim();
-    if (SYSTEM_STATE === STATES.PASSWORD) {
+    if (cliState === STATES.PASSWORD) {
       if (!this.inputRef.current?.value) {
         throw new Error('No command provided from inputRef');
       }
@@ -86,30 +101,51 @@ class CLI extends React.Component<CLIProps, CLIState> {
   };
 
   handleCommand = async (cmd: string) => {
-    const { SYSTEM_STATE, user } = this.state;
+    const { user } = this.state;
+    const { cliState } = this.props;
     if (!cmd) throw new Error('No command provided');
 
-    const { cmdType, status, responses } = await parseCommand(
-      cmd,
-      this.updateSystemState,
-      this.updateUser,
-      this.clearCommand
-    );
+    const commandStrings = cmd.split(' ');
+    const rootCommand = commandStrings[0];
+    const knownCommands = ['register', 'login', 'logout'];
 
-    if (!cmdType || !status || !responses) {
-      throw new Error('Invalid command');
+    if (!knownCommands.includes(rootCommand)) {
+      this.updateCommandOutputs({
+        cmdType: 'UNKNOWN',
+        cmd: cmd,
+        status: 'error',
+        responses: [`Unknown cmd executed: ${cmd}`],
+      });
+      throw new Error('Unknown command');
     }
 
-    if (SYSTEM_STATE === STATES.INIT) {
+    if (cliState === STATES.INIT) {
+      const { cmdType, status, responses } = await parseCommand(
+        cmd,
+        this.updateUser,
+        this.clearCommand
+      );
+      if (!cmdType || !status || !responses) {
+        throw new Error('Invalid command');
+      }
       this.updateCommandOutputs({ cmd, cmdType, status, responses });
       this.clearInput();
     }
 
-    if (SYSTEM_STATE === STATES.PASSWORD) {
-      // need to look at command type here to determine if its a registration or login
+    if (cliState === STATES.PASSWORD) {
+      // check redux action for logging in or regiustering
+      console.log('handleCommand: Password', cmd, cmdType);
+      console.log('register: Password', cmd);
+      this.handleLoginUser(cmd);
+    }
+    if (cliState === STATES.LOGIN) {
       console.log('register: Password', cmd);
       this.registerNewUser(cmd);
     }
+  };
+
+  handleRegistration = (cmd: string) => {
+    //do nothing
   };
 
   clearCommand = () => {
@@ -136,17 +172,20 @@ class CLI extends React.Component<CLIProps, CLIState> {
   }
 
   componentDidMount(): void {
+    const { cliState } = this.props;
     this.setInputFocus();
     if (this.AuthTimeOut) {
       clearTimeout(this.AuthTimeOut);
     }
+    console.log(cliState);
   }
 
   render() {
-    const { inputText, outputs, SYSTEM_STATE } = this.state;
+    const { inputText, outputs } = this.state;
+    const { cliState } = this.props;
     return (
-      <CLIContainer onClick={this.setInputFocus}>
-        <div>{SYSTEM_STATE}</div>
+      <CLIContainer id="CLI-Container" onClick={this.setInputFocus}>
+        <div>{cliState}</div>
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}
@@ -160,7 +199,7 @@ class CLI extends React.Component<CLIProps, CLIState> {
         ))}
         <InputForm onSubmit={this.handleInputSubmit}>
           <InputField
-            type={SYSTEM_STATE === STATES.PASSWORD ? 'password' : 'text'}
+            type={cliState === STATES.PASSWORD ? 'password' : 'text'}
             ref={this.inputRef}
             value={inputText}
             onChange={this.handleInputChange}
@@ -175,13 +214,14 @@ class CLI extends React.Component<CLIProps, CLIState> {
 const mapStateToProps = (state: RootState) => ({
   user: state.user.user,
   isAuthenticated: state.user.isAuthenticated,
+  cliState: state.cli.state,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      login: login,
       registerUser: registerUser,
+      loginUser: loginUser,
     },
     dispatch
   );

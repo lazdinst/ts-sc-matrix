@@ -9,15 +9,23 @@ export type Command = {
 
 export interface CLIProps {
   login: (user: User) => void;
-  registerUser: (user: User) => void;
+  registerUser: (user: User) => boolean;
+  loginUser: (user: User) => boolean;
   logout: () => void;
   checkUsernameExists: (username: string) => void;
+  cliState: string;
 }
 
 export interface CLIState {
   outputs: any[];
   inputs: any[];
   inputText: string;
-  SYSTEM_STATE: string;
   user: string;
+}
+
+export interface Response {
+  cmdType: string;
+  cmd: string;
+  status: string;
+  responses: string[];
 }
