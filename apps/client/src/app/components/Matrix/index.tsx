@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import styled from 'styled-components';
-import { randomFloat } from './utils';
 import MatrixLetter from './MatrixLetter';
-import settings from './settings';
-import { Timestamp } from 'mongodb';
+import { fps, letterSize } from './settings';
 
-const fps = settings.fps;
 const nextFrame = 1000 / fps;
 let lastTime = 0;
 let timer = 0;
 
-// const settings.letterSize = 10;
 const MainContainer = styled.div`
   display: flex;
   position: relative;
@@ -43,147 +39,156 @@ type MatrixProps = {
   children?: ReactNode;
 };
 
-const Matrix: React.FC<MatrixProps> = ({ children }) => {
-  const letterTrailCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const letterCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const backgroundCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [matrixLetters, setMatrixLetters] = useState<MatrixLetter[]>([]);
-  const [matrixLettersLayer2, setMatrixLettersLayer2] = useState<
-    MatrixLetter[]
-  >([]);
-  const [matrixLettersBackground, setMatrixLettersBackground] = useState<
-    MatrixLetter[]
-  >([]);
-  const requestRef = useRef<number | null>(null);
-  const [canvasWidth, setCanvasWidth] = useState<number>(window.innerWidth);
-  const [canvasHeight, setCanvasHeight] = useState<number>(window.innerHeight);
-  const [maxColumns, setMaxColumns] = useState<number>(
-    window.innerWidth / settings.letterSize
-  );
+type FrameRateCallback = () => void;
 
-  const getCanvasContext = () => {
-    const letterTrailCanvas = letterTrailCanvasRef.current;
-    const letterTrailCanvasContext = letterTrailCanvas?.getContext('2d');
-    const letterCanvas = letterCanvasRef.current;
-    const letterCanvasContext = letterCanvas?.getContext('2d');
+class MatrixRain extends React.Component<MatrixProps> {
+  private letterRef: React.RefObject<HTMLCanvasElement> | null;
+  private letterCanvas: HTMLCanvasElement | null;
+  private letterContext: CanvasRenderingContext2D | null;
+  private letterTrailRef: React.RefObject<HTMLCanvasElement> | null;
+  private letterTrailCanvas: HTMLCanvasElement | null;
+  private letterTrailContext: CanvasRenderingContext2D | null;
+  private backgroundRef: React.RefObject<HTMLCanvasElement> | null;
+  private backgroundCanvas: HTMLCanvasElement | null;
+  private backgroundContext: CanvasRenderingContext2D | null;
 
-    const backgroundCanvas = backgroundCanvasRef.current;
-    const backgroundCanvasContext = backgroundCanvas?.getContext('2d');
-    return {
-      letterCanvasContext,
-      letterTrailCanvasContext,
-      backgroundCanvasContext,
-    };
-  };
+  private requestAnmationRefId: number | null;
 
-  const setCanvasDimensions = () => {
-    const { letterTrailCanvas, letterCanvas, backgroundCanvas } =
-      getCanvasElements();
+  private columnCount: number;
+  private matrixLetters: MatrixLetter[];
+  private matrixLettersLayer2: MatrixLetter[];
+  private matrixBackgroundLetters: MatrixLetter[];
+  private canvasWidth: number;
+  private canvasHeight: number;
 
-    if (letterTrailCanvas && letterCanvas && backgroundCanvas) {
-      setCanvasWidth(window.innerWidth);
-      setCanvasHeight(window.innerHeight);
-      setMaxColumns(window.innerWidth / settings.letterSize);
+  constructor(props: object) {
+    super(props);
+    this.state = {};
+    this.columnCount = 0;
+    this.requestAnmationRefId = 0;
+    this.matrixLetters = [];
+    this.matrixLettersLayer2 = [];
+    this.matrixBackgroundLetters = [];
+    this.letterRef = React.createRef();
+    this.letterCanvas = null;
+    this.letterContext = null;
 
-      setCanvasDimensionAttributes(
-        letterTrailCanvas,
-        window.innerWidth,
-        window.innerHeight
-      );
-      setCanvasDimensionAttributes(
-        letterCanvas,
-        window.innerWidth,
-        window.innerHeight
-      );
-      setCanvasDimensionAttributes(
-        backgroundCanvas,
-        window.innerWidth,
-        window.innerHeight
-      );
+    this.letterTrailRef = React.createRef();
+    this.letterTrailCanvas = null;
+    this.letterTrailContext = null;
+
+    this.backgroundRef = React.createRef();
+    this.backgroundCanvas = null;
+    this.backgroundContext = null;
+
+    this.canvasWidth = window.innerWidth;
+    this.canvasHeight = window.innerHeight;
+  }
+
+  initializeMatrix = () => {
+    if (!this.letterRef || !this.letterTrailRef || !this.backgroundRef) {
+      throw new Error('Canvas refs are not available to initialize matrix.');
     }
+
+    this.letterCanvas = this.getCanvasFromRef(this.letterRef);
+    this.letterContext = this.getCanvasContextFromRef(this.letterRef);
+
+    this.letterTrailCanvas = this.getCanvasFromRef(this.letterTrailRef);
+    this.letterTrailContext = this.getCanvasContextFromRef(this.letterTrailRef);
+
+    this.backgroundCanvas = this.getCanvasFromRef(this.backgroundRef);
+    this.backgroundContext = this.getCanvasContextFromRef(this.backgroundRef);
+
+    if (this.letterCanvas && this.letterTrailCanvas && this.backgroundCanvas) {
+      [
+        this.letterCanvas,
+        this.letterTrailCanvas,
+        this.backgroundCanvas,
+      ].forEach((canvas) => {
+        this.setCanvasDimensions(canvas, this.canvasWidth, this.canvasHeight);
+      });
+    }
+
+    this.columnCount = this.getColumnCount(this.letterRef);
   };
 
-  const setCanvasDimensionAttributes = (
+  getCanvasFromRef = (ref: React.RefObject<HTMLCanvasElement>) => {
+    if (!ref.current) {
+      throw new Error(`Canvas is not available. ref: ${ref}`);
+    }
+    const canvas = ref.current as HTMLCanvasElement | null;
+    return canvas;
+  };
+
+  getCanvasContextFromRef = (ref: React.RefObject<HTMLCanvasElement>) => {
+    const canvas = this.getCanvasFromRef(ref) as HTMLCanvasElement | null;
+    if (!canvas) {
+      throw new Error(`Canvas is not available for context. ref: ${ref}`);
+    }
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    return ctx;
+  };
+
+  setCanvasDimensions = (
     canvas: HTMLCanvasElement,
     width: number,
     height: number
   ) => {
-    if (canvas) {
-      canvas.setAttribute('width', width.toString());
-      canvas.setAttribute('height', height.toString());
+    if (!canvas || !width || !height) {
+      throw new Error('Canvas is not available to set dimensions.');
     }
-    return;
+    canvas.setAttribute('width', width.toString());
+    canvas.setAttribute('height', height.toString());
   };
 
-  const getCanvasElements = (): {
-    letterTrailCanvas: HTMLCanvasElement | null;
-    letterCanvas: HTMLCanvasElement | null;
-    backgroundCanvas: HTMLCanvasElement | null;
-  } => {
-    const letterTrailCanvas =
-      letterTrailCanvasRef.current as HTMLCanvasElement | null;
-    const letterCanvas = letterCanvasRef.current as HTMLCanvasElement | null;
-    const backgroundCanvas =
-      backgroundCanvasRef.current as HTMLCanvasElement | null;
-
-    return {
-      letterTrailCanvas,
-      letterCanvas,
-      backgroundCanvas,
-    };
+  getColumnCount = (ref: React.RefObject<HTMLCanvasElement>) => {
+    const canvas = this.getCanvasFromRef(ref);
+    if (!canvas) {
+      throw new Error('Canvas is not available to set drop columns.');
+    }
+    return canvas.width / letterSize;
   };
 
-  const generateMatrixLetters = (columnCount: number) => {
-    console.log('Genearting Matrix');
+  clearCanvasByRef = (ref: React.RefObject<HTMLCanvasElement>) => {
+    const canvas = this.getCanvasFromRef(ref);
+    if (!canvas) {
+      throw new Error('Canvas is not available to clear.');
+    }
+    const ctx = this.getCanvasContextFromRef(ref);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+  };
+
+  generateMatrixLetters = (matrix: MatrixLetter[], size?: number) => {
     try {
-      const matrix: MatrixLetter[] = [];
-      const {
-        letterCanvasContext,
-        letterTrailCanvasContext,
-        backgroundCanvasContext,
-      } = getCanvasContext();
-
       if (
-        !letterCanvasContext ||
-        !letterTrailCanvasContext ||
-        !backgroundCanvasContext
+        !this.letterContext ||
+        !this.letterTrailContext ||
+        !this.backgroundContext
       ) {
         throw new Error('Canvas contexts are not available.');
       }
 
-      const {
-        position: { start, end },
-      } = settings;
-
-      for (let i = 0; i < columnCount; i++) {
-        const column = i * settings.letterSize;
-        const randomStartPostion = randomFloat(start, end);
-
+      for (let i = 0; i < this.columnCount; i++) {
+        const column = i * letterSize;
         matrix.push(
           new MatrixLetter(
             column,
-            canvasHeight,
-            randomStartPostion,
-            letterCanvasContext,
-            letterTrailCanvasContext,
-            backgroundCanvasContext
+            this.canvasHeight,
+            this.letterContext,
+            this.letterTrailContext,
+            this.backgroundContext,
+            size ? size : letterSize
           )
         );
       }
-
-      return matrix;
     } catch (error) {
       console.error('Error in generateMatrixLetters:', error);
       return [];
     }
   };
 
-  type FrameRateCallback = () => void;
-
-  const frameRate = (
-    timeStamp: DOMHighResTimeStamp,
-    callBack: FrameRateCallback
-  ) => {
+  frameRate = (timeStamp: DOMHighResTimeStamp, callBack: FrameRateCallback) => {
     const deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
 
@@ -195,99 +200,59 @@ const Matrix: React.FC<MatrixProps> = ({ children }) => {
     }
   };
 
-  const animate = (timeStamp: DOMHighResTimeStamp) => {
-    frameRate(timeStamp, () => {
-      if (!matrixLetters.length) {
-        throw new Error('Matrix letters are not available.');
+  animate = (timeStamp: DOMHighResTimeStamp) => {
+    this.frameRate(timeStamp, () => {
+      if (!this.letterRef || !this.letterTrailRef) {
+        throw new Error('Canvas ref is not available to clear.');
       }
-
-      clearCanvas();
-
-      let i = matrixLetters.length;
-      while (i--) {
-        console.log('Drawing');
-        matrixLetters[i].draw();
+      this.clearCanvasByRef(this.letterRef);
+      // this.clearCanvasByRef(this.letterTrailRef);
+      if (this.matrixLetters.length) {
+        let i = this.matrixLetters.length;
+        while (i--) {
+          this.matrixLetters[i].draw();
+          // this.matrixLettersLayer2[i].draw();
+          this.matrixBackgroundLetters[i].drawBackground();
+        }
       }
     });
-    requestAnimationFrame(animate);
-    // if (matrixLetters.length) {
-    //   let i = matrixLetters.length;
-    //   while (i--) {
-    //     matrixLetters[i].draw();
-    //     // matrixLettersLayer2[i].draw();
-    //     // matrixLettersBackground[i].drawBackground(1000);
-    //   }
-    // }
-    // requestRef.current = requestAnimationFrame((timestamp) => executeLoop());
+    requestAnimationFrame(this.animate);
   };
 
-  const clearCanvas = () => {
-    const { letterCanvasContext, letterTrailCanvasContext } =
-      getCanvasContext();
-    if (!letterTrailCanvasContext || !letterCanvasContext) {
-      throw new Error('Canvas contexts are not available.');
-      return;
+  componentDidMount(): void {
+    this.initializeMatrix();
+    this.generateMatrixLetters(this.matrixLetters);
+    // this.generateMatrixLetters(this.matrixLettersLayer2, 18);
+    this.generateMatrixLetters(this.matrixBackgroundLetters);
+    this.animate(0);
+  }
+
+  componentWillUnmount(): void {
+    if (this.requestAnmationRefId !== null) {
+      cancelAnimationFrame(this.requestAnmationRefId);
     }
-    letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.2)';
-    letterTrailCanvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
-    // if (letterCanvasContext) {
-    //   // letterCanvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    //   letterCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    //   letterCanvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
-    // }
-  };
+  }
 
-  useEffect(() => {
-    const matrix = generateMatrixLetters(
-      window.innerWidth / settings.letterSize
+  render() {
+    const { children } = this.props;
+    return (
+      // Strict order of Canvas components is important for z-index
+      <MainContainer>
+        <ChildredContainer>{children}</ChildredContainer>
+        <MatrixContainer>
+          <MatrixCanvasComponent ref={this.backgroundRef}>
+            Canvas is not supported in your browser.
+          </MatrixCanvasComponent>
+          <MatrixCanvasComponent ref={this.letterTrailRef}>
+            Canvas is not supported in your browser.
+          </MatrixCanvasComponent>
+          <MatrixCanvasComponent ref={this.letterRef}>
+            Canvas is not supported in your browser.
+          </MatrixCanvasComponent>
+        </MatrixContainer>
+      </MainContainer>
     );
-    setMatrixLetters(matrix);
+  }
+}
 
-    const matrixLayer2 = generateMatrixLetters(
-      window.innerWidth / settings.letterSize
-    );
-    setMatrixLettersLayer2(matrixLayer2);
-
-    const matrixBackground = generateMatrixLetters(
-      window.innerWidth / settings.letterSize
-    );
-    setMatrixLettersBackground(matrixBackground);
-
-    setCanvasDimensions();
-    animate(0);
-  }, [
-    setMatrixLetters,
-    setMatrixLettersLayer2,
-    setMatrixLettersBackground,
-    maxColumns,
-  ]);
-
-  // useEffect(() => {
-  //   console.log('Starting animation');
-  //   animate(0);
-  //   return () => {
-  //     if (requestRef.current !== null) {
-  //       cancelAnimationFrame(requestRef.current);
-  //     }
-  //   };
-  // }, [matrixLetters, matrixLettersBackground]);
-
-  return (
-    <MainContainer>
-      <ChildredContainer>{children}</ChildredContainer>
-      <MatrixContainer>
-        <MatrixCanvasComponent ref={letterTrailCanvasRef}>
-          Canvas is not supported in your browser.
-        </MatrixCanvasComponent>
-        <MatrixCanvasComponent ref={letterCanvasRef}>
-          Canvas is not supported in your browser.
-        </MatrixCanvasComponent>
-        <MatrixCanvasComponent ref={backgroundCanvasRef}>
-          Canvas is not supported in your browser.
-        </MatrixCanvasComponent>
-      </MatrixContainer>
-    </MainContainer>
-  );
-};
-
-export default Matrix;
+export default MatrixRain;
