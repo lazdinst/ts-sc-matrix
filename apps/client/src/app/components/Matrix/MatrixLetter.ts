@@ -1,5 +1,5 @@
 import { randomFloat, randomInt } from './utils';
-import settings from './settings';
+import { letterSize, position, letterColor, font, lightness } from './settings';
 import data from './data';
 
 class MatrixLetter {
@@ -7,39 +7,53 @@ class MatrixLetter {
   private verticalPostion: number;
   private firstLetter = '';
   private letters: string[] = [];
+  private fontSize: number;
   private boost = false;
+  private boostSpeed = 0;
   private speed = 0;
-  private letterCanvasContext: CanvasRenderingContext2D | null | undefined;
-  private letterTrailCanvasContext: CanvasRenderingContext2D | null | undefined;
+  private letterContext: CanvasRenderingContext2D | null | undefined;
+  private letterTrailContext: CanvasRenderingContext2D | null | undefined;
+  private backgroundContext: CanvasRenderingContext2D | null | undefined;
   private canvasHeight: number;
-  private offset = settings.letterSize;
-  private letterTrailLength = 30;
-  private drawDelay = 20; // 20 is the best value for the trail
+  private offset = letterSize;
+  private letterTrailLength = 20;
+  private drawDelay = 0; // 20 is the best value for the trail
   private currentDrawDelay = 0;
   private delayedStart = false;
 
   constructor(
     column: number,
     canvasHeight: number,
-    verticalPostion: number,
-    letterCanvasContext: CanvasRenderingContext2D,
-    letterTrailCanvasContext: CanvasRenderingContext2D
+    letterContext: CanvasRenderingContext2D,
+    letterTrailContext: CanvasRenderingContext2D,
+    backgroundContext: CanvasRenderingContext2D,
+    fontSize?: number
   ) {
     this.column = column;
     this.canvasHeight = canvasHeight;
-    this.verticalPostion = verticalPostion;
-    this.letterCanvasContext = letterCanvasContext;
-    this.letterTrailCanvasContext = letterTrailCanvasContext;
+    this.verticalPostion = randomFloat(position.start, position.end);
+    this.letterContext = letterContext;
+    this.letterTrailContext = letterTrailContext;
+    this.backgroundContext = backgroundContext;
     this.getRandomLetter();
-
-    this.offset = this.letterTrailLength * settings.letterSize;
+    this.fontSize = fontSize || letterSize;
+    this.offset = this.letterTrailLength * letterSize;
 
     this.resetBoost();
     this.resetDelayedStart();
+
+    // this.letterContext.textAlign = 'center';
+    // this.letterTrailContext.fillStyle = maxtrixBackgroundLetters;
+    // this.letterTrailContext.font = `${letterSize}px ${font}`;
+    this.letterTrailLength = randomInt(6, 30);
   }
 
   private resetDelayedStart() {
     this.delayedStart = randomFloat(0, 1) > 0.9;
+  }
+
+  private setRandomTrailLength() {
+    this.letterTrailLength = randomInt(5, 20);
   }
 
   private setCanvasMatrix() {
@@ -51,15 +65,18 @@ class MatrixLetter {
   }
 
   private resetBoost() {
-    this.boost = randomFloat(0.1, 10) > 6;
+    this.boost = false;
+    this.boostSpeed = 1;
+
+    if (randomFloat(0.1, 10) > 9) {
+      this.boost = true;
+      this.boostSpeed = randomInt(2, 4);
+    }
   }
 
   private resetLetterPosition() {
-    this.verticalPostion = randomFloat(
-      settings.position.start,
-      settings.position.end
-    );
-    this.speed = randomFloat(settings.speed.min, settings.speed.max);
+    this.verticalPostion = randomFloat(position.start, position.end);
+    // this.speed = letterSize; //randomFloat(speed.min, speed.max);
   }
 
   private sendLetterToCanvas(
@@ -67,65 +84,87 @@ class MatrixLetter {
     context: CanvasRenderingContext2D,
     color?: string
   ) {
-    context.fillStyle = color ?? settings.letterColor;
-    context.font = `${settings.letterSize}px ${settings.font}`;
-    context.fillText(letter, this.column, this.verticalPostion);
+    context.shadowColor = letterColor;
+    context.shadowBlur = 5;
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 5;
 
-    context.shadowColor = settings.letterColor;
+    context.textAlign = 'center';
+    context.fillStyle = color ?? letterColor;
+    context.font = `${this.fontSize}px ${font}`;
+
+    const verticalPostion = this.verticalPostion - this.fontSize;
+    context.fillText(letter, this.column, verticalPostion);
+
+    // Reset the shadow properties (optional)
+    context.shadowColor = 'transparent';
+    context.shadowBlur = 0;
     context.shadowOffsetX = 0;
     context.shadowOffsetY = 0;
-    context.shadowBlur = 10;
   }
 
   private sendLetterTrailToCanvas(
     letters: string[],
-    canvas: CanvasRenderingContext2D,
+    context: CanvasRenderingContext2D,
     color?: string
   ) {
-    canvas.font = `${settings.letterSize}px ${settings.font}`;
+    context.font = `${this.fontSize}px ${font}`;
+
     letters.forEach((letter, index) => {
-      const isRandomLetterChange = randomFloat(0, 1) > 0.95;
-      if (isRandomLetterChange) {
-        letters[index] = this.getRandomLetter();
+      if (index > 0) {
+        const isRandomLetterChange = randomFloat(0, 1) > 0.8;
+        if (isRandomLetterChange) {
+          letters[index] = this.getRandomLetter();
+        }
+
+        // Calculate the lightness
+        const minLightness = lightness.low;
+        const maxLightness = lightness.high;
+        const letterOpacity = (letters.length - index) / letters.length;
+        const l = minLightness + (maxLightness - minLightness) * letterOpacity;
+
+        const fillStyle = `hsl(152, 100%, ${l}%)`;
+        context.shadowColor = `hsl(152, 100%, ${l}%)`;
+        context.shadowBlur = 5;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+
+        context.fillStyle = fillStyle;
+        context.textAlign = 'center';
+        const verticalPostion =
+          this.verticalPostion - (index + 1) * this.fontSize;
+        context.fillText(letters[index], this.column, verticalPostion);
+
+        context.shadowColor = 'transparent';
+        context.shadowBlur = 0;
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
       }
-      const letterOpacity = (letters.length - index) / letters.length;
-      // hsl(152 100% 50% / 0.5)
-
-      canvas.fillStyle = `rgba(0,255, 136,${letterOpacity})`;
-      canvas.fillText(
-        letters[index],
-        this.column,
-        this.verticalPostion - index * settings.letterSize
-      );
     });
-
-    // canvas.fillStyle = 'rgba(0,0,0,0.7)';
-    // canvas.fillRect(
-    //   this.column,
-    //   this.verticalPostion,
-    //   settings.letterSize,
-    //   3 // 3 is the best value for the trail
-    // );
   }
 
   // sendRandomBackgroundLetterToCanvas() {
 
   private clearLetterCanvas() {
-    if (!this.letterTrailCanvasContext || !this.letterCanvasContext) {
+    if (!this.letterTrailContext || !this.letterContext) {
       throw new Error('Canvas contexts are not available.');
-      return;
     }
-
-    this.letterTrailCanvasContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    this.letterTrailCanvasContext.fillRect(
+    this.letterTrailContext.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    this.letterTrailContext.fillRect(
       this.column,
       this.verticalPostion,
-      64,
+      this.fontSize,
       this.canvasHeight
     );
   }
 
-  public draw(boost?: number) {
+  public draw(color?: string) {
+    // this.clearLetterCanvas();
+
+    // this.ctx.textAlign = 'center';
+    // this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    // this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     if (!this.delayedStart) {
       if (this.currentDrawDelay > this.drawDelay) {
         this.firstLetter = this.getRandomLetter();
@@ -139,60 +178,44 @@ class MatrixLetter {
       }
       this.currentDrawDelay++;
 
-      // this makes a bad blur
-      // this.speed = randomFloat(settings.speed.min, settings.speed.max);
-
-      if (this.boost) {
-        const boostSpeed = randomInt(1, 2);
-        this.speed += boostSpeed;
-        console.log(boostSpeed);
+      if (this.letterContext) {
+        this.sendLetterToCanvas(this.firstLetter, this.letterContext);
       }
 
-      if (this.letterCanvasContext) {
-        this.sendLetterToCanvas(this.firstLetter, this.letterCanvasContext);
-      }
-
-      if (this.letterTrailCanvasContext) {
-        this.sendLetterTrailToCanvas(
-          this.letters,
-          this.letterTrailCanvasContext
-        );
+      if (this.letterContext) {
+        this.sendLetterTrailToCanvas(this.letters, this.letterContext);
       }
     }
 
-    this.verticalPostion += this.speed;
+    this.verticalPostion =
+      this.verticalPostion + this.fontSize * this.boostSpeed;
     this.clearLetterCanvas();
-    if (this.verticalPostion - this.offset > this.canvasHeight) {
+
+    if (
+      this.verticalPostion - this.offset > this.canvasHeight &&
+      Math.random() > 0.5
+    ) {
       this.resetLetterPosition();
       this.resetDelayedStart();
       this.resetBoost();
+      this.setRandomTrailLength();
     }
   }
 
   public drawBackground(boost?: number) {
     const letter = this.getRandomLetter();
-    this.speed = randomFloat(settings.speed.min, settings.speed.max);
-    if (boost) {
-      this.speed = boost;
-    }
 
-    if (this.letterTrailCanvasContext) {
-      this.letterTrailCanvasContext.fillStyle =
-        settings.maxtrixBackgroundLetters;
-      this.letterTrailCanvasContext.font = `${settings.letterSize}px ${settings.font}`;
-      this.letterTrailCanvasContext.fillText(
+    if (this.letterContext) {
+      this.letterContext.fillStyle = 'rgba(0, 255, 0, 0.1)';
+      this.letterContext.font = `${this.fontSize}px ${font}`;
+      this.letterContext.fillText(
         letter,
         this.column,
-        this.verticalPostion - settings.letterSize
+        this.verticalPostion - this.fontSize
       );
     }
 
-    this.verticalPostion += this.speed;
-
-    if (this.verticalPostion - (boost ?? 0) > this.canvasHeight) {
-      this.resetLetterPosition();
-      this.speed = randomFloat(settings.speed.min, settings.speed.max);
-    }
+    this.verticalPostion = randomInt(0, this.canvasHeight);
   }
 }
 

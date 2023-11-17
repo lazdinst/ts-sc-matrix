@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
-import Matrix from '../../components/Matrix';
+import Matrix from '../../components/Matrix/Matrix';
+import Rain from '../../components/Rain';
 import styled from 'styled-components';
 import LoginPrompt from '../../containers/LoginPrompt';
 
@@ -12,13 +13,11 @@ const MatrixChildWrapper = styled.div`
 
 const AuthWrapper: React.FC = () => {
   return (
-    <>
-      <Matrix>
-        <MatrixChildWrapper>
-          <LoginPrompt />
-        </MatrixChildWrapper>
-      </Matrix>
-    </>
+    <Matrix>
+      <MatrixChildWrapper>
+        <LoginPrompt />
+      </MatrixChildWrapper>
+    </Matrix>
   );
 };
 

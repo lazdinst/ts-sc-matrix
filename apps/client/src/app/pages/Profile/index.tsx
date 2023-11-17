@@ -1,5 +1,5 @@
 import React from 'react';
-import Matrix from '../../components/Matrix';
+import Matrix from '../../components/Rain';
 
 const Profile = () => {
   return <Matrix />;

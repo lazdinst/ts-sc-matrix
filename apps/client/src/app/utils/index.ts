@@ -37,3 +37,7 @@ export function parseUnitName(unitName: string): string {
   const parsedName: string = capitalizedWords.join(' ');
   return parsedName;
 }
+
+export function getRandomInt(max: number, min: number) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
