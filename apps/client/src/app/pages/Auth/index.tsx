@@ -1,8 +1,5 @@
-import React, { ReactNode } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
-import Matrix from '../../components/Matrix/Matrix';
-import Rain from '../../components/Rain';
+import React from 'react';
+import Matrix from '../../components/Matrix';
 import styled from 'styled-components';
 import LoginPrompt from '../../containers/LoginPrompt';
 

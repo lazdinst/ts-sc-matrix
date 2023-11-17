@@ -42,9 +42,6 @@ class MatrixLetter {
     this.resetBoost();
     this.resetDelayedStart();
 
-    // this.letterContext.textAlign = 'center';
-    // this.letterTrailContext.fillStyle = maxtrixBackgroundLetters;
-    // this.letterTrailContext.font = `${letterSize}px ${font}`;
     this.letterTrailLength = randomInt(6, 30);
   }
 
