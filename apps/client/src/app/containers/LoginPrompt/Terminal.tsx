@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
 import CLI from '../CLI';
+import TerminalTopBar from './TerminalTopBar';
 const SKIP_ANIMATION = true;
 
 const TerminalContainer = styled.div`
@@ -10,9 +11,9 @@ const TerminalContainer = styled.div`
   background-color: rgb(0, 0, 0, 0.9);
   color: rgb(0, 255, 136, 0.5);
   border-radius: 4px;
-  height: 400px;
   width: 400px;
   overflow-y: auto;
+  border: 1px solid rgb(255, 255, 255, 0.1);
 `;
 
 interface TerminalProps {
@@ -24,15 +25,10 @@ const Terminal: React.FC<TerminalProps> = () => {
   const startAnimation = SKIP_ANIMATION || isPromptReady;
 
   return (
-    <div>
-      {startAnimation ? (
-        <TerminalContainer id="terminal-container">
-          <CLI />
-        </TerminalContainer>
-      ) : (
-        <TextWithCursor callback={setPromptReady} />
-      )}
-    </div>
+    <TerminalContainer>
+      <TerminalTopBar />
+      {startAnimation ? <CLI /> : <TextWithCursor callback={setPromptReady} />}
+    </TerminalContainer>
   );
 };
 
