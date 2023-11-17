@@ -33,7 +33,6 @@ const ChildredContainer = styled.div`
   background-color: transparent;
   z-index: 2;
 `;
-// background-color: black;
 
 type MatrixProps = {
   children?: ReactNode;
