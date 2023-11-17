@@ -51,7 +51,7 @@ class MatrixRain extends React.Component<MatrixProps> {
   private backgroundCanvas: HTMLCanvasElement | null;
   private backgroundContext: CanvasRenderingContext2D | null;
 
-  private requestAnmationRefId: number | null;
+  private requestAnimationFrameRefId: number | null;
 
   private columnCount: number;
   private matrixLetters: MatrixLetter[];
@@ -64,7 +64,7 @@ class MatrixRain extends React.Component<MatrixProps> {
     super(props);
     this.state = {};
     this.columnCount = 0;
-    this.requestAnmationRefId = 0;
+    this.requestAnimationFrameRefId = 0;
     this.matrixLetters = [];
     this.matrixLettersLayer2 = [];
     this.matrixBackgroundLetters = [];
@@ -215,7 +215,7 @@ class MatrixRain extends React.Component<MatrixProps> {
         }
       }
     });
-    requestAnimationFrame(this.animate);
+    this.requestAnimationFrameRefId = requestAnimationFrame(this.animate);
   };
 
   componentDidMount(): void {
@@ -227,8 +227,8 @@ class MatrixRain extends React.Component<MatrixProps> {
   }
 
   componentWillUnmount(): void {
-    if (this.requestAnmationRefId !== null) {
-      cancelAnimationFrame(this.requestAnmationRefId);
+    if (this.requestAnimationFrameRefId !== null) {
+      cancelAnimationFrame(this.requestAnimationFrameRefId);
     }
   }
 
