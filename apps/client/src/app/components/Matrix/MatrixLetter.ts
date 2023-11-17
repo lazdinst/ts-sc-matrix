@@ -45,7 +45,7 @@ class MatrixLetter {
     // this.letterContext.textAlign = 'center';
     // this.letterTrailContext.fillStyle = maxtrixBackgroundLetters;
     // this.letterTrailContext.font = `${letterSize}px ${font}`;
-    this.letterTrailLength = randomInt(10, 30);
+    this.letterTrailLength = randomInt(6, 30);
   }
 
   private resetDelayedStart() {
@@ -53,7 +53,7 @@ class MatrixLetter {
   }
 
   private setRandomTrailLength() {
-    this.letterTrailLength = randomInt(10, 20);
+    this.letterTrailLength = randomInt(5, 20);
   }
 
   private setCanvasMatrix() {

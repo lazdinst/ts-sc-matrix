@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
 import CLI from '../CLI';
-
-const SKIP_ANIMATION = false;
+const SKIP_ANIMATION = true;
 
 const TerminalContainer = styled.div`
   font-size: 0.75rem;

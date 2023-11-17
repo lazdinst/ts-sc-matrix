@@ -1,3 +1,3 @@
-import cli, { setCLIState, STATES } from './cli';
+import cli, { setCLIState, STATES, setPreviousRootCommand } from './cli';
 
-export { cli, setCLIState, STATES };
+export { cli, setCLIState, STATES, setPreviousRootCommand };

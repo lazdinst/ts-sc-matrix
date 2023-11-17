@@ -14,6 +14,9 @@ export interface CLIProps {
   logout: () => void;
   checkUsernameExists: (username: string) => void;
   cliState: string;
+  previousRootCommand: string;
+  setPreviousRootCommand: (command: string) => void;
+  setCLIState: (state: string) => void;
 }
 
 export interface CLIState {
@@ -23,9 +26,9 @@ export interface CLIState {
   user: string;
 }
 
-export interface Response {
+export interface CommandResponse {
   cmdType: string;
-  cmd: string;
+  cmd: string | null;
   status: string;
-  responses: string[];
+  messages: string[];
 }

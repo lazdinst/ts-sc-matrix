@@ -2,10 +2,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../../redux/store';
-import { loginUser, registerUser, logout } from '../../../redux/slices/user';
+import {
+  loginUser,
+  registerUser,
+  logout,
+  isUserRegistered,
+  setIsLoggingIn,
+  setIsRegistering,
+} from '../../../redux/slices/user';
 import { User } from '../../../redux/slices/user/types';
-import { Command, CLIProps, CLIState } from './types';
-import { STATES } from '../../../redux/slices/cli';
+import { Command, CLIProps, CLIState, CommandResponse } from './types';
+import {
+  STATES,
+  setCLIState,
+  setPreviousRootCommand,
+} from '../../../redux/slices/cli';
 import { parseCommand } from './commandParser';
 import {
   CLIContainer,
@@ -30,7 +41,7 @@ class CLI extends React.Component<CLIProps, CLIState> {
     this.inputRef = React.createRef();
   }
 
-  updateCommandOutputs = (cmd: Command) => {
+  updateCommandOutputs = (cmd: CommandResponse) => {
     this.setState((prevState) => ({
       outputs: [...prevState.outputs, cmd],
     }));
@@ -55,12 +66,20 @@ class CLI extends React.Component<CLIProps, CLIState> {
   };
 
   handleLoginUser = async (cmd: string) => {
-    const { loginUser } = this.props;
+    const { loginUser, setPreviousRootCommand, setCLIState } = this.props;
     const { user } = this.state;
+
     const userAttempt: User = {
       id: '',
       username: user,
       password: cmd,
+    };
+
+    const commandResponse: CommandResponse = {
+      cmdType: '',
+      cmd: null,
+      status: 'error',
+      messages: [],
     };
 
     try {
@@ -69,6 +88,10 @@ class CLI extends React.Component<CLIProps, CLIState> {
         throw new Error('Login failed');
       }
     } catch (error) {
+      commandResponse.messages = ['Authentication Failure... '];
+      this.updateCommandOutputs(commandResponse);
+      setCLIState(STATES.INIT);
+      setPreviousRootCommand('');
       console.log('handle login use failed', error);
     }
     this.clearInput();
@@ -100,48 +123,134 @@ class CLI extends React.Component<CLIProps, CLIState> {
     this.handleCommand(cmd);
   };
 
+  handleMaskPassword = (chars: string) => {
+    return chars
+      .split('')
+      .map((char) => '*')
+      .join('');
+  };
+
   handleCommand = async (cmd: string) => {
-    const { user } = this.state;
-    const { cliState } = this.props;
+    const {
+      cliState,
+      previousRootCommand,
+      setPreviousRootCommand,
+      setCLIState,
+    } = this.props;
     if (!cmd) throw new Error('No command provided');
+    this.clearInput();
 
     const commandStrings = cmd.split(' ');
-    const rootCommand = commandStrings[0];
-    const knownCommands = ['register', 'login', 'logout'];
-
-    if (!knownCommands.includes(rootCommand)) {
+    const newRootCommand = commandStrings[0];
+    const knownRootCommands = ['register', 'login', 'logout', 'clear'];
+    const commandResponse: CommandResponse = {
+      cmdType: '',
+      cmd: cmd,
+      status: 'error',
+      messages: [],
+    };
+    console.log(newRootCommand, previousRootCommand);
+    if (
+      !knownRootCommands.includes(newRootCommand) &&
+      !knownRootCommands.includes(previousRootCommand)
+    ) {
       this.updateCommandOutputs({
         cmdType: 'UNKNOWN',
         cmd: cmd,
         status: 'error',
-        responses: [`Unknown cmd executed: ${cmd}`],
+        messages: [`Unknown cmd executed: ${cmd}`],
       });
+      this.clearInput();
       throw new Error('Unknown command');
     }
 
-    if (cliState === STATES.INIT) {
-      const { cmdType, status, responses } = await parseCommand(
-        cmd,
-        this.updateUser,
-        this.clearCommand
-      );
-      if (!cmdType || !status || !responses) {
-        throw new Error('Invalid command');
+    // If there is no previous command then we are starting a new command chain
+    if (!knownRootCommands.includes(previousRootCommand)) {
+      // Login Chain
+      if (newRootCommand === 'login') {
+        // Is the chain provided
+        if (commandStrings.length === 1) {
+          commandResponse.messages = [
+            `invalid input...expected 1 argument, received 0 arguments.`,
+            `"login $username"`,
+          ];
+          this.updateCommandOutputs(commandResponse);
+          return;
+        }
+
+        // Is the username provided
+        if (commandStrings.length === 2) {
+          // Is the username valid
+          const username = commandStrings[1];
+          const userExists = await isUserRegistered(username);
+
+          if (userExists) {
+            setIsLoggingIn(true);
+            this.updateUser(username);
+            setCLIState(STATES.PASSWORD);
+            setPreviousRootCommand(newRootCommand);
+            commandResponse.status = 'success';
+            commandResponse.messages = [
+              `logging in as: ${username}`,
+              `password:`,
+            ];
+          } else {
+            setCLIState(STATES.INIT);
+
+            commandResponse.messages = [
+              `user does not exist`,
+              `proceed with user registration.`,
+            ];
+          }
+
+          this.updateCommandOutputs(commandResponse);
+        }
+
+        if (commandStrings.length > 2) {
+          commandResponse.messages = [
+            `invalid input...expected 1 argument, received ${
+              commandStrings.length - 1
+            } arguments.`,
+            `"login $username"`,
+          ];
+          this.updateCommandOutputs(commandResponse);
+          return;
+        }
       }
-      this.updateCommandOutputs({ cmd, cmdType, status, responses });
-      this.clearInput();
     }
 
-    if (cliState === STATES.PASSWORD) {
-      // check redux action for logging in or regiustering
-      console.log('handleCommand: Password', cmd, cmdType);
-      console.log('register: Password', cmd);
-      this.handleLoginUser(cmd);
+    if (previousRootCommand === 'login') {
+      commandResponse.cmd = this.handleMaskPassword(cmd);
+      commandResponse.status = 'info';
+      commandResponse.messages = [`Authenticating...`];
+      this.updateCommandOutputs(commandResponse);
+      this.handleLoginUser(newRootCommand);
     }
-    if (cliState === STATES.LOGIN) {
-      console.log('register: Password', cmd);
-      this.registerNewUser(cmd);
-    }
+
+    // If there is a previous command then we are continuing a command chain
+
+    // if (cliState === STATES.INIT) {
+    //   const { cmdType, status, messages } = await parseCommand(
+    //     cmd,
+    //     this.updateUser,
+    //     this.clearCommand
+    //   );
+    //   if (!cmdType || !status || !messages) {
+    //     throw new Error('Invalid command');
+    //   }
+    //   this.updateCommandOutputs({ cmd, cmdType, status, messages });
+    //   this.clearInput();
+    // }
+
+    // if (cliState === STATES.PASSWORD) {
+    //   console.log('handleCommand: Password', cmd, cmdType);
+    //   console.log('register: Password', cmd);
+    //   this.handleLoginUser(cmd);
+    // }
+    // if (cliState === STATES.LOGIN) {
+    //   console.log('register: Password', cmd);
+    //   this.registerNewUser(cmd);
+    // }
   };
 
   handleRegistration = (cmd: string) => {
@@ -189,9 +298,8 @@ class CLI extends React.Component<CLIProps, CLIState> {
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}
-            <br />
             <ItemResponse status={item.status}>
-              {item.responses.map((response: string) => {
+              {item.messages.map((response: string) => {
                 return <div key={response}>{response}</div>;
               })}
             </ItemResponse>
@@ -215,13 +323,16 @@ const mapStateToProps = (state: RootState) => ({
   user: state.user.user,
   isAuthenticated: state.user.isAuthenticated,
   cliState: state.cli.state,
+  previousRootCommand: state.cli.previousRootCommand,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      registerUser: registerUser,
-      loginUser: loginUser,
+      registerUser,
+      loginUser,
+      setCLIState,
+      setPreviousRootCommand,
     },
     dispatch
   );

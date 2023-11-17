@@ -16,11 +16,13 @@ type StateTypes = keyof typeof STATES;
 interface CLIState {
   connected: boolean;
   state: StateTypes;
+  previousRootCommand: string;
 }
 
 const initialState: CLIState = {
   connected: false,
   state: 'INIT',
+  previousRootCommand: '',
 };
 
 const cli = createSlice({
@@ -30,10 +32,13 @@ const cli = createSlice({
     setCLIState: (state, action: PayloadAction<StateTypes>) => {
       state.state = action.payload;
     },
+    setPreviousRootCommand: (state, action: PayloadAction<string>) => {
+      state.previousRootCommand = action.payload;
+    },
   },
 });
 
-export const { setCLIState } = cli.actions;
+export const { setCLIState, setPreviousRootCommand } = cli.actions;
 
 export const getCLIState = (state: RootState) => state.cli.state;
 export default cli.reducer;

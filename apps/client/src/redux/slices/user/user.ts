@@ -1,7 +1,7 @@
 import { Dispatch, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from './types';
 import { RootState } from '../../store';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const DEFAULT_API_URL = 'http://localhost:6969';
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
@@ -69,9 +69,8 @@ export const isUserRegistered = async (username: string) => {
   try {
     const uri = `${API_URL}/api/user/check-username/${username}`;
     const response = await axios.get(uri);
-    console.log(response);
-    if (response) {
-      return true;
+    if (response.data) {
+      return response.data.exists;
     }
   } catch (error) {
     return true;
@@ -108,7 +107,7 @@ export const registerUser =
 
 export const loginUser =
   (user: User) =>
-  async (dispatch: Dispatch): Promise<boolean> => {
+  async (dispatch: Dispatch): Promise<AxiosResponse> => {
     const { username, password } = user;
     try {
       const uri = `${API_URL}/api/user/login`;
@@ -125,11 +124,11 @@ export const loginUser =
       };
       dispatch(login(authenticatedUser));
       dispatch(setRegistrationError(null));
-      return true;
+      return response;
     } catch (error) {
       console.error(error);
       dispatch(setRegistrationError('Login failed. Please try again.'));
-      return false;
+      throw error;
     }
   };
 

@@ -7,7 +7,7 @@ import {
 
 import { setCLIState } from '../../../redux/slices/cli/cli';
 
-import { Response } from './types';
+import { CommandResponse } from './types';
 
 export const parseCommand = async (
   cmd: string,
@@ -18,7 +18,7 @@ export const parseCommand = async (
   const commandStart = cmdParts[0];
 
   if (commandStart === 'register') {
-    const response: Response = {
+    const response: CommandResponse = {
       cmdType: 'REGISTER',
       cmd: cmd,
       status: 'error',
@@ -42,7 +42,7 @@ export const parseCommand = async (
   }
 
   if (commandStart === 'login') {
-    const response: Response = {
+    const response: CommandResponse = {
       cmdType: 'LOGIN',
       cmd: cmd,
       status: 'error',

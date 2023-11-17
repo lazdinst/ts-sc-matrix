@@ -55,7 +55,9 @@ router.post('/login', async (req, res) => {
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).send({ error: 'Authentication failed' });
+      return res
+        .status(401)
+        .send({ error: 'Incorrect Password. Authentication failed.' });
     }
 
     const token = jwt.sign(

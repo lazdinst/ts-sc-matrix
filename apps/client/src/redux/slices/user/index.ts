@@ -5,4 +5,7 @@ export {
   register,
   registerUser,
   loginUser,
+  isUserRegistered,
+  setIsLoggingIn,
+  setIsRegistering,
 } from './user';
