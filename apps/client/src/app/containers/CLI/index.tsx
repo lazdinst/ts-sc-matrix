@@ -16,6 +16,7 @@ import {
   STATES,
   setCLIState,
   setPreviousRootCommand,
+  updateOutputs,
 } from '../../../redux/slices/cli';
 import { knownRootCommands } from './constants';
 import {
@@ -42,9 +43,8 @@ class CLI extends React.Component<CLIProps, CLIState> {
   }
 
   updateCommandOutputs = (cmd: CommandResponse) => {
-    this.setState((prevState) => ({
-      outputs: [...prevState.outputs, cmd],
-    }));
+    const { updateOutputs } = this.props;
+    updateOutputs(cmd);
   };
 
   updateUser = (user: string) => {
@@ -390,8 +390,8 @@ class CLI extends React.Component<CLIProps, CLIState> {
   }
 
   render() {
-    const { inputText, outputs } = this.state;
-    const { cliState } = this.props;
+    const { inputText } = this.state;
+    const { cliState, outputs } = this.props;
     return (
       <CLIContainer id="CLI-Container" onClick={this.setInputFocus}>
         {outputs.map((item, index) => (
@@ -423,6 +423,7 @@ const mapStateToProps = (state: RootState) => ({
   isAuthenticated: state.user.isAuthenticated,
   cliState: state.cli.state,
   previousRootCommand: state.cli.previousRootCommand,
+  outputs: state.cli.outputs,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
@@ -432,6 +433,7 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
       loginUser,
       setCLIState,
       setPreviousRootCommand,
+      updateOutputs,
     },
     dispatch
   );
