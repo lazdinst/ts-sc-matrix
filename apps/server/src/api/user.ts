@@ -2,8 +2,22 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
+const sessions = new Map();
+
+function getSessionData(id: string) {
+  return sessions.get(id);
+}
+
+function storeSession(sessionId, user) {
+  sessions.set(sessionId, user);
+}
+
+function generateSessionId() {
+  return uuidv4();
+}
 
 router.post('/register', async (req, res) => {
   try {
@@ -60,8 +74,10 @@ router.post('/login', async (req, res) => {
         .send({ error: 'Incorrect Password. Authentication failed.' });
     }
 
+    const sessionId = generateSessionId();
+    storeSession(sessionId, user);
     const token = jwt.sign(
-      { userId: user._id, username: user.username },
+      { userId: user._id, username: user.username, sessionId },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '1h' }
     );
@@ -85,6 +101,34 @@ router.get('/check-username/:username', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.post('/validate-token', (req, res, next) => {
+  const token = req.body.token; // Assuming the token is sent in the request body
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.VITE_REACT_JWT_SECRET || 'secret'
+    );
+    const sessionId = decoded.sessionId;
+
+    // Retrieve user data from the session using the sessionId
+    const user = getSessionData(sessionId);
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid session' });
+    }
+
+    // Attach user data to the response
+    res.json({ user });
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
   }
 });
 

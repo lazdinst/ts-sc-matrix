@@ -8,4 +8,6 @@ export {
   isUserRegistered,
   setIsLoggingIn,
   setIsRegistering,
+  validateToken,
+  setAuthenticating,
 } from './user';

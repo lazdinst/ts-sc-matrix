@@ -9,6 +9,7 @@ import {
   isUserRegistered,
   setIsLoggingIn,
   setIsRegistering,
+  validateToken,
 } from '../../../redux/slices/user';
 import { User } from '../../../redux/slices/user/types';
 import { Command, CLIProps, CLIState, CommandResponse } from './types';
@@ -391,9 +392,12 @@ class CLI extends React.Component<CLIProps, CLIState> {
 
   render() {
     const { inputText } = this.state;
-    const { cliState, outputs } = this.props;
+    const { cliState, outputs, validateToken } = this.props;
     return (
       <CLIContainer id="CLI-Container" onClick={this.setInputFocus}>
+        <button type="button" onClick={validateToken}>
+          Validate Token
+        </button>
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}
@@ -434,6 +438,7 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
       setCLIState,
       setPreviousRootCommand,
       updateOutputs,
+      validateToken,
     },
     dispatch
   );

@@ -13,6 +13,7 @@ interface UserState {
   loginError: string | null;
   isLoggingIn: boolean | null;
   isRegistering: boolean | null;
+  isAuthenticating: boolean | null;
 }
 
 const initialState: UserState = {
@@ -22,6 +23,7 @@ const initialState: UserState = {
   loginError: null,
   isLoggingIn: null,
   isRegistering: null,
+  isAuthenticating: true,
 };
 
 const user = createSlice({
@@ -49,6 +51,9 @@ const user = createSlice({
     setRegistrationError: (state, action: PayloadAction<string | null>) => {
       state.registrationError = action.payload;
     },
+    setAuthenticating: (state, action: PayloadAction<boolean | null>) => {
+      state.isAuthenticating = action.payload;
+    },
     setLoginError: (state, action: PayloadAction<string | null>) => {
       state.loginError = action.payload;
     },
@@ -62,6 +67,7 @@ export const {
   setIsLoggingIn,
   setIsRegistering,
   setRegistrationError,
+  setAuthenticating,
 } = user.actions;
 export default user.reducer;
 
@@ -132,6 +138,28 @@ export const loginUser =
     }
   };
 
+export const validateToken = () => async (dispatch: Dispatch) => {
+  try {
+    const uri = `${API_URL}/api/user/validate-token`;
+    const token = localStorage.getItem('authToken');
+    const response = await axios.post(uri, {
+      token,
+    });
+    const authenticatedUser: User = {
+      id: response.data.id,
+      username: response.data.username,
+      password: '',
+    };
+    dispatch(login(authenticatedUser));
+    dispatch(setAuthenticating(false));
+  } catch (error) {
+    console.error(error);
+    dispatch(setRegistrationError('Login failed. Please try again.'));
+    dispatch(setAuthenticating(false));
+    throw error;
+  }
+};
+
 export const setAuthTokenLocalStorage = (token: string | null) => {
   if (token) {
     localStorage.setItem('authToken', token);
@@ -144,6 +172,9 @@ export const selectRegistrationError = (state: RootState) =>
   state.user.registrationError;
 
 export const selectIsAuthenticated = (state: RootState) =>
+  state.user.isAuthenticated;
+
+export const selectIsAuthenticating = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectUser = (state: RootState) => state.user.user;
