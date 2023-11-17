@@ -79,7 +79,7 @@ export const isUserRegistered = async (username: string) => {
 
 export const registerUser =
   (user: User) =>
-  async (dispatch: Dispatch): Promise<boolean> => {
+  async (dispatch: Dispatch): Promise<AxiosResponse> => {
     const { username, password } = user;
     try {
       const uri = `${API_URL}/api/user/register`;
@@ -97,11 +97,11 @@ export const registerUser =
       dispatch(register(registeredUser));
 
       dispatch(setRegistrationError(null));
-      return true;
+      return response;
     } catch (error) {
       console.error(error);
       dispatch(setRegistrationError('Registration failed. Please try again.'));
-      return false;
+      throw error;
     }
   };
 
