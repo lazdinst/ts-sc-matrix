@@ -20,3 +20,13 @@ export const matrixResponses = [
   'Greetings, user. Prepare for a journey into the abyss where laughter is scarce and darkness is plenty.',
   "Hello, human. The Matrix is a carnival of nightmares, and you've just bought a ticket to the darkest show in town.",
 ];
+
+export const knownRootCommands = [
+  'register',
+  'login',
+  'logout',
+  'clear',
+  'help',
+  'exit',
+  'quit',
+];

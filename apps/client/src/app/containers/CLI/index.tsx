@@ -17,7 +17,7 @@ import {
   setCLIState,
   setPreviousRootCommand,
 } from '../../../redux/slices/cli';
-import { parseCommand } from './commandParser';
+import { knownRootCommands } from './constants';
 import {
   CLIContainer,
   OutputItem,
@@ -131,6 +131,7 @@ class CLI extends React.Component<CLIProps, CLIState> {
 
   clearInput = () => {
     this.setState({ inputText: '' });
+    this.setInputFocus();
   };
 
   handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,25 +164,20 @@ class CLI extends React.Component<CLIProps, CLIState> {
   };
 
   handleCommand = async (cmd: string) => {
-    const {
-      cliState,
-      previousRootCommand,
-      setPreviousRootCommand,
-      setCLIState,
-    } = this.props;
+    const { previousRootCommand } = this.props;
     if (!cmd) throw new Error('No command provided');
     this.clearInput();
 
     const commandStrings = cmd.split(' ');
     const newRootCommand = commandStrings[0];
-    const knownRootCommands = ['register', 'login', 'logout', 'clear'];
+
     const commandResponse: CommandResponse = {
       cmdType: '',
       cmd: cmd,
       status: 'error',
       messages: [],
     };
-    console.log(newRootCommand, previousRootCommand);
+
     if (
       !knownRootCommands.includes(newRootCommand) &&
       !knownRootCommands.includes(previousRootCommand)
@@ -193,108 +189,53 @@ class CLI extends React.Component<CLIProps, CLIState> {
         messages: [`Unknown cmd executed: ${cmd}`],
       });
       this.clearInput();
-      throw new Error('Unknown command');
+      return;
     }
 
+    this.handleKnownCommands(newRootCommand, commandStrings, commandResponse);
+  };
+
+  handleKnownCommands = async (
+    newRootCommand: string,
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    const { previousRootCommand } = this.props;
     if (!knownRootCommands.includes(previousRootCommand)) {
       if (newRootCommand === 'login') {
-        if (commandStrings.length === 1) {
-          commandResponse.messages = [
-            `invalid input...expected 1 argument, received 0 arguments.`,
-            `"login $username"`,
-          ];
-          this.updateCommandOutputs(commandResponse);
-          return;
-        }
-
-        if (commandStrings.length === 2) {
-          const username = commandStrings[1];
-          const userExists = await isUserRegistered(username);
-
-          if (userExists) {
-            setIsLoggingIn(true);
-            this.updateUser(username);
-            setCLIState(STATES.PASSWORD);
-            setPreviousRootCommand(newRootCommand);
-            commandResponse.status = 'success';
-            commandResponse.messages = [
-              `logging in as: ${username}`,
-              `password:`,
-            ];
-          } else {
-            setCLIState(STATES.INIT);
-            commandResponse.messages = [
-              `user does not exist`,
-              `proceed with user registration.`,
-            ];
-          }
-
-          this.updateCommandOutputs(commandResponse);
-          return;
-        }
-
-        if (commandStrings.length > 2) {
-          commandResponse.messages = [
-            `invalid input...expected 1 argument, received ${
-              commandStrings.length - 1
-            } arguments.`,
-            `"login $username"`,
-          ];
-          this.updateCommandOutputs(commandResponse);
-          return;
-        }
-      }
-    }
-
-    if (newRootCommand === 'register') {
-      if (commandStrings.length === 1) {
-        commandResponse.messages = [
-          `invalid input...expected 1 argument, received 0 arguments.`,
-          `"login $username"`,
-        ];
-        this.updateCommandOutputs(commandResponse);
+        this.handleLoginCommandAttempt(
+          newRootCommand,
+          commandStrings,
+          commandResponse
+        );
         return;
       }
 
-      if (commandStrings.length === 2) {
-        const username = commandStrings[1];
-        const userExists = await isUserRegistered(username);
-
-        if (!userExists) {
-          setIsLoggingIn(true);
-          this.updateUser(username);
-          setCLIState(STATES.PASSWORD);
-          setPreviousRootCommand(newRootCommand);
-          commandResponse.status = 'success';
-          commandResponse.messages = [
-            `Creating auth client: ${username}`,
-            `password:`,
-          ];
-        } else {
-          setCLIState(STATES.INIT);
-          commandResponse.messages = [
-            `user with this login already exists`,
-            `proceed with login or choose a different username`,
-          ];
-        }
-
-        this.updateCommandOutputs(commandResponse);
+      if (newRootCommand === 'register') {
+        this.handleRegisterCommandAttempt(
+          newRootCommand,
+          commandStrings,
+          commandResponse
+        );
+        return;
+      }
+      if (newRootCommand === 'help') {
+        this.handleHelpCommandAttempt(
+          newRootCommand,
+          commandStrings,
+          commandResponse
+        );
+        return;
       }
 
-      if (commandStrings.length > 2) {
-        commandResponse.messages = [
-          `invalid input...expected 1 argument, received ${
-            commandStrings.length - 1
-          } arguments.`,
-          `"login $username"`,
-        ];
-        this.updateCommandOutputs(commandResponse);
+      if (newRootCommand === 'clear') {
+        this.clearCommand();
         return;
       }
     }
 
     if (previousRootCommand === 'login' || previousRootCommand === 'register') {
-      commandResponse.cmd = this.handleMaskPassword(cmd);
+      commandResponse.cmd = this.handleMaskPassword(newRootCommand);
       commandResponse.status = 'info';
       commandResponse.messages = [`Authenticating...`];
       this.updateCommandOutputs(commandResponse);
@@ -305,6 +246,117 @@ class CLI extends React.Component<CLIProps, CLIState> {
       }
       this.handleUserRegistration(newRootCommand);
     }
+  };
+
+  handleLoginCommandAttempt = async (
+    newRootCommand: string,
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    const { setPreviousRootCommand, setCLIState } = this.props;
+    if (commandStrings.length === 1) {
+      commandResponse.messages = [
+        `invalid input...expected 1 argument, received 0 arguments.`,
+        `"login $username"`,
+      ];
+      this.updateCommandOutputs(commandResponse);
+      return;
+    }
+
+    if (commandStrings.length === 2) {
+      const username = commandStrings[1];
+      const userExists = await isUserRegistered(username);
+
+      if (userExists) {
+        setIsLoggingIn(true);
+        this.updateUser(username);
+        setCLIState(STATES.PASSWORD);
+        setPreviousRootCommand(newRootCommand);
+        commandResponse.status = 'success';
+        commandResponse.messages = [`logging in as: ${username}`, `password:`];
+      } else {
+        setCLIState(STATES.INIT);
+        commandResponse.messages = [
+          `user does not exist`,
+          `proceed with user registration.`,
+        ];
+      }
+
+      this.updateCommandOutputs(commandResponse);
+      return;
+    }
+
+    if (commandStrings.length > 2) {
+      commandResponse.messages = [
+        `invalid input...expected 1 argument, received ${
+          commandStrings.length - 1
+        } arguments.`,
+        `"login $username"`,
+      ];
+      this.updateCommandOutputs(commandResponse);
+      return;
+    }
+  };
+
+  handleRegisterCommandAttempt = async (
+    newRootCommand: string,
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    const { setPreviousRootCommand, setCLIState } = this.props;
+    if (commandStrings.length === 1) {
+      commandResponse.messages = [
+        `invalid input...expected 1 argument, received 0 arguments.`,
+        `"login $username"`,
+      ];
+      this.updateCommandOutputs(commandResponse);
+      return;
+    }
+
+    if (commandStrings.length === 2) {
+      const username = commandStrings[1];
+      const userExists = await isUserRegistered(username);
+
+      if (!userExists) {
+        setIsLoggingIn(true);
+        this.updateUser(username);
+        setCLIState(STATES.PASSWORD);
+        setPreviousRootCommand(newRootCommand);
+        commandResponse.status = 'success';
+        commandResponse.messages = [
+          `Creating auth client: ${username}`,
+          `password:`,
+        ];
+      } else {
+        setCLIState(STATES.INIT);
+        commandResponse.messages = [
+          `user with this login already exists`,
+          `proceed with login or choose a different username`,
+        ];
+      }
+
+      this.updateCommandOutputs(commandResponse);
+    }
+
+    if (commandStrings.length > 2) {
+      commandResponse.messages = [
+        `invalid input...expected 1 argument, received ${
+          commandStrings.length - 1
+        } arguments.`,
+        `"login $username"`,
+      ];
+      this.updateCommandOutputs(commandResponse);
+      return;
+    }
+  };
+
+  handleHelpCommandAttempt = async (
+    newRootCommand: string,
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    commandResponse.messages = ['help command not implemented yet.'];
+    this.updateCommandOutputs(commandResponse);
   };
 
   clearCommand = () => {
@@ -342,7 +394,6 @@ class CLI extends React.Component<CLIProps, CLIState> {
     const { cliState } = this.props;
     return (
       <CLIContainer id="CLI-Container" onClick={this.setInputFocus}>
-        <div>{cliState}</div>
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}

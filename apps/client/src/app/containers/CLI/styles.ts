@@ -6,8 +6,9 @@ export const CLIContainer = styled.div`
   font-family: courier;
   height: 400px;
   overflow-y: auto;
-  opacity: 0; /* Start with opacity 0 */
-  animation: ${fadeIn} 0.5s ease-in-out forwards; /* Apply the animation */
+  opacity: 0;
+  animation: ${fadeIn} 0.5s ease-in-out forwards;
+  padding: 0rem 0.25rem;
 `;
 
 export const OutputItem = styled.div`
