@@ -17,12 +17,14 @@ interface CLIState {
   connected: boolean;
   state: StateTypes;
   previousRootCommand: string;
+  outputs: string[];
 }
 
 const initialState: CLIState = {
   connected: false,
   state: 'INIT',
   previousRootCommand: '',
+  outputs: [],
 };
 
 const cli = createSlice({
@@ -35,10 +37,14 @@ const cli = createSlice({
     setPreviousRootCommand: (state, action: PayloadAction<string>) => {
       state.previousRootCommand = action.payload;
     },
+    updateOutputs: (state, action: PayloadAction<string>) => {
+      state.outputs = [...state.outputs, action.payload];
+    },
   },
 });
 
-export const { setCLIState, setPreviousRootCommand } = cli.actions;
+export const { setCLIState, setPreviousRootCommand, updateOutputs } =
+  cli.actions;
 
 export const getCLIState = (state: RootState) => state.cli.state;
 export default cli.reducer;

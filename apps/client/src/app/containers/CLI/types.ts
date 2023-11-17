@@ -17,6 +17,8 @@ export interface CLIProps {
   previousRootCommand: string;
   setPreviousRootCommand: (command: string) => void;
   setCLIState: (state: string) => void;
+  updateOutputs: (output: CommandResponse) => void;
+  outputs: CommandResponse[];
 }
 
 export interface CLIState {
