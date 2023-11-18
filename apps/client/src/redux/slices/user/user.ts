@@ -123,8 +123,8 @@ export const loginUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const authenticatedUser: User = {
-        id: response.data.id,
-        username: response.data.username,
+        id: response.data.user.id,
+        username: response.data.user.username,
       };
       dispatch(login(authenticatedUser));
       dispatch(setRegistrationError(null));

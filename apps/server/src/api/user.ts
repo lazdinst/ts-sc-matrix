@@ -98,7 +98,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.status(200).send({ token });
+    res.status(200).send({ token, user });
   } catch (error) {
     res.status(400).send(error);
   }
