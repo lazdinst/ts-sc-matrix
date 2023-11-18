@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
 interface UserState {
   isAuthenticated: boolean;
+  isAuthenticating: boolean;
   user: User | null;
   registrationError: string | null;
   loginError: string | null;
@@ -22,6 +23,7 @@ const initialState: UserState = {
   loginError: null,
   isLoggingIn: null,
   isRegistering: null,
+  isAuthenticating: true,
 };
 
 const user = createSlice({
@@ -49,6 +51,9 @@ const user = createSlice({
     setRegistrationError: (state, action: PayloadAction<string | null>) => {
       state.registrationError = action.payload;
     },
+    setAuthenticating: (state, action: PayloadAction<boolean | null>) => {
+      state.isAuthenticating = action.payload;
+    },
     setLoginError: (state, action: PayloadAction<string | null>) => {
       state.loginError = action.payload;
     },
@@ -62,6 +67,7 @@ export const {
   setIsLoggingIn,
   setIsRegistering,
   setRegistrationError,
+  setAuthenticating,
 } = user.actions;
 export default user.reducer;
 
@@ -90,9 +96,8 @@ export const registerUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const registeredUser: User = {
-        id: response.data.id,
-        username: response.data.username,
-        password: '',
+        id: response.data.user.id,
+        username: response.data.user.username,
       };
       dispatch(register(registeredUser));
 
@@ -118,9 +123,8 @@ export const loginUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const authenticatedUser: User = {
-        id: response.data.id,
-        username: response.data.username,
-        password: '',
+        id: response.data.user.id,
+        username: response.data.user.username,
       };
       dispatch(login(authenticatedUser));
       dispatch(setRegistrationError(null));
@@ -131,6 +135,38 @@ export const loginUser =
       throw error;
     }
   };
+
+export const validateToken = () => async (dispatch: Dispatch) => {
+  try {
+    const uri = `${API_URL}/api/user/validate-token`;
+    const token = localStorage.getItem('authToken');
+    const response = await axios.post(uri, {
+      token,
+    });
+    const authenticatedUser: User = {
+      id: response.data.id,
+      username: response.data.username,
+    };
+
+    dispatch(login(authenticatedUser));
+    dispatch(setAuthenticating(false));
+  } catch (error) {
+    console.error(error);
+    dispatch(setRegistrationError('Login failed. Please try again.'));
+    dispatch(setAuthenticating(false));
+    throw error;
+  }
+};
+
+export const logoutUser = () => async (dispatch: Dispatch) => {
+  try {
+    dispatch(logout());
+    setAuthTokenLocalStorage(null);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 
 export const setAuthTokenLocalStorage = (token: string | null) => {
   if (token) {
@@ -144,6 +180,9 @@ export const selectRegistrationError = (state: RootState) =>
   state.user.registrationError;
 
 export const selectIsAuthenticated = (state: RootState) =>
+  state.user.isAuthenticated;
+
+export const selectIsAuthenticating = (state: RootState) =>
   state.user.isAuthenticated;
 
 export const selectUser = (state: RootState) => state.user.user;

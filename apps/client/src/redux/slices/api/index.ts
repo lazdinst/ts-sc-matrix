@@ -1,3 +1,3 @@
-import server from './server';
+import server, { fetchServerStatus } from './server';
 
-export { server };
+export { server, fetchServerStatus };

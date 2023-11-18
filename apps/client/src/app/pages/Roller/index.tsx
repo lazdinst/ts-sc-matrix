@@ -11,7 +11,7 @@ import {
   Card,
   SecondarySidebar,
 } from '../../components';
-
+import GameHistory from '../../containers/GameHistory';
 import PlayerCard from '../../containers/PlayerCard';
 
 const Roller: React.FC = () => {
@@ -35,7 +35,9 @@ const Roller: React.FC = () => {
 
   return (
     <>
-      <SecondarySidebar>dfew</SecondarySidebar>
+      <SecondarySidebar>
+        <GameHistory />
+      </SecondarySidebar>
       <Page
         id="roller-page"
         flexDirection="column"
@@ -50,7 +52,7 @@ const Roller: React.FC = () => {
           width="100%"
           padding="3rem 0rem"
         >
-          <PlayerCard player={playerOne} />
+          {playerOne && <PlayerCard player={playerOne} />}
           <PlayerCard player={playerTwo} />
         </Section>
         <Section justifyContent="center" height="100%">

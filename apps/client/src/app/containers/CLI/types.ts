@@ -1,12 +1,5 @@
 import { User } from '../../../redux/slices/user/types';
 
-export type Command = {
-  cmd: string;
-  cmdType: string;
-  status: string;
-  responses: string[];
-};
-
 export interface CLIProps {
   login: (user: User) => void;
   registerUser: (user: User) => boolean;
@@ -19,6 +12,7 @@ export interface CLIProps {
   setCLIState: (state: string) => void;
   updateOutputs: (output: CommandResponse) => void;
   outputs: CommandResponse[];
+  clearOutputs: () => void;
 }
 
 export interface CLIState {

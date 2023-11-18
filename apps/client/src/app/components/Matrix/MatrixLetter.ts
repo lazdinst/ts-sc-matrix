@@ -73,7 +73,6 @@ class MatrixLetter {
 
   private resetLetterPosition() {
     this.verticalPostion = randomFloat(position.start, position.end);
-    // this.speed = letterSize; //randomFloat(speed.min, speed.max);
   }
 
   private sendLetterToCanvas(
@@ -93,7 +92,7 @@ class MatrixLetter {
     const verticalPostion = this.verticalPostion - this.fontSize;
     context.fillText(letter, this.column, verticalPostion);
 
-    // Reset the shadow properties (optional)
+    // Reset the shadow properties
     context.shadowColor = 'transparent';
     context.shadowBlur = 0;
     context.shadowOffsetX = 0;

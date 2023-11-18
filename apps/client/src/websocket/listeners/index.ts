@@ -1,43 +1,50 @@
-import { Socket } from 'socket.io-client'; // Import your Socket.io library
-import { Dispatch } from 'redux';
-
-import {
-  connectWebSocket,
-  disconnectWebSocket,
-} from '../../redux/slices/websocket';
-
-import { setRolls } from '../../redux/slices/roller';
+import { Socket } from 'socket.io-client';
 import { RollerState } from '../../redux/slices/roller/roller';
+import { User } from '../../redux/slices/user/types';
+
+const emitUserToSocket = (socket: Socket, user: User) => {
+  socket.emit('user-connected', user);
+};
 
 export const setupSocketStateListeners = (
   socket: Socket,
-  dispatch: Dispatch
+  user: User,
+  connectWebSocket: () => void,
+  disconnectWebSocket: () => void
 ) => {
   socket.on('connect', () => {
     console.log('Connected...');
-    dispatch(connectWebSocket());
+    connectWebSocket();
+    emitUserToSocket(socket, user);
   });
 
   socket.on('disconnect', () => {
-    dispatch(disconnectWebSocket());
+    disconnectWebSocket();
   });
 
-  socket.on('error', (error) => {
+  socket.on('error', (error: Error) => {
     console.error('WebSocket error:', error);
   });
 };
 
-export const setupConnectionListners = (socket: Socket, dispatch: Dispatch) => {
-  socket.on('connections', (connections: { count: number }) => {
-    console.log('Connections:', connections);
+export const setupUserConnections = (socket: Socket, setConnections: any) => {
+  socket.on('connections', (users) => {
+    console.log('Connections:', users);
+    setConnections('users');
   });
 };
 
-export const setupSocketListeners = (socket: Socket, dispatch: Dispatch) => {
+// export const setupConnectionListners = (socket: Socket) => {
+//   socket.on('connections', (connections: { count: number }) => {
+//     console.log('Connections:', connections);
+//   });
+// };
+
+export const setupRollerListeners = (socket: Socket, setRolls: any) => {
   socket.on('roll', (message: any) => {
     console.log('Roll:', message);
     const rollMessage: RollerState = message;
     console.log('rollMessage:', rollMessage);
-    dispatch(setRolls(rollMessage));
+    setRolls(rollMessage);
   });
 };
