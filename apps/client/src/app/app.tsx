@@ -1,50 +1,57 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-
-import { ThemeProvider } from '../app/styled';
 import Router from './router';
 import Sidebar from './containers/Sidebar';
 import Main from './components/Main';
 import Loader from './components/Loader';
 import { RootState } from '../redux/store';
-import { useSelector, useDispatch } from 'react-redux';
 import Auth from './pages/Auth';
-import { validateToken, setAuthenticating } from '../redux/slices/user';
+import { validateToken } from '../redux/slices/user';
+import { fetchServerStatus } from '../redux/slices/api';
 
-import { useServerConnection } from './containers/ServerStatus';
+type AppProps = {
+  isAuthenticated: boolean;
+  isAuthenticating: boolean;
+  loading: boolean;
+  connected: boolean;
+  error: string | null;
+  validateToken: () => void;
+  fetchServerStatus: () => Promise<void>;
+};
 
-class App extends React.Component {
+class App extends React.Component<AppProps> {
   componentDidMount() {
-    // You can directly call validateToken from props
-    this.props.validateToken();
+    const { validateToken, fetchServerStatus } = this.props;
+    fetchServerStatus().then(() => validateToken());
   }
 
   render() {
-    const { isAuthenticated, isAuthenticating } = this.props;
+    const { isAuthenticated, isAuthenticating, loading, error, connected } =
+      this.props;
 
-    let content = null;
-
-    if (loading) {
-      content = <Loader />;
-    } else if (error) {
-      content = <div>Error: {error}</div>;
-    } else if (connected) {
-      content = <Router />;
+    if (!connected) {
+      if (loading) {
+        return <Loader />;
+      }
+      if (error) {
+        return <div>Error: {error}</div>;
+      }
     }
 
-    if (isAuthenticating) return <Loader />;
+    if (!isAuthenticated) {
+      if (isAuthenticating) {
+        return <Loader />;
+      }
+      return <Auth />;
+    }
 
     return (
-      <ThemeProvider>
-        {isAuthenticated ? (
-          <>
-            <Sidebar />
-            <Main>{content}</Main>
-          </>
-        ) : (
-          <Auth />
-        )}
-      </ThemeProvider>
+      <>
+        <Sidebar />
+        <Main>
+          <Router />
+        </Main>
+      </>
     );
   }
 }
@@ -52,8 +59,11 @@ class App extends React.Component {
 const mapStateToProps = (state: RootState) => ({
   isAuthenticated: state.user.isAuthenticated,
   isAuthenticating: state.user.isAuthenticating,
-  isLoading: state.server.isLoading,
+  loading: state.server.loading,
+  connected: state.server.connected,
+  error: state.server.error,
 });
 
-// Connect the component to the Redux store and automatically inject validateToken action
-export default connect(mapStateToProps, { validateToken })(App);
+export default connect(mapStateToProps, { validateToken, fetchServerStatus })(
+  App
+);

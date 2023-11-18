@@ -8,12 +8,12 @@ const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
 interface UserState {
   isAuthenticated: boolean;
+  isAuthenticating: boolean;
   user: User | null;
   registrationError: string | null;
   loginError: string | null;
   isLoggingIn: boolean | null;
   isRegistering: boolean | null;
-  isAuthenticating: boolean | null;
 }
 
 const initialState: UserState = {

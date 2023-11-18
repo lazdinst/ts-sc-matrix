@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import App from './app/app';
 import WebSocketProvider from './websocket';
+import { ThemeProvider } from './app/styled';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +16,9 @@ root.render(
     <BrowserRouter>
       <Provider store={store}>
         <WebSocketProvider>
-          <App />
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
         </WebSocketProvider>
       </Provider>
     </BrowserRouter>
