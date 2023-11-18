@@ -5,14 +5,12 @@ import { RootState } from '../../../redux/store';
 import {
   loginUser,
   registerUser,
-  logout,
   isUserRegistered,
   setIsLoggingIn,
-  setIsRegistering,
   validateToken,
 } from '../../../redux/slices/user';
 import { User } from '../../../redux/slices/user/types';
-import { Command, CLIProps, CLIState, CommandResponse } from './types';
+import { CLIProps, CLIState, CommandResponse } from './types';
 import {
   STATES,
   setCLIState,
@@ -392,12 +390,9 @@ class CLI extends React.Component<CLIProps, CLIState> {
 
   render() {
     const { inputText } = this.state;
-    const { cliState, outputs, validateToken } = this.props;
+    const { cliState, outputs } = this.props;
     return (
       <CLIContainer id="CLI-Container" onClick={this.setInputFocus}>
-        <button type="button" onClick={validateToken}>
-          Validate Token
-        </button>
         {outputs.map((item, index) => (
           <OutputItem key={index}>
             {item.cmd}

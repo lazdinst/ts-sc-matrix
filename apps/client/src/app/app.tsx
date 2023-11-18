@@ -8,6 +8,7 @@ import { RootState } from '../redux/store';
 import Auth from './pages/Auth';
 import { validateToken } from '../redux/slices/user';
 import { fetchServerStatus } from '../redux/slices/api';
+import FadeWrapper from './components/FadeWrapper';
 
 type AppProps = {
   isAuthenticated: boolean;
@@ -46,12 +47,12 @@ class App extends React.Component<AppProps> {
     }
 
     return (
-      <>
+      <FadeWrapper>
         <Sidebar />
         <Main>
           <Router />
         </Main>
-      </>
+      </FadeWrapper>
     );
   }
 }
