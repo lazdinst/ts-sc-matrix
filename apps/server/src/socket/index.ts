@@ -32,10 +32,11 @@ export const initializeSocketIO = (server: any) => {
       console.log('User connected:', userInfo);
       connectedClients.set(socket.id, userInfo);
 
-      for (const [clientId, clientUserInfo] of connectedClients) {
-        if (clientId !== socket.id) {
-          socket.emit('connections', clientUserInfo);
-        }
+      const connections = Array.from(connectedClients.entries()).map(
+        (connection) => connection[1]
+      );
+      if (connections.length > 1) {
+        socket.emit('connections', connections);
       }
     });
 
