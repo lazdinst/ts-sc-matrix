@@ -5,13 +5,12 @@ import { RootState } from '../../../redux/store';
 import {
   loginUser,
   registerUser,
-  logout,
   isUserRegistered,
   setIsLoggingIn,
-  setIsRegistering,
+  validateToken,
 } from '../../../redux/slices/user';
 import { User } from '../../../redux/slices/user/types';
-import { Command, CLIProps, CLIState, CommandResponse } from './types';
+import { CLIProps, CLIState, CommandResponse } from './types';
 import {
   STATES,
   setCLIState,
@@ -434,6 +433,7 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
       setCLIState,
       setPreviousRootCommand,
       updateOutputs,
+      validateToken,
     },
     dispatch
   );

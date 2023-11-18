@@ -2,8 +2,38 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
+const sessions = new Map();
+
+function getSessionData(id: string) {
+  return sessions.get(id);
+}
+
+function storeSession(sessionId, user) {
+  sessions.set(sessionId, user);
+}
+
+function generateSessionId() {
+  return uuidv4();
+}
+
+router.get('/check-username/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res.status(200).json({ exists: true });
+    }
+
+    res.status(200).json({ exists: false });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 router.post('/register', async (req, res) => {
   try {
@@ -60,31 +90,43 @@ router.post('/login', async (req, res) => {
         .send({ error: 'Incorrect Password. Authentication failed.' });
     }
 
+    const sessionId = generateSessionId();
+    storeSession(sessionId, user);
     const token = jwt.sign(
-      { userId: user._id, username: user.username },
+      { userId: user._id, username: user.username, sessionId },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '1h' }
     );
 
-    res.status(200).send({ token });
+    res.status(200).send({ token, user });
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-router.get('/check-username/:username', async (req, res) => {
-  try {
-    const { username } = req.params;
-    const existingUser = await User.findOne({ username });
+router.post('/validate-token', (req, res, next) => {
+  const token = req.body.token;
 
-    if (existingUser) {
-      return res.status(200).json({ exists: true });
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.VITE_REACT_JWT_SECRET || 'secret'
+    );
+    const { userId, username, sessionId } = decoded;
+
+    // const user = getSessionData(sessionId);
+
+    if (!sessionId || !userId || !username) {
+      return res.status(401).json({ message: 'Invalid session' });
     }
 
-    res.status(200).json({ exists: false });
+    res.json({ id: userId, username, sessionId });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 });
 
