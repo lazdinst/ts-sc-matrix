@@ -1,6 +1,8 @@
-import React, { useEffect, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators, Dispatch } from 'redux';
+import { RootState } from '../redux/store';
 import { io, Socket } from 'socket.io-client';
-import { useDispatch } from 'react-redux';
 
 import {
   setupSocketListeners,
@@ -8,36 +10,79 @@ import {
   setupSocketStateListeners,
 } from './listeners';
 
+import {
+  connectWebSocket,
+  disconnectWebSocket,
+} from '../redux/slices/websocket';
+
+import { setRolls } from '../redux/slices/roller';
+import { User } from '../redux/slices/user/types';
+
 interface WebSocketProviderProps {
   children: ReactNode;
+  setupSocketStateListeners: typeof setupSocketStateListeners;
+  setupSocketListeners: typeof setupSocketListeners;
+  setupConnectionListners: typeof setupConnectionListners;
+  setRolls: typeof setRolls;
+  connectWebSocket: typeof connectWebSocket;
+  disconnectWebSocket: typeof disconnectWebSocket;
+  user: User | null;
 }
 
-const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
-  const dispatch = useDispatch();
-  let socket: Socket | null = null; // Declare socket variable
+class WebSocketProvider extends React.Component<WebSocketProviderProps> {
+  private socket: Socket | null = null;
+  constructor(props: WebSocketProviderProps) {
+    super(props);
+    this.state = {
+      socket: null,
+    };
+  }
 
-  const createSocket = () => {
-    socket = io('ws://localhost:5000');
+  createSocket = () => {
+    const { connectWebSocket, disconnectWebSocket, setRolls, user } =
+      this.props;
+    if (!user) {
+      throw new Error('User is not defined in WebSocketProvider');
+    }
+    this.socket = io('ws://localhost:5000');
     console.log('Creating ws socket...');
-    setupSocketStateListeners(socket, dispatch);
-    setupSocketListeners(socket, dispatch);
-    setupConnectionListners(socket, dispatch);
-
-    return socket;
+    setupSocketStateListeners(
+      this.socket,
+      user,
+      connectWebSocket,
+      disconnectWebSocket
+    );
+    setupConnectionListners(this.socket);
+    setupSocketListeners(this.socket, setRolls);
   };
 
-  useEffect(() => {
-    console.log('Connecting to websocket server...');
-    const socket = createSocket();
+  componentDidMount() {
+    this.createSocket();
+  }
 
-    return () => {
-      if (socket?.connected) {
-        socket.disconnect();
-      }
-    };
-  }, []);
+  componentWillUnmount() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+  }
 
-  return children;
-};
+  render() {
+    return this.props.children;
+  }
+}
 
-export default WebSocketProvider;
+const mapStateToProps = (state: RootState) => ({
+  user: state.user.user,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch) =>
+  bindActionCreators(
+    {
+      disconnectWebSocket,
+      connectWebSocket,
+      setRolls,
+    },
+    dispatch
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(WebSocketProvider);

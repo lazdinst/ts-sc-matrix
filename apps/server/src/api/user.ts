@@ -7,17 +7,35 @@ import { v4 as uuidv4 } from 'uuid';
 const router = express.Router();
 const sessions = new Map();
 
-function getSessionData(id: string) {
+function getSessionData() {
+  return [...sessions.values()];
+}
+
+function getSessionById(id: string) {
   return sessions.get(id);
 }
 
 function storeSession(sessionId, user) {
+  console.log('Storing session', JSON.stringify(user));
   sessions.set(sessionId, user);
 }
 
 function generateSessionId() {
   return uuidv4();
 }
+
+router.get('/sessions', async (req, res) => {
+  try {
+    const sessions = getSessionData();
+    const users = sessions.map((session) => ({
+      _id: session._id,
+      username: session.username,
+    }));
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 router.get('/check-username/:username', async (req, res) => {
   try {
