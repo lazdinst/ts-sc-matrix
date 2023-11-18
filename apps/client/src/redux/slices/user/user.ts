@@ -96,8 +96,8 @@ export const registerUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const registeredUser: User = {
-        id: response.data.id,
-        username: response.data.username,
+        id: response.data.user.id,
+        username: response.data.user.username,
       };
       dispatch(register(registeredUser));
 

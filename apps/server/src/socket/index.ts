@@ -13,8 +13,6 @@ type UserInfo = {
 export const connectedClients = new Map<string, UserInfo>();
 
 export const initializeSocketIO = (server: any) => {
-  let totalConnections = 0;
-
   io = new SocketIoServer(server, {
     cors: {
       origin: allowedOrigins,
@@ -27,8 +25,7 @@ export const initializeSocketIO = (server: any) => {
 
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
-    totalConnections++;
-    io.emit('connections', { count: totalConnections });
+
     setupConnectedClientListeners(socket, connectedClients);
 
     socket.on('user-connected', (userInfo: UserInfo) => {
@@ -37,14 +34,12 @@ export const initializeSocketIO = (server: any) => {
 
       for (const [clientId, clientUserInfo] of connectedClients) {
         if (clientId !== socket.id) {
-          socket.emit('user-info', clientUserInfo);
+          socket.emit('connections', clientUserInfo);
         }
       }
     });
 
     socket.on('disconnect', () => {
-      totalConnections--;
-      io.emit('connections', { count: totalConnections });
       connectedClients.delete(socket.id);
     });
     socket.on('roll', () => {

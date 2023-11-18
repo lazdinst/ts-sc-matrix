@@ -5,8 +5,8 @@ import { RootState } from '../redux/store';
 import { io, Socket } from 'socket.io-client';
 
 import {
-  setupSocketListeners,
-  setupConnectionListners,
+  setupRollerListeners,
+  setupUserConnections,
   setupSocketStateListeners,
 } from './listeners';
 
@@ -21,8 +21,8 @@ import { User } from '../redux/slices/user/types';
 interface WebSocketProviderProps {
   children: ReactNode;
   setupSocketStateListeners: typeof setupSocketStateListeners;
-  setupSocketListeners: typeof setupSocketListeners;
-  setupConnectionListners: typeof setupConnectionListners;
+  setupRollerListeners: typeof setupRollerListeners;
+  setupUserConnections: typeof setupUserConnections;
   setRolls: typeof setRolls;
   connectWebSocket: typeof connectWebSocket;
   disconnectWebSocket: typeof disconnectWebSocket;
@@ -52,8 +52,8 @@ class WebSocketProvider extends React.Component<WebSocketProviderProps> {
       connectWebSocket,
       disconnectWebSocket
     );
-    setupConnectionListners(this.socket);
-    setupSocketListeners(this.socket, setRolls);
+    setupUserConnections(this.socket);
+    setupRollerListeners(this.socket, setRolls);
   };
 
   componentDidMount() {

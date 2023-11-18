@@ -26,13 +26,10 @@ function generateSessionId() {
   return uuidv4();
 }
 
-router.get('/sessions', async (req, res) => {
+router.get('/connections', async (req, res) => {
   try {
-    const sessions = getSessionData();
-    const users = sessions.map((session) => ({
-      _id: session._id,
-      username: session.username,
-    }));
+    console.log(connectedClients);
+    const users = Array.from(connectedClients.entries());
     res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -84,7 +81,14 @@ router.post('/register', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.status(201).json({ message: 'User registered successfully', token });
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res
+        .status(401)
+        .send({ error: 'Failed to get user after registration' });
+    }
+
+    res.status(201).json({ token, user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
