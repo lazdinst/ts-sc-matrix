@@ -2,6 +2,7 @@ export {
   default as user,
   login,
   logout,
+  logoutUser,
   register,
   registerUser,
   loginUser,

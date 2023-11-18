@@ -98,7 +98,6 @@ export const registerUser =
       const registeredUser: User = {
         id: response.data.id,
         username: response.data.username,
-        password: '',
       };
       dispatch(register(registeredUser));
 
@@ -126,7 +125,6 @@ export const loginUser =
       const authenticatedUser: User = {
         id: response.data.id,
         username: response.data.username,
-        password: '',
       };
       dispatch(login(authenticatedUser));
       dispatch(setRegistrationError(null));
@@ -148,14 +146,24 @@ export const validateToken = () => async (dispatch: Dispatch) => {
     const authenticatedUser: User = {
       id: response.data.id,
       username: response.data.username,
-      password: '',
     };
+
     dispatch(login(authenticatedUser));
     dispatch(setAuthenticating(false));
   } catch (error) {
     console.error(error);
     dispatch(setRegistrationError('Login failed. Please try again.'));
     dispatch(setAuthenticating(false));
+    throw error;
+  }
+};
+
+export const logoutUser = () => async (dispatch: Dispatch) => {
+  try {
+    dispatch(logout());
+    setAuthTokenLocalStorage(null);
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };

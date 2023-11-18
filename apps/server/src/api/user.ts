@@ -19,6 +19,22 @@ function generateSessionId() {
   return uuidv4();
 }
 
+router.get('/check-username/:username', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res.status(200).json({ exists: true });
+    }
+
+    res.status(200).json({ exists: false });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -88,24 +104,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/check-username/:username', async (req, res) => {
-  try {
-    const { username } = req.params;
-    const existingUser = await User.findOne({ username });
-
-    if (existingUser) {
-      return res.status(200).json({ exists: true });
-    }
-
-    res.status(200).json({ exists: false });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 router.post('/validate-token', (req, res, next) => {
-  const token = req.body.token; // Assuming the token is sent in the request body
+  const token = req.body.token;
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -116,17 +116,15 @@ router.post('/validate-token', (req, res, next) => {
       token,
       process.env.VITE_REACT_JWT_SECRET || 'secret'
     );
-    const sessionId = decoded.sessionId;
+    const { userId, username, sessionId } = decoded;
 
-    // Retrieve user data from the session using the sessionId
-    const user = getSessionData(sessionId);
+    // const user = getSessionData(sessionId);
 
-    if (!user) {
+    if (!sessionId || !userId || !username) {
       return res.status(401).json({ message: 'Invalid session' });
     }
 
-    // Attach user data to the response
-    res.json({ user });
+    res.json({ id: userId, username, sessionId });
   } catch (error) {
     return res.status(401).json({ message: 'Invalid token' });
   }
