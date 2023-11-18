@@ -40,11 +40,20 @@ const cli = createSlice({
     updateOutputs: (state, action: PayloadAction<string>) => {
       state.outputs = [...state.outputs, action.payload];
     },
+    clearOutputs: (state) => {
+      state.outputs = [];
+    },
+    reinitialize: () => initialState,
   },
 });
 
-export const { setCLIState, setPreviousRootCommand, updateOutputs } =
-  cli.actions;
+export const {
+  setCLIState,
+  setPreviousRootCommand,
+  updateOutputs,
+  clearOutputs,
+  reinitialize,
+} = cli.actions;
 
 export const getCLIState = (state: RootState) => state.cli.state;
 export default cli.reducer;

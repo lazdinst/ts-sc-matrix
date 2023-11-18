@@ -4,6 +4,8 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
+import { connectedClients } from '../socket';
+
 const router = express.Router();
 const sessions = new Map();
 
@@ -99,6 +101,19 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).send({ error: 'Authentication failed' });
+    }
+
+    let isUserLoggedIn = false;
+
+    for (const userInfo of connectedClients.values()) {
+      if (userInfo.username === username) {
+        isUserLoggedIn = true;
+        break;
+      }
+    }
+
+    if (isUserLoggedIn) {
+      return res.status(401).send({ error: 'User already logged in' });
     }
 
     const isMatch = await user.comparePassword(password);

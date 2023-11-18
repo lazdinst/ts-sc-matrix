@@ -10,7 +10,7 @@ type UserInfo = {
   username: string;
 };
 
-const connectedClients = new Map<string, UserInfo>();
+export const connectedClients = new Map<string, UserInfo>();
 
 export const initializeSocketIO = (server: any) => {
   let totalConnections = 0;
@@ -28,9 +28,6 @@ export const initializeSocketIO = (server: any) => {
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
     totalConnections++;
-    console.log('emmitting message to client', totalConnections);
-
-    io.emit('message', 'Hello, World!!');
     io.emit('connections', { count: totalConnections });
     setupConnectedClientListeners(socket, connectedClients);
 
@@ -48,8 +45,7 @@ export const initializeSocketIO = (server: any) => {
     socket.on('disconnect', () => {
       totalConnections--;
       io.emit('connections', { count: totalConnections });
-
-      console.log('Client disconnected');
+      connectedClients.delete(socket.id);
     });
     socket.on('roll', () => {
       console.log('Rolled');

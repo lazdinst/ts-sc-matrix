@@ -16,6 +16,8 @@ import {
   setCLIState,
   setPreviousRootCommand,
   updateOutputs,
+  clearOutputs,
+  reinitialize,
 } from '../../../redux/slices/cli';
 import { knownRootCommands } from './constants';
 import {
@@ -359,9 +361,8 @@ class CLI extends React.Component<CLIProps, CLIState> {
   };
 
   clearCommand = () => {
-    this.setState((prevState) => ({
-      outputs: [],
-    }));
+    const { clearOutputs } = this.props;
+    clearOutputs();
   };
 
   setInputFocus = () => {
@@ -386,6 +387,11 @@ class CLI extends React.Component<CLIProps, CLIState> {
     if (this.AuthTimeOut) {
       clearTimeout(this.AuthTimeOut);
     }
+  }
+
+  componentWillUnmount(): void {
+    const { reinitialize } = this.props;
+    reinitialize(STATES.INIT);
   }
 
   render() {
@@ -434,6 +440,8 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
       setPreviousRootCommand,
       updateOutputs,
       validateToken,
+      clearOutputs,
+      reinitialize,
     },
     dispatch
   );

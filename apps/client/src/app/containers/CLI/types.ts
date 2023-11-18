@@ -12,6 +12,7 @@ export interface CLIProps {
   setCLIState: (state: string) => void;
   updateOutputs: (output: CommandResponse) => void;
   outputs: CommandResponse[];
+  clearOutputs: () => void;
 }
 
 export interface CLIState {
