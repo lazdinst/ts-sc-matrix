@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import App from './app/app';
-import WebSocketProvider from './websocket';
 import { ThemeProvider } from './app/styled';
 
 const root = ReactDOM.createRoot(
@@ -15,11 +14,9 @@ root.render(
   <StrictMode>
     <BrowserRouter>
       <Provider store={store}>
-        <WebSocketProvider>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
-        </WebSocketProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </Provider>
     </BrowserRouter>
   </StrictMode>
