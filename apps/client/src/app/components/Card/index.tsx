@@ -46,12 +46,10 @@ export interface CardHeaderProps {
 }
 
 const CardHeader = styled.h3<CardHeaderProps>`
-  font-weight: bold;
   text-align: center;
   font-family: 'eurostile';
   text-transform: uppercase;
   color: #fff;
-  text-transform: uppercase;
   font-weight: 500;
   font-size: 2rem;
   text-shadow: 0 0 1.25rem

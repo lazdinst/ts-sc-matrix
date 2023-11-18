@@ -6,6 +6,7 @@ import Main from './components/Main';
 import Loader from './components/Loader';
 import { RootState } from '../redux/store';
 import Auth from './pages/Auth';
+import WebSocketProvider from '../websocket';
 import { validateToken } from '../redux/slices/user';
 import { fetchServerStatus } from '../redux/slices/api';
 import FadeWrapper from './components/FadeWrapper';
@@ -47,12 +48,14 @@ class App extends React.Component<AppProps> {
     }
 
     return (
-      <FadeWrapper>
-        <Sidebar />
-        <Main>
-          <Router />
-        </Main>
-      </FadeWrapper>
+      <WebSocketProvider>
+        <FadeWrapper>
+          <Sidebar />
+          <Main>
+            <Router />
+          </Main>
+        </FadeWrapper>
+      </WebSocketProvider>
     );
   }
 }

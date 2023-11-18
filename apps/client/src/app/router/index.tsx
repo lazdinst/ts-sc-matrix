@@ -9,12 +9,6 @@ export const routes = [
   {
     path: '/',
     name: 'home',
-    icon: 'coffee',
-    element: <Home />,
-  },
-  {
-    path: '/roller',
-    name: 'roller',
     icon: 'dice',
     element: <Roller />,
   },
