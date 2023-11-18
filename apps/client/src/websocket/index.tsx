@@ -15,6 +15,8 @@ import {
   disconnectWebSocket,
 } from '../redux/slices/websocket';
 
+import { setConnections } from '../redux/slices/connections';
+
 import { setRolls } from '../redux/slices/roller';
 import { User } from '../redux/slices/user/types';
 
@@ -26,6 +28,7 @@ interface WebSocketProviderProps {
   setRolls: typeof setRolls;
   connectWebSocket: typeof connectWebSocket;
   disconnectWebSocket: typeof disconnectWebSocket;
+  setConnections: typeof setConnections;
   user: User | null;
 }
 
@@ -39,8 +42,13 @@ class WebSocketProvider extends React.Component<WebSocketProviderProps> {
   }
 
   createSocket = () => {
-    const { connectWebSocket, disconnectWebSocket, setRolls, user } =
-      this.props;
+    const {
+      connectWebSocket,
+      disconnectWebSocket,
+      setRolls,
+      user,
+      setConnections,
+    } = this.props;
     if (!user) {
       throw new Error('User is not defined in WebSocketProvider');
     }
@@ -52,7 +60,7 @@ class WebSocketProvider extends React.Component<WebSocketProviderProps> {
       connectWebSocket,
       disconnectWebSocket
     );
-    setupUserConnections(this.socket);
+    setupUserConnections(this.socket, setConnections);
     setupRollerListeners(this.socket, setRolls);
   };
 
@@ -81,6 +89,7 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
       disconnectWebSocket,
       connectWebSocket,
       setRolls,
+      setConnections,
     },
     dispatch
   );

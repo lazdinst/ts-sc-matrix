@@ -27,9 +27,10 @@ export const setupSocketStateListeners = (
   });
 };
 
-export const setupUserConnections = (socket: Socket) => {
-  socket.on('connections', (user) => {
-    console.log('Connections:', user);
+export const setupUserConnections = (socket: Socket, setConnections: any) => {
+  socket.on('connections', (users) => {
+    console.log('Connections:', users);
+    setConnections('users');
   });
 };
 
