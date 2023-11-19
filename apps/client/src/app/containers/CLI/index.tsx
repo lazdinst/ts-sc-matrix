@@ -391,7 +391,7 @@ class CLI extends React.Component<CLIProps, CLIState> {
 
   componentWillUnmount(): void {
     const { reinitialize } = this.props;
-    reinitialize(STATES.INIT);
+    reinitialize();
   }
 
   render() {

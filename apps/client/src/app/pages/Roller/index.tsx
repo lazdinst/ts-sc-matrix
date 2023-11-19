@@ -36,7 +36,7 @@ const Roller: React.FC = () => {
   return (
     <>
       <SecondarySidebar>
-        <GameHistory />
+        <GameHistory gameHistory={[]} />
       </SecondarySidebar>
       <Page
         id="roller-page"

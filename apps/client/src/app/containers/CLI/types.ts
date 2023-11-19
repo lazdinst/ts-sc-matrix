@@ -13,6 +13,7 @@ export interface CLIProps {
   updateOutputs: (output: CommandResponse) => void;
   outputs: CommandResponse[];
   clearOutputs: () => void;
+  reinitialize: () => void;
 }
 
 export interface CLIState {

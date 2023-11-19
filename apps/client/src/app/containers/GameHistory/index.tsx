@@ -27,9 +27,7 @@ class GameHistory extends React.Component<GameHistoryProps> {
   }
 }
 
-const mapStateToProps = (state: RootState) => ({
-  gameHistory: state.roller.gameHistory,
-});
+const mapStateToProps = (state: RootState) => ({});
 
 const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators({}, dispatch);

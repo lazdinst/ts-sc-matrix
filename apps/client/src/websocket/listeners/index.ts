@@ -27,10 +27,13 @@ export const setupSocketStateListeners = (
   });
 };
 
-export const setupUserConnections = (socket: Socket, setConnections: any) => {
-  socket.on('connections', (users) => {
+export const setupUserConnections = (
+  socket: Socket,
+  setConnections: (users: string[]) => void
+) => {
+  socket.on('connections', (users: string[]) => {
     console.log('Connections:', users);
-    setConnections('users');
+    setConnections(['users']);
   });
 };
 
@@ -40,7 +43,10 @@ export const setupUserConnections = (socket: Socket, setConnections: any) => {
 //   });
 // };
 
-export const setupRollerListeners = (socket: Socket, setRolls: any) => {
+export const setupRollerListeners = (
+  socket: Socket,
+  setRolls: (arg0: RollerState) => void
+) => {
   socket.on('roll', (message: any) => {
     console.log('Roll:', message);
     const rollMessage: RollerState = message;
