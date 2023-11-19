@@ -136,26 +136,28 @@ export const loginUser =
     }
   };
 
-export const validateToken = () => async (dispatch: Dispatch) => {
-  try {
-    const uri = `${API_URL}/api/user/validate-token`;
-    const token = localStorage.getItem('authToken');
-    const response = await axios.post(uri, {
-      token,
-    });
-    const authenticatedUser: User = {
-      id: response.data.id,
-      username: response.data.username,
-    };
+export const validateToken = () => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const uri = `${API_URL}/api/user/validate-token`;
+      const token = localStorage.getItem('authToken');
+      const response = await axios.post(uri, {
+        token,
+      });
+      const authenticatedUser: User = {
+        id: response.data.id,
+        username: response.data.username,
+      };
 
-    dispatch(login(authenticatedUser));
-    dispatch(setAuthenticating(false));
-  } catch (error) {
-    console.error(error);
-    dispatch(setRegistrationError('Login failed. Please try again.'));
-    dispatch(setAuthenticating(false));
-    throw error;
-  }
+      dispatch(login(authenticatedUser));
+      dispatch(setAuthenticating(false));
+    } catch (error) {
+      console.error(error);
+      dispatch(setRegistrationError('Login failed. Please try again.'));
+      dispatch(setAuthenticating(false));
+      throw error;
+    }
+  };
 };
 
 export const logoutUser = () => async (dispatch: Dispatch) => {
