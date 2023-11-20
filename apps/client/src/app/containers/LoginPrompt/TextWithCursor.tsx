@@ -40,7 +40,7 @@ const StyledTextWithCursor = styled.div<StyledTextWithCursorProps>`
 
 interface TextWithCursorProps {
   speedModifier?: number;
-  callback: (isReady: boolean) => void;
+  callback: () => void;
 }
 
 interface TextWithCursorState {
@@ -81,7 +81,7 @@ class TextAnimation extends React.Component<
   completeAnimation = () => {
     const { callback } = this.props;
     setTimeout(() => {
-      if (callback) callback(true);
+      if (callback) callback();
       this.setState({
         displayText: '',
         displayCursor: false,

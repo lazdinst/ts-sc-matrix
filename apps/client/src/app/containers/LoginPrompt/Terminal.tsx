@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
 import CLI from '../CLI';
 import TerminalTopBar from './TerminalTopBar';
-const SKIP_ANIMATION = import.meta.env.VITE_REACT_APP_SKIP_ANIMATION || false;
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+const ENABLE_ANIMATION = false;
 
 const TerminalContainer = styled.div`
   font-size: 0.75rem;
@@ -14,16 +22,21 @@ const TerminalContainer = styled.div`
   width: 400px;
   overflow-y: auto;
   border: 1px solid rgb(255, 255, 255, 0.1);
+  animation: ${fadeIn} 1s ease-in-out;
 `;
 
 const Terminal: React.FC = () => {
-  const [isPromptReady, setPromptReady] = useState<boolean>(false);
-  const startAnimation = SKIP_ANIMATION || isPromptReady;
+  const [showAnimation, setShowAnimation] = useState<boolean>(ENABLE_ANIMATION);
+
+  // TODO: Need to get this from local storage
+  if (showAnimation) {
+    return <TextWithCursor callback={() => setShowAnimation(!showAnimation)} />;
+  }
 
   return (
     <TerminalContainer>
       <TerminalTopBar />
-      {startAnimation ? <CLI /> : <TextWithCursor callback={setPromptReady} />}
+      <CLI />
     </TerminalContainer>
   );
 };

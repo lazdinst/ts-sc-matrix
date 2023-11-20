@@ -319,6 +319,7 @@ const CLI: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
+    _clearInputElement();
   }, [outputs]);
 
   return (
