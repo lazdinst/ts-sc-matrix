@@ -15,7 +15,8 @@ export const connectedClients = new Map<string, UserInfo>();
 export const initializeSocketIO = (server: any) => {
   io = new SocketIoServer(server, {
     cors: {
-      origin: allowedOrigins,
+      // origin: allowedOrigins,
+      origin: '* ',
       methods: ['GET', 'POST'],
       credentials: true,
     },

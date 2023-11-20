@@ -23,14 +23,20 @@ import userRoutes from './api/user';
       ','
     );
 
+    // const corsOptions: cors.CorsOptions = {
+    //   origin: (origin, callback) => {
+    //     if (allowedOrigins.includes(origin) || !origin) {
+    //       callback(null, true);
+    //     } else {
+    //       callback(new Error('Not allowed by CORS'));
+    //     }
+    //   },
+    //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    //   credentials: true,
+    //   optionsSuccessStatus: 204,
+    // };
     const corsOptions: cors.CorsOptions = {
-      origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
+      origin: '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
       optionsSuccessStatus: 204,
