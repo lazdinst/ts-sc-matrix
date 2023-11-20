@@ -5,5 +5,5 @@ export {
   setPreviousRootCommand,
   updateOutputs,
   clearOutputs,
-  reinitialize,
+  reinitializeCLIState,
 } from './cli';

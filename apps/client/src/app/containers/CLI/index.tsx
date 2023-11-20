@@ -14,10 +14,10 @@ import {
   setPreviousRootCommand,
   updateOutputs,
   clearOutputs,
-  reinitialize,
+  reinitializeCLIState,
   STATES,
 } from '../../../redux/slices/cli';
-import { CommandResponse } from '../../../redux/slices/cli/types';
+import { Command } from '../../../redux/slices/cli/types';
 import { knownRootCommands } from './constants';
 import {
   CLIContainer,
@@ -50,11 +50,11 @@ const CLI: React.FC = () => {
       inputRef.current.value = inputText;
     }
     return () => {
-      reinitialize();
+      reinitializeCLIState();
     };
-  }, [inputText, reinitialize]);
+  }, [inputText, reinitializeCLIState]);
 
-  const _updateCommandOutputs = (cmd: CommandResponse) => {
+  const _updateCommandOutputs = (cmd: Command) => {
     dispatch(updateOutputs(cmd));
   };
 
@@ -79,7 +79,7 @@ const CLI: React.FC = () => {
     }
   };
 
-  const handleMaskPassword = (chars: string) => {
+  const _handleMaskPassword = (chars: string) => {
     return chars
       .split('')
       .map(() => '*')
@@ -92,12 +92,11 @@ const CLI: React.FC = () => {
     }
     _clearInputElement();
 
-    const commandStrings = cmd.split(' ');
-    const newRootCommand = commandStrings[0];
+    const newRootCommand = cmd.split(' ')[0];
 
-    const commandResponse: CommandResponse = {
-      cmdType: '',
+    const command: Command = {
       cmd: cmd,
+      type: 'UNKNOWN',
       status: 'error',
       messages: [],
     };
@@ -106,74 +105,122 @@ const CLI: React.FC = () => {
       !knownRootCommands.includes(newRootCommand) &&
       !knownRootCommands.includes(previousRootCommand)
     ) {
-      _updateCommandOutputs({
-        cmdType: 'UNKNOWN',
-        cmd: cmd,
-        status: 'error',
-        messages: [`Unknown cmd executed: ${cmd}`],
-      });
+      command.messages = [`Unknown cmd executed: ${cmd}`];
+      _updateCommandOutputs(command);
       return;
     }
 
-    _handleKnownCommands(newRootCommand, commandStrings, commandResponse);
+    _handleKnownCommands(command);
   };
 
-  const _handleKnownCommands = async (
-    newRootCommand: string,
-    commandStrings: string[],
-    commandResponse: CommandResponse
-  ) => {
-    commandResponse.cmd = newRootCommand;
+  const _handleKnownCommands = async (command: Command) => {
+    const rootCommand = command.cmd.split(' ')[0];
     if (!knownRootCommands.includes(previousRootCommand)) {
-      if (newRootCommand === 'login') {
-        handleLoginCommandAttempt(commandStrings, commandResponse);
+      dispatch(setPreviousRootCommand(rootCommand));
+
+      if (rootCommand === 'login') {
+        _handleLoginCommandAttempt(command);
         return;
       }
 
-      if (newRootCommand === 'register') {
-        handleRegisterCommandAttempt(commandStrings, commandResponse);
+      if (rootCommand === 'register') {
+        _handleRegisterCommandAttempt(command);
         return;
       }
 
-      if (newRootCommand === 'help') {
-        handleHelpCommandAttempt(commandStrings, commandResponse);
+      if (rootCommand === 'help') {
+        _handleHelpCommandAttempt(command);
         return;
       }
 
-      if (newRootCommand === 'clear') {
+      if (rootCommand === 'clear') {
         _clearCommand();
         return;
       }
     }
 
     if (previousRootCommand === 'login' || previousRootCommand === 'register') {
-      commandResponse.cmd = handleMaskPassword(newRootCommand);
-      commandResponse.status = 'info';
-      commandResponse.messages = [`Authenticating...`];
-      _updateCommandOutputs(commandResponse);
+      command.status = 'info';
+      command.messages = [`Authenticating...`];
+      _updateCommandOutputs({
+        ...command,
+        cmd: _handleMaskPassword(rootCommand),
+      });
 
       if (previousRootCommand === 'login') {
-        _handleLoginUser(newRootCommand);
+        _handleLoginUser(command);
         return;
       }
-      handleUserRegistration(newRootCommand);
+
+      if (previousRootCommand === 'register') {
+        _handleUserRegistration(command);
+      }
     }
   };
 
   const _clearCommand = () => {
-    dispatch(clearOutputs());
+    dispatch(reinitializeCLIState());
   };
 
-  const handleLoginCommandAttempt = async (
-    commandStrings: string[],
-    commandResponse: CommandResponse
-  ) => {
+  const _handleLoginUser = async (command: Command) => {
+    const rootCommand = command.cmd.split(' ')[0];
+    const userAttempt: User = {
+      id: '',
+      username: user,
+      password: rootCommand,
+    };
+
+    try {
+      const loginStatus = await dispatch(loginUser(userAttempt));
+      if (!loginStatus) {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      command.messages = ['Authentication Failure... '];
+      _updateCommandOutputs(command);
+    }
+
+    _clearInputElement();
+    dispatch(reinitializeCLIState());
+  };
+
+  const _handleUserRegistration = async (command: Command) => {
+    const rootCommand = command.cmd.split(' ')[0];
+    const userAttempt: User = {
+      id: '',
+      username: user,
+      password: rootCommand,
+    };
+
+    try {
+      const registrationStatus = await dispatch(registerUser(userAttempt));
+      if (!registrationStatus) {
+        throw new Error('Registration failed');
+      }
+
+      command.status = 'success';
+      command.messages = [
+        `Creating auth client: ${user}`,
+        `Password: ********`,
+        `User registration successful.`,
+      ];
+    } catch (error) {
+      command.messages = ['User registration failed. Please try again.'];
+      console.error('handle registration user failed', error);
+    }
+
+    _clearInputElement();
+    dispatch(reinitializeCLIState());
+  };
+
+  const _handleLoginCommandAttempt = async (command: Command) => {
+    const commandStrings = command.cmd.split(' ');
     if (commandStrings.length === 1) {
-      commandResponse.messages = [
+      command.messages = [
         `invalid input...expected 1 argument, received 0 arguments.`,
         `"login $username"`,
       ];
-      _updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(command);
       return;
     }
 
@@ -181,163 +228,72 @@ const CLI: React.FC = () => {
       const username = commandStrings[1];
       const userExists = await isUserRegistered(username);
 
-      // NEED TO DISPATCH THERE ACTIONS
       if (userExists) {
-        dispatch(setIsLoggingIn(true));
         _updateUser(username);
+        dispatch(setIsLoggingIn(true));
         dispatch(setCLIState(STATES.PASSWORD));
-        setPreviousRootCommand(commandResponse.cmd);
-        commandResponse.status = 'success';
-        commandResponse.messages = [`logging in as: ${username}`, `password:`];
+        command.status = 'success';
+        command.messages = [`logging in as: ${username}`, `password:`];
       } else {
         dispatch(setCLIState(STATES.INIT));
-        commandResponse.messages = [
+        command.messages = [
           `user does not exist`,
           `proceed with user registration.`,
         ];
       }
 
-      _updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(command);
       return;
     }
 
     if (commandStrings.length > 2) {
-      commandResponse.messages = [
+      command.messages = [
         `invalid input...expected 1 argument, received ${
           commandStrings.length - 1
         } arguments.`,
         `"login $username"`,
       ];
-      _updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(command);
       return;
     }
   };
 
-  const _handleLoginUser = async (cmd: string) => {
-    const userAttempt: User = {
-      id: '',
-      username: user,
-      password: cmd,
-    };
-
-    const commandResponse: CommandResponse = {
-      cmdType: '',
-      cmd: '',
-      status: 'error',
-      messages: [],
-    };
-
-    try {
-      const loginStatus = await loginUser(userAttempt);
-      if (!loginStatus) {
-        throw new Error('Login failed');
-      }
-    } catch (error) {
-      commandResponse.messages = ['Authentication Failure... '];
-      _updateCommandOutputs(commandResponse);
-      dispatch(setCLIState(STATES.INIT));
-      setPreviousRootCommand('');
-      console.log('handle login user failed', error);
-    }
-    _clearInputElement();
-  };
-
-  const handleUserRegistration = async (newRootCommand: string) => {
-    const userAttempt: User = {
-      id: '',
-      username: user,
-      password: newRootCommand,
-    };
-
-    const commandResponse: CommandResponse = {
-      cmdType: '',
-      cmd: newRootCommand,
-      status: 'error',
-      messages: [],
-    };
-
-    try {
-      const registrationStatus = await registerUser(userAttempt);
-      if (!registrationStatus) {
-        throw new Error('Registration failed');
-      }
-
-      commandResponse.status = 'success';
-      commandResponse.messages = [
-        `Creating auth client: ${user}`,
-        `Password: ********`,
-        `User registration successful.`,
+  const _handleRegisterCommandAttempt = async (command: Command) => {
+    const commandStrings = command.cmd.split(' ');
+    if (commandStrings.length === 1 || commandStrings.length > 2) {
+      command.messages = [
+        `invalid input...expected 1 argument, received ${
+          commandStrings.length - 1
+        } arguments.`,
+        `"login $username"`,
       ];
-    } catch (error) {
-      commandResponse.messages = [
-        'User registration failed. Please try again.',
-      ];
-      console.error('handle registration user failed', error);
+      _updateCommandOutputs(command);
+      return;
     }
 
-    setCLIState(STATES.INIT);
-    setPreviousRootCommand('');
-    _updateCommandOutputs(commandResponse);
-    _clearInputElement();
-  };
+    if (commandStrings.length === 2) {
+      const username = commandStrings[1];
+      const userExists = await isUserRegistered(username);
 
-  const handleRegisterCommandAttempt = async (
-    commandStrings: string[],
-    commandResponse: CommandResponse
-  ) => {
-    commandResponse.cmdType = 'HELP';
-    commandResponse.status = 'success';
-    commandResponse.messages = [
-      'Available commands:',
-      '- login',
-      '- register',
-      '- help',
-      '- clear',
-    ];
-    const userAttempt: User = {
-      id: '',
-      username: user,
-      password: commandResponse.cmd,
-    };
-
-    // working here but need to replace this
-
-    try {
-      const userExists = await isUserRegistered(user);
       if (!userExists) {
-        const registrationStatus = await registerUser(userAttempt);
-        if (!registrationStatus) {
-          throw new Error('Registration failed');
-        }
-
-        commandResponse.status = 'success';
-        commandResponse.messages = [
-          `Creating auth client: ${user}`,
-          `User registration successful.`,
-        ];
+        _updateUser(username);
+        dispatch(setIsLoggingIn(true));
+        dispatch(setCLIState(STATES.PASSWORD));
+        command.status = 'success';
+        command.messages = [`registering as: ${username}`, `password:`];
       } else {
-        commandResponse.messages = ['User with this login already exists.'];
+        dispatch(setCLIState(STATES.INIT));
+        command.messages = [`user already exist`, `proceed with registration.`];
       }
-    } catch (error) {
-      commandResponse.messages = [
-        'User registration failed. Please try again.',
-      ];
-      console.error('handle registration user failed', error);
-    }
 
-    setCLIState('INIT');
-    setPreviousRootCommand('');
-    _updateCommandOutputs(commandResponse);
-    _clearInputElement();
+      _updateCommandOutputs(command);
+      return;
+    }
   };
 
-  const handleHelpCommandAttempt = async (
-    commandStrings: string[],
-    commandResponse: CommandResponse
-  ) => {
-    commandResponse.cmdType = 'HELP';
-    commandResponse.status = 'success';
-    commandResponse.messages = [
+  const _handleHelpCommandAttempt = async (command: Command) => {
+    command.status = 'success';
+    command.messages = [
       'Available commands:',
       '- login',
       '- register',
@@ -345,7 +301,8 @@ const CLI: React.FC = () => {
       '- clear',
     ];
 
-    _updateCommandOutputs(commandResponse);
+    _updateCommandOutputs(command);
+    dispatch(setPreviousRootCommand(''));
   };
 
   const _setInputFocus = () => {

@@ -1,7 +1,7 @@
 import { STATES } from './constants';
 
-export interface CommandResponse {
-  cmdType: string;
+export interface Command {
+  type: string;
   cmd: string;
   status: string;
   messages: string[];
@@ -13,5 +13,5 @@ export interface CLIState {
   connected: boolean;
   state: StateTypes;
   previousRootCommand: string;
-  outputs: CommandResponse[];
+  outputs: Command[];
 }
