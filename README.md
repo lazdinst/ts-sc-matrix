@@ -1,6 +1,6 @@
 ### JWT Generation:
 
-- Built into node via crypto. Add to .env as JWT_SECRET.
+- Built into node via crypto. Add to .env as VITE_REACT_JWT_SECRET.
 
 ```const crypto = require('crypto');
 const randomBytes = crypto.randomBytes(32);
