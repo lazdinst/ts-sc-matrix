@@ -44,6 +44,9 @@ export function rollCoreUnit(units: IUnit[]): IUnit {
   return coreUnits[Math.floor(Math.random() * coreUnits.length)];
 }
 
+// TODO:
+
+// perform a roll of 4 squiares kinf of like a tekken fighter chara select
 export function performRoll(
   playerName: string,
   units: IUnit[],
@@ -51,7 +54,7 @@ export function performRoll(
 ): { name: string; race: string; units: IUnit[] } {
   const race = rollRace();
   const unitsByRace = units.filter((unit) => unit.race === race);
-  const ROLL_COUNT = 4;
+  const ROLL_COUNT = 3;
   unavailableUnits = unavailableUnits || [];
 
   const rolledUnits = Array.from({ length: ROLL_COUNT }, () => {

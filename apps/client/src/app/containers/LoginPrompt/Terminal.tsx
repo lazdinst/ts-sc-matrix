@@ -16,11 +16,7 @@ const TerminalContainer = styled.div`
   border: 1px solid rgb(255, 255, 255, 0.1);
 `;
 
-interface TerminalProps {
-  callback: () => void;
-}
-
-const Terminal: React.FC<TerminalProps> = () => {
+const Terminal: React.FC = () => {
   const [isPromptReady, setPromptReady] = useState<boolean>(false);
   const startAnimation = SKIP_ANIMATION || isPromptReady;
 

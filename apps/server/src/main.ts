@@ -49,9 +49,12 @@ import userRoutes from './api/user';
     app.use('/api/roll', rollRoutes);
     app.use('/api/user', userRoutes);
 
-    app.use(express.static(path.join(__dirname, '../../dist/apps/client')));
+    app.use(express.static(path.join(__dirname, '../../../dist/apps/client')));
+
     app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../apps/client/index.html'));
+      res.sendFile(
+        path.join(__dirname, '../../../dist/apps/client/index.html')
+      );
     });
 
     const port = process.env.PORT || 5000;

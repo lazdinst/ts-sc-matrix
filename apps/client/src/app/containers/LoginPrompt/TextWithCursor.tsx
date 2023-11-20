@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { getRandomInt } from '../../utils';
 
 const blinkAnimation = keyframes`
   0%, 100% {
@@ -44,6 +43,13 @@ interface TextWithCursorProps {
   callback: (isReady: boolean) => void;
 }
 
+interface TextWithCursorState {
+  text: string;
+  displayText: string;
+  displayCursor: boolean;
+  lineIndex: number;
+}
+
 const lines = [
   'Wake up, Neo.',
   'The Matrix has you.',
@@ -54,8 +60,13 @@ const lines = [
 const TRANSITION_TIME = 3000;
 const TYPE_SPEED = 150;
 
-class TextAnimation extends React.Component {
-  constructor(props) {
+class TextAnimation extends React.Component<
+  TextWithCursorProps,
+  TextWithCursorState
+> {
+  private animationInterval: NodeJS.Timeout | null = null;
+  private animationManagerTimeout: NodeJS.Timeout | null = null;
+  constructor(props: TextWithCursorProps) {
     super(props);
     this.state = {
       text: '',
@@ -112,7 +123,9 @@ class TextAnimation extends React.Component {
     this.animationInterval = setInterval(() => {
       if (index > text.length - 1) {
         index = 0;
-        clearInterval(this.animationInterval);
+        if (this.animationInterval) {
+          clearInterval(this.animationInterval);
+        }
         this.endOfLineValidation();
         return;
       }

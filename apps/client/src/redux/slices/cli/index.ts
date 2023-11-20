@@ -1,9 +1,9 @@
+export { STATES } from './constants';
 export {
   default as cli,
   setCLIState,
-  STATES,
   setPreviousRootCommand,
   updateOutputs,
   clearOutputs,
-  reinitialize,
+  reinitializeCLIState,
 } from './cli';

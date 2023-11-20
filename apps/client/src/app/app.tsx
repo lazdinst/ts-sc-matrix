@@ -1,73 +1,59 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../redux/store';
+import WebSocketProvider from '../websocket';
+import { validateToken } from '../redux/slices/user';
+import { fetchServerStatus } from '../redux/slices/api';
 import Router from './router';
 import Sidebar from './containers/Sidebar';
 import Main from './components/Main';
 import Loader from './components/Loader';
-import { RootState } from '../redux/store';
 import Auth from './pages/Auth';
-import WebSocketProvider from '../websocket';
-import { validateToken } from '../redux/slices/user';
-import { fetchServerStatus } from '../redux/slices/api';
 import FadeWrapper from './components/FadeWrapper';
 
-type AppProps = {
-  isAuthenticated: boolean;
-  isAuthenticating: boolean;
-  loading: boolean;
-  connected: boolean;
-  error: string | null;
-  validateToken: () => void;
-  fetchServerStatus: () => Promise<void>;
+const App: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.user.isAuthenticated
+  );
+  const isAuthenticating = useSelector(
+    (state: RootState) => state.user.isAuthenticating
+  );
+  const loading = useSelector((state: RootState) => state.server.loading);
+  const connected = useSelector((state: RootState) => state.server.connected);
+  const error = useSelector((state: RootState) => state.server.error);
+
+  useEffect(() => {
+    dispatch(fetchServerStatus());
+    dispatch(validateToken());
+  }, []);
+
+  if (!connected) {
+    if (loading) {
+      return <Loader />;
+    }
+    if (error) {
+      return <div>Error: {error}</div>;
+    }
+  }
+
+  if (!isAuthenticated) {
+    if (isAuthenticating) {
+      return <Loader />;
+    }
+    return <Auth />;
+  }
+
+  return (
+    <WebSocketProvider>
+      <FadeWrapper>
+        <Sidebar />
+        <Main>
+          <Router />
+        </Main>
+      </FadeWrapper>
+    </WebSocketProvider>
+  );
 };
 
-class App extends React.Component<AppProps> {
-  componentDidMount() {
-    const { validateToken, fetchServerStatus } = this.props;
-    fetchServerStatus().then(() => validateToken());
-  }
-
-  render() {
-    const { isAuthenticated, isAuthenticating, loading, error, connected } =
-      this.props;
-
-    if (!connected) {
-      if (loading) {
-        return <Loader />;
-      }
-      if (error) {
-        return <div>Error: {error}</div>;
-      }
-    }
-
-    if (!isAuthenticated) {
-      if (isAuthenticating) {
-        return <Loader />;
-      }
-      return <Auth />;
-    }
-
-    return (
-      <WebSocketProvider>
-        <FadeWrapper>
-          <Sidebar />
-          <Main>
-            <Router />
-          </Main>
-        </FadeWrapper>
-      </WebSocketProvider>
-    );
-  }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  isAuthenticated: state.user.isAuthenticated,
-  isAuthenticating: state.user.isAuthenticating,
-  loading: state.server.loading,
-  connected: state.server.connected,
-  error: state.server.error,
-});
-
-export default connect(mapStateToProps, { validateToken, fetchServerStatus })(
-  App
-);
+export default App;
