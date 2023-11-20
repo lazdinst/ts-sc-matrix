@@ -1,8 +1,4 @@
-// Login.tsx
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { login } from '../../../redux/slices/user';
-import { User } from '../../../redux/slices/user/types';
+import React from 'react';
 import styled from 'styled-components';
 import Terminal from './Terminal';
 

@@ -4,20 +4,37 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
+import { connectedClients } from '../socket';
+
 const router = express.Router();
 const sessions = new Map();
 
-function getSessionData(id: string) {
+function getSessionData() {
+  return [...sessions.values()];
+}
+
+function getSessionById(id: string) {
   return sessions.get(id);
 }
 
 function storeSession(sessionId, user) {
+  console.log('Storing session', JSON.stringify(user));
   sessions.set(sessionId, user);
 }
 
 function generateSessionId() {
   return uuidv4();
 }
+
+router.get('/connections', async (req, res) => {
+  try {
+    console.log(connectedClients);
+    const users = Array.from(connectedClients.entries());
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 router.get('/check-username/:username', async (req, res) => {
   try {
@@ -64,7 +81,14 @@ router.post('/register', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.status(201).json({ message: 'User registered successfully', token });
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res
+        .status(401)
+        .send({ error: 'Failed to get user after registration' });
+    }
+
+    res.status(201).json({ token, user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -81,6 +105,19 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(401).send({ error: 'Authentication failed' });
+    }
+
+    let isUserLoggedIn = false;
+
+    for (const userInfo of connectedClients.values()) {
+      if (userInfo.username === username) {
+        isUserLoggedIn = true;
+        break;
+      }
+    }
+
+    if (isUserLoggedIn) {
+      return res.status(401).send({ error: 'User already logged in' });
     }
 
     const isMatch = await user.comparePassword(password);

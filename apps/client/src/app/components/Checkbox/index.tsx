@@ -52,7 +52,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   ...props
 }) => (
   <CheckboxWrapper className={className}>
-    <HiddenCheckbox checked={checked} {...props} />
+    <HiddenCheckbox checked={checked} />
     <StyledCheckbox />
   </CheckboxWrapper>
 );

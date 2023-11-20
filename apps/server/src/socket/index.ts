@@ -1,43 +1,56 @@
-import { Server as SocketIoServer } from 'socket.io';
+import { Server as SocketIoServer, Socket } from 'socket.io';
+import { setupConnectedClientListeners } from './listeners';
 
 const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 
 let io: SocketIoServer;
 
-export const initializeSocketIO = (server: any) => {
-  let totalConnections = 0;
+type UserInfo = {
+  _id: string;
+  username: string;
+};
 
+export const connectedClients = new Map<string, UserInfo>();
+
+export const initializeSocketIO = (server: any) => {
   io = new SocketIoServer(server, {
     cors: {
       origin: allowedOrigins,
-      methods: ["GET", "POST"],
+      methods: ['GET', 'POST'],
       credentials: true,
     },
   });
 
-  console.log("io Server Created");
+  console.log('io Server Created');
 
-  io.on("connection", (socket) => {
-    console.log("New Client Connected: ", socket.id);
-    totalConnections++;
-    console.log("emmitting message to client", totalConnections);
-    io.emit('message', 'Hello, World!!');
-    io.emit('connections', { count: totalConnections });
-    socket.on("disconnect", () => {
-      totalConnections--;
-      io.emit('connections', { count: totalConnections });
-      console.log("Client disconnected");
+  io.on('connection', (socket: Socket) => {
+    console.log('New Client Connected: ', socket.id);
+
+    setupConnectedClientListeners(socket, connectedClients);
+
+    socket.on('user-connected', (userInfo: UserInfo) => {
+      console.log('User connected:', userInfo);
+      connectedClients.set(socket.id, userInfo);
+
+      const connections = Array.from(connectedClients.entries()).map(
+        (connection) => connection[1]
+      );
+      if (connections.length > 1) {
+        socket.emit('connections', connections);
+      }
     });
-    socket.on("roll", () => {
-      console.log('Rolled')
+
+    socket.on('disconnect', () => {
+      connectedClients.delete(socket.id);
+    });
+    socket.on('roll', () => {
+      console.log('Rolled');
     });
   });
 
-  // Add error handling for the Socket.IO server
-  io.on("error", (error) => {
-    console.error("Socket.IO error:", error);
+  io.on('error', (error) => {
+    console.error('Socket.IO error:', error);
   });
-
 };
 
 export const getIO = () => {

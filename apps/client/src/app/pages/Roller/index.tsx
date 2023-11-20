@@ -36,7 +36,7 @@ const Roller: React.FC = () => {
   return (
     <>
       <SecondarySidebar>
-        <GameHistory />
+        <GameHistory gameHistory={[]} />
       </SecondarySidebar>
       <Page
         id="roller-page"
@@ -52,7 +52,7 @@ const Roller: React.FC = () => {
           width="100%"
           padding="3rem 0rem"
         >
-          <PlayerCard player={playerOne} />
+          {playerOne && <PlayerCard player={playerOne} />}
           <PlayerCard player={playerTwo} />
         </Section>
         <Section justifyContent="center" height="100%">

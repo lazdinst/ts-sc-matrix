@@ -7,8 +7,8 @@ const DEFAULT_API_URL = 'http://localhost:6969';
 const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
 interface UserState {
-  isAuthenticated: boolean;
-  isAuthenticating: boolean;
+  isAuthenticated: boolean | null;
+  isAuthenticating: boolean | null;
   user: User | null;
   registrationError: string | null;
   loginError: string | null;
@@ -96,8 +96,8 @@ export const registerUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const registeredUser: User = {
-        id: response.data.id,
-        username: response.data.username,
+        id: response.data.user.id,
+        username: response.data.user.username,
       };
       dispatch(register(registeredUser));
 
@@ -136,26 +136,28 @@ export const loginUser =
     }
   };
 
-export const validateToken = () => async (dispatch: Dispatch) => {
-  try {
-    const uri = `${API_URL}/api/user/validate-token`;
-    const token = localStorage.getItem('authToken');
-    const response = await axios.post(uri, {
-      token,
-    });
-    const authenticatedUser: User = {
-      id: response.data.id,
-      username: response.data.username,
-    };
+export const validateToken = () => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const uri = `${API_URL}/api/user/validate-token`;
+      const token = localStorage.getItem('authToken');
+      const response = await axios.post(uri, {
+        token,
+      });
+      const authenticatedUser: User = {
+        id: response.data.id,
+        username: response.data.username,
+      };
 
-    dispatch(login(authenticatedUser));
-    dispatch(setAuthenticating(false));
-  } catch (error) {
-    console.error(error);
-    dispatch(setRegistrationError('Login failed. Please try again.'));
-    dispatch(setAuthenticating(false));
-    throw error;
-  }
+      dispatch(login(authenticatedUser));
+      dispatch(setAuthenticating(false));
+    } catch (error) {
+      console.error(error);
+      dispatch(setRegistrationError('Login failed. Please try again.'));
+      dispatch(setAuthenticating(false));
+      throw error;
+    }
+  };
 };
 
 export const logoutUser = () => async (dispatch: Dispatch) => {
