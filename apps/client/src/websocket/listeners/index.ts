@@ -27,7 +27,7 @@ export const setupSocketStateListeners = (
   });
 };
 
-export const setupUserConnections = (
+export const setupUserConnectionListeners = (
   socket: Socket,
   setConnections: (users: string[]) => void
 ) => {

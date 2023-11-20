@@ -5,7 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import { WS_URL } from '../redux/slices/config';
 import {
   setupRollerListeners,
-  setupUserConnections,
+  setupUserConnectionListeners,
   setupSocketStateListeners,
 } from './listeners';
 
@@ -43,9 +43,9 @@ const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
         () => dispatch(connectWebSocket()),
         () => dispatch(disconnectWebSocket())
       );
-      setupUserConnections(socket, (connections) =>
-        dispatch(setConnections(connections))
-      );
+      setupUserConnectionListeners(socket, (connections) => {
+        dispatch(setConnections(connections));
+      });
       setupRollerListeners(socket, (rolls) => dispatch(setRolls(rolls)));
     };
 

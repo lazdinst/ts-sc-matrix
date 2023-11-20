@@ -23,7 +23,7 @@ export const initializeSocketIO = (server: any) => {
   });
 
   console.log('io Server Created');
-
+  // Listeners
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
 
@@ -32,17 +32,13 @@ export const initializeSocketIO = (server: any) => {
     socket.on('user-connected', (userInfo: UserInfo) => {
       console.log('User connected:', userInfo);
       connectedClients.set(socket.id, userInfo);
-
-      const connections = Array.from(connectedClients.entries()).map(
-        (connection) => connection[1]
-      );
-      if (connections.length > 1) {
-        socket.emit('connections', connections);
-      }
+      emitToAllConnections(socket, connectedClients);
     });
 
     socket.on('disconnect', () => {
+      console.log('Client disconnected:', socket.id);
       connectedClients.delete(socket.id);
+      emitToAllConnections(socket, connectedClients);
     });
     socket.on('roll', () => {
       console.log('Rolled');
@@ -51,6 +47,23 @@ export const initializeSocketIO = (server: any) => {
 
   io.on('error', (error) => {
     console.error('Socket.IO error:', error);
+  });
+};
+
+export const emitToAllConnections = (
+  socket: Socket,
+  connectedClients: Map<string, UserInfo>
+) => {
+  const connections = getConnections(connectedClients);
+  if (connections.length > 1) {
+    console.log('emitting');
+    io.sockets.emit('connections', connections);
+  }
+};
+
+export const getConnections = (connectedClients: Map<string, UserInfo>) => {
+  return Array.from(connectedClients.entries()).map((connection) => {
+    return connection[1];
   });
 };
 
