@@ -1,7 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+export type Connection = {
+  _id: string;
+  username: string;
+};
+
+export type ConnectedClientsType = Connection[];
 
 interface ConnectionState {
-  connections: string[];
+  connections: ConnectedClientsType;
 }
 
 const initialState: ConnectionState = {
@@ -12,21 +18,12 @@ const connections = createSlice({
   name: 'connection',
   initialState,
   reducers: {
-    addConnection(state, action: PayloadAction<string>) {
-      state.connections.push(action.payload);
-    },
-    removeConnection(state, action: PayloadAction<string>) {
-      state.connections = state.connections.filter(
-        (conn) => conn !== action.payload
-      );
-    },
-    setConnections(state, action: PayloadAction<string[]>) {
+    setConnections(state, action: PayloadAction<ConnectedClientsType>) {
       state.connections = action.payload;
     },
   },
 });
 
-export const { addConnection, removeConnection, setConnections } =
-  connections.actions;
+export const { setConnections } = connections.actions;
 
 export default connections.reducer;

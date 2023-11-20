@@ -1,16 +1,18 @@
 import { Server as SocketIoServer, Socket } from 'socket.io';
-import { setupConnectedClientListeners } from './listeners';
+import {
+  setupConnectedClientListeners,
+  setupPartyListeners,
+} from './listeners';
+import { UserInfo, ConnectedClientsType } from './types';
 
 const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 
 let io: SocketIoServer;
 
-type UserInfo = {
-  _id: string;
-  username: string;
-};
-
-export const connectedClients = new Map<string, UserInfo>();
+export const connectedClients: ConnectedClientsType = new Map<
+  string,
+  UserInfo
+>();
 
 export const initializeSocketIO = (server: any) => {
   io = new SocketIoServer(server, {
@@ -28,17 +30,17 @@ export const initializeSocketIO = (server: any) => {
     console.log('New Client Connected: ', socket.id);
 
     setupConnectedClientListeners(socket, connectedClients);
-
+    setupPartyListeners(io, socket);
     socket.on('user-connected', (userInfo: UserInfo) => {
       console.log('User connected:', userInfo);
       connectedClients.set(socket.id, userInfo);
-      emitToAllConnections(socket, connectedClients);
+      emitToAllConnections(connectedClients);
     });
 
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
       connectedClients.delete(socket.id);
-      emitToAllConnections(socket, connectedClients);
+      emitToAllConnections(connectedClients);
     });
     socket.on('roll', () => {
       console.log('Rolled');
@@ -51,7 +53,6 @@ export const initializeSocketIO = (server: any) => {
 };
 
 export const emitToAllConnections = (
-  socket: Socket,
   connectedClients: Map<string, UserInfo>
 ) => {
   const connections = getConnections(connectedClients);

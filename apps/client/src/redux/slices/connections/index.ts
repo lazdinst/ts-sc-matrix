@@ -1,2 +1,2 @@
-import connections, { setConnections } from './connections';
-export { connections, setConnections };
+export type { Connection, ConnectedClientsType } from './connections';
+export { default as connections, setConnections } from './connections';
