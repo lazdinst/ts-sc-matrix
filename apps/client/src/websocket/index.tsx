@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { io, Socket } from 'socket.io-client';
-
+import { WS_URL } from '../redux/slices/config';
 import {
   setupRollerListeners,
   setupUserConnections,
@@ -35,12 +35,7 @@ const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     let socket: Socket | null = null;
 
     const createSocket = () => {
-      const protocol = import.meta.env.VITE_REACT_APP_WS_PROTOCOL;
-      const host = import.meta.env.VITE_REACT_APP_API_HOST;
-      const port = import.meta.env.VITE_REACT_APP_API_PORT;
-
-      const uri = `${protocol}://${host}:${port}`;
-      socket = io(uri);
+      socket = io(WS_URL);
       console.log('Creating ws socket...');
       setupSocketStateListeners(
         socket,
