@@ -1,12 +1,13 @@
 import { User } from '../../../redux/slices/user/types';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   registerUser,
   loginUser,
   validateToken,
   isUserRegistered,
+  setIsLoggingIn,
 } from '../../../redux/slices/user';
 import {
   setCLIState,
@@ -14,8 +15,9 @@ import {
   updateOutputs,
   clearOutputs,
   reinitialize,
+  STATES,
 } from '../../../redux/slices/cli';
-import { CLIProps, STATES, CommandResponse } from './types';
+import { CommandResponse } from '../../../redux/slices/cli/types';
 import { knownRootCommands } from './constants';
 import {
   CLIContainer,
@@ -26,8 +28,8 @@ import {
 } from './styles';
 import { RootState, useAppDispatch } from '../../../redux/store';
 
-const CLI: React.FC<CLIProps> = (props) => {
-  const [inputText, setInputText] = useState('');
+const CLI: React.FC = () => {
+  const [inputText, _setInputText] = useState('');
   const [user, _setUser] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
   const dispatch = useAppDispatch();
@@ -36,39 +38,44 @@ const CLI: React.FC<CLIProps> = (props) => {
     (state: RootState) => state.user.isAuthenticated
   );
 
+  const cliState = useSelector((state: RootState) => state.cli.state);
+  const previousRootCommand = useSelector(
+    (state: RootState) => state.cli.previousRootCommand
+  );
+  const outputs = useSelector((state: RootState) => state.cli.outputs);
+
   useEffect(() => {
-    setInputFocus();
+    _setInputFocus();
     if (inputRef.current) {
       inputRef.current.value = inputText;
     }
-    // Clean up when unmounting
     return () => {
       reinitialize();
     };
   }, [inputText, reinitialize]);
 
-  const updateCommandOutputs = (cmd: CommandResponse) => {
-    setOutputs(cmd);
+  const _updateCommandOutputs = (cmd: CommandResponse) => {
+    dispatch(updateOutputs(cmd));
   };
 
-  const updateUser = (newUser: string) => {
+  const _updateUser = (newUser: string) => {
     _setUser(newUser);
   };
 
-  const clearInput = () => {
-    setInputText('');
-    setInputFocus();
+  const _clearInputElement = () => {
+    _setInputText('');
+    _setInputFocus();
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(e.target.value);
+  const _handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    _setInputText(e.target.value);
   };
 
-  const handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const _handleInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cmd = inputText.trim();
     if (cmd) {
-      handleCommand(cmd);
+      _handleCommand(cmd);
     }
   };
 
@@ -79,12 +86,11 @@ const CLI: React.FC<CLIProps> = (props) => {
       .join('');
   };
 
-  const handleCommand = async (cmd: string) => {
-    const { previousRootCommand } = props;
+  const _handleCommand = async (cmd: string) => {
     if (!cmd) {
       throw new Error('No command provided');
     }
-    clearInput();
+    _clearInputElement();
 
     const commandStrings = cmd.split(' ');
     const newRootCommand = commandStrings[0];
@@ -100,7 +106,7 @@ const CLI: React.FC<CLIProps> = (props) => {
       !knownRootCommands.includes(newRootCommand) &&
       !knownRootCommands.includes(previousRootCommand)
     ) {
-      updateCommandOutputs({
+      _updateCommandOutputs({
         cmdType: 'UNKNOWN',
         cmd: cmd,
         status: 'error',
@@ -109,51 +115,33 @@ const CLI: React.FC<CLIProps> = (props) => {
       return;
     }
 
-    handleKnownCommands(newRootCommand, commandStrings, commandResponse);
+    _handleKnownCommands(newRootCommand, commandStrings, commandResponse);
   };
 
-  const handleKnownCommands = async (
+  const _handleKnownCommands = async (
     newRootCommand: string,
     commandStrings: string[],
     commandResponse: CommandResponse
   ) => {
-    const {
-      previousRootCommand,
-      loginUser,
-      setPreviousRootCommand,
-      setCLIState,
-    } = props;
-
+    commandResponse.cmd = newRootCommand;
     if (!knownRootCommands.includes(previousRootCommand)) {
       if (newRootCommand === 'login') {
-        handleLoginCommandAttempt(
-          newRootCommand,
-          commandStrings,
-          commandResponse
-        );
+        handleLoginCommandAttempt(commandStrings, commandResponse);
         return;
       }
 
       if (newRootCommand === 'register') {
-        handleRegisterCommandAttempt(
-          newRootCommand,
-          commandStrings,
-          commandResponse
-        );
+        handleRegisterCommandAttempt(commandStrings, commandResponse);
         return;
       }
 
       if (newRootCommand === 'help') {
-        handleHelpCommandAttempt(
-          newRootCommand,
-          commandStrings,
-          commandResponse
-        );
+        handleHelpCommandAttempt(commandStrings, commandResponse);
         return;
       }
 
       if (newRootCommand === 'clear') {
-        clearCommand();
+        _clearCommand();
         return;
       }
     }
@@ -162,40 +150,30 @@ const CLI: React.FC<CLIProps> = (props) => {
       commandResponse.cmd = handleMaskPassword(newRootCommand);
       commandResponse.status = 'info';
       commandResponse.messages = [`Authenticating...`];
-      updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(commandResponse);
 
       if (previousRootCommand === 'login') {
-        handleLoginUser(newRootCommand);
+        _handleLoginUser(newRootCommand);
         return;
       }
       handleUserRegistration(newRootCommand);
     }
   };
 
-  const clearCommand = () => {
-    const { clearOutputs } = props;
-    clearOutputs();
+  const _clearCommand = () => {
+    dispatch(clearOutputs());
   };
 
   const handleLoginCommandAttempt = async (
-    newRootCommand: string,
     commandStrings: string[],
     commandResponse: CommandResponse
   ) => {
-    const {
-      setPreviousRootCommand,
-      setCLIState,
-      loginUser,
-      isUserRegistered,
-      updateUser,
-    } = props;
-
     if (commandStrings.length === 1) {
       commandResponse.messages = [
         `invalid input...expected 1 argument, received 0 arguments.`,
         `"login $username"`,
       ];
-      updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(commandResponse);
       return;
     }
 
@@ -203,22 +181,23 @@ const CLI: React.FC<CLIProps> = (props) => {
       const username = commandStrings[1];
       const userExists = await isUserRegistered(username);
 
+      // NEED TO DISPATCH THERE ACTIONS
       if (userExists) {
-        setIsLoggingIn(true);
-        updateUser(username);
-        setCLIState(STATES.PASSWORD);
-        setPreviousRootCommand(newRootCommand);
+        dispatch(setIsLoggingIn(true));
+        _updateUser(username);
+        dispatch(setCLIState(STATES.PASSWORD));
+        setPreviousRootCommand(commandResponse.cmd);
         commandResponse.status = 'success';
         commandResponse.messages = [`logging in as: ${username}`, `password:`];
       } else {
-        setCLIState(STATES.INIT);
+        dispatch(setCLIState(STATES.INIT));
         commandResponse.messages = [
           `user does not exist`,
           `proceed with user registration.`,
         ];
       }
 
-      updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(commandResponse);
       return;
     }
 
@@ -229,15 +208,12 @@ const CLI: React.FC<CLIProps> = (props) => {
         } arguments.`,
         `"login $username"`,
       ];
-      updateCommandOutputs(commandResponse);
+      _updateCommandOutputs(commandResponse);
       return;
     }
   };
 
-  const handleLoginUser = async (cmd: string) => {
-    const { loginUser, setPreviousRootCommand, setCLIState, updateUser } =
-      props;
-
+  const _handleLoginUser = async (cmd: string) => {
     const userAttempt: User = {
       id: '',
       username: user,
@@ -246,7 +222,7 @@ const CLI: React.FC<CLIProps> = (props) => {
 
     const commandResponse: CommandResponse = {
       cmdType: '',
-      cmd: null,
+      cmd: '',
       status: 'error',
       messages: [],
     };
@@ -258,17 +234,15 @@ const CLI: React.FC<CLIProps> = (props) => {
       }
     } catch (error) {
       commandResponse.messages = ['Authentication Failure... '];
-      updateCommandOutputs(commandResponse);
-      setCLIState(STATES.INIT);
+      _updateCommandOutputs(commandResponse);
+      dispatch(setCLIState(STATES.INIT));
       setPreviousRootCommand('');
       console.log('handle login user failed', error);
     }
-    clearInput();
+    _clearInputElement();
   };
 
   const handleUserRegistration = async (newRootCommand: string) => {
-    const { setPreviousRootCommand, setCLIState, registerUser } = props;
-
     const userAttempt: User = {
       id: '',
       username: user,
@@ -303,23 +277,30 @@ const CLI: React.FC<CLIProps> = (props) => {
 
     setCLIState(STATES.INIT);
     setPreviousRootCommand('');
-    updateCommandOutputs(commandResponse);
-    clearInput();
+    _updateCommandOutputs(commandResponse);
+    _clearInputElement();
   };
 
-  const handleRegisterCommandAttempt = async (newRootCommand: string) => {
+  const handleRegisterCommandAttempt = async (
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    commandResponse.cmdType = 'HELP';
+    commandResponse.status = 'success';
+    commandResponse.messages = [
+      'Available commands:',
+      '- login',
+      '- register',
+      '- help',
+      '- clear',
+    ];
     const userAttempt: User = {
       id: '',
       username: user,
-      password: newRootCommand,
+      password: commandResponse.cmd,
     };
 
-    const commandResponse: CommandResponse = {
-      cmdType: '',
-      cmd: newRootCommand,
-      status: 'error',
-      messages: [],
-    };
+    // working here but need to replace this
 
     try {
       const userExists = await isUserRegistered(user);
@@ -346,41 +327,28 @@ const CLI: React.FC<CLIProps> = (props) => {
 
     setCLIState('INIT');
     setPreviousRootCommand('');
-    updateCommandOutputs(commandResponse);
-    clearInput();
+    _updateCommandOutputs(commandResponse);
+    _clearInputElement();
   };
 
-  const handleHelpCommandAttempt = (newRootCommand: string) => {
-    const commandResponse: CommandResponse = {
-      cmdType: '',
-      cmd: newRootCommand,
-      status: 'info',
-      messages: [],
-    };
+  const handleHelpCommandAttempt = async (
+    commandStrings: string[],
+    commandResponse: CommandResponse
+  ) => {
+    commandResponse.cmdType = 'HELP';
+    commandResponse.status = 'success';
+    commandResponse.messages = [
+      'Available commands:',
+      '- login',
+      '- register',
+      '- help',
+      '- clear',
+    ];
 
-    // Customize this part to provide help messages for specific commands.
-    // For example:
-    if (newRootCommand === 'login') {
-      commandResponse.messages = [
-        'Help for the login command:',
-        '- Usage: login $username',
-      ];
-    } else if (newRootCommand === 'register') {
-      commandResponse.messages = [
-        'Help for the register command:',
-        '- Usage: register $username',
-      ];
-    } else {
-      commandResponse.messages = [
-        `Help for the ${newRootCommand} command:`,
-        '- No help available for this command.',
-      ];
-    }
-
-    updateCommandOutputs(commandResponse);
+    _updateCommandOutputs(commandResponse);
   };
 
-  const setInputFocus = () => {
+  const _setInputFocus = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -397,7 +365,7 @@ const CLI: React.FC<CLIProps> = (props) => {
   }, [outputs]);
 
   return (
-    <CLIContainer id="CLI-Container" onClick={setInputFocus}>
+    <CLIContainer id="CLI-Container" onClick={_setInputFocus}>
       {outputs.map((item, index) => (
         <OutputItem key={index}>
           {item.cmd}
@@ -408,12 +376,12 @@ const CLI: React.FC<CLIProps> = (props) => {
           </ItemResponse>
         </OutputItem>
       ))}
-      <InputForm onSubmit={handleInputSubmit}>
+      <InputForm onSubmit={_handleInputSubmit}>
         <InputField
           type={cliState === STATES.PASSWORD ? 'password' : 'text'}
           ref={inputRef}
           value={inputText}
-          onChange={handleInputChange}
+          onChange={_handleInputChange}
           placeholder=""
         />
       </InputForm>

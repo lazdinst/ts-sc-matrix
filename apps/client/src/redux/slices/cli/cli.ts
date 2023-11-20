@@ -1,24 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-
-export const STATES = {
-  INIT: 'INIT',
-  LOGIN: 'LOGIN',
-  PASSWORD: 'PASSWORD',
-  FAILED: 'FAILED',
-  SUCCESS: 'SUCCESS',
-  AUTHENTICATING: 'AUTHENTICATING',
-  REGISTER: 'REGISTER',
-} as const;
-
-type StateTypes = keyof typeof STATES;
-
-interface CLIState {
-  connected: boolean;
-  state: StateTypes;
-  previousRootCommand: string;
-  outputs: string[];
-}
+import { StateTypes, CLIState, CommandResponse } from './types';
 
 const initialState: CLIState = {
   connected: false,
@@ -37,7 +19,7 @@ const cli = createSlice({
     setPreviousRootCommand: (state, action: PayloadAction<string>) => {
       state.previousRootCommand = action.payload;
     },
-    updateOutputs: (state, action: PayloadAction<string>) => {
+    updateOutputs: (state, action: PayloadAction<CommandResponse>) => {
       state.outputs = [...state.outputs, action.payload];
     },
     clearOutputs: (state) => {
