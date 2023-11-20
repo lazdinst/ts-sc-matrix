@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import TextWithCursor from './TextWithCursor'; // Import the TextWithCursor component
 import CLI from '../CLI';
 import TerminalTopBar from './TerminalTopBar';
-const SKIP_ANIMATION = true;
+const SKIP_ANIMATION = import.meta.env.VITE_REACT_APP_SKIP_ANIMATION || false;
 
 const TerminalContainer = styled.div`
   font-size: 0.75rem;
