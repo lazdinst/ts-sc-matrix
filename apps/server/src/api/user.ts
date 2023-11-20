@@ -77,7 +77,7 @@ router.post('/register', async (req, res) => {
 
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
-      process.env.JWT_SECRET || 'secret',
+      process.env.VITE_REACT_JWT_SECRET || 'secret',
       { expiresIn: '1h' }
     );
 
@@ -131,7 +131,7 @@ router.post('/login', async (req, res) => {
     storeSession(sessionId, user);
     const token = jwt.sign(
       { userId: user._id, username: user.username, sessionId },
-      process.env.JWT_SECRET || 'secret',
+      process.env.VITE_REACT_JWT_SECRET || 'secret',
       { expiresIn: '1h' }
     );
 
