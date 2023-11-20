@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const defaultPlayerRoll = {
   name: '',
@@ -62,9 +63,6 @@ const initialState: RollerState = {
   playerOne: defaultPlayerRoll,
   playerTwo: defaultPlayerRoll,
 };
-
-const DEFAULT_API_URL = 'http://localhost:6969';
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
 
 export const executeNewRoll = createAsyncThunk(
   'roller/executeNewRoll',

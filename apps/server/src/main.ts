@@ -57,7 +57,7 @@ import userRoutes from './api/user';
       );
     });
 
-    const port = process.env.PORT || 5000;
+    const port = process.env.VITE_REACT_APP_API_PORT || 10000;
 
     server.listen(port, () => {
       console.log(`Listening on: ${port}`);

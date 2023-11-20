@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AsyncThunkAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const DEFAULT_API_URL = 'http://localhost:6969';
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
+import { API_URL } from '../config';
 
 interface ServerStatusState {
   connected: boolean;

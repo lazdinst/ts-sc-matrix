@@ -2,9 +2,7 @@ import { Dispatch, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from './types';
 import { RootState } from '../../store';
 import axios, { AxiosResponse } from 'axios';
-
-const DEFAULT_API_URL = 'http://localhost:6969';
-const API_URL = import.meta.env.VITE_REACT_APP_API_URL || DEFAULT_API_URL;
+import { API_URL } from '../config';
 
 interface UserState {
   isAuthenticated: boolean | null;
