@@ -2,7 +2,7 @@ import { Dispatch, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from './types';
 import { RootState } from '../../store';
 import axios, { AxiosResponse } from 'axios';
-import { API_URL } from '../config';
+import { API_URL } from '../../../config';
 
 interface UserState {
   isAuthenticated: boolean | null;
