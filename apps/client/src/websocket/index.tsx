@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../redux/store';
 import { io, Socket } from 'socket.io-client';
 import { WS_URL } from '../redux/slices/config';
 import {
@@ -15,16 +15,14 @@ import {
 } from '../redux/slices/websocket';
 
 import { setConnections } from '../redux/slices/connections';
-
 import { setRolls } from '../redux/slices/roller';
-import { User } from '../redux/slices/user/types';
 
 interface WebSocketProviderProps {
   children: React.ReactNode;
 }
 
 const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
   useEffect(() => {
@@ -56,8 +54,7 @@ const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
         socket.disconnect();
       }
     };
-  }, []); // Empty dependency array is intentional to run this effect only once
-
+  }, []);
   return children;
 };
 

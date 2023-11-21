@@ -8,10 +8,12 @@ export type ConnectedClientsType = Connection[];
 
 interface ConnectionState {
   connections: ConnectedClientsType;
+  party: ConnectedClientsType;
 }
 
 const initialState: ConnectionState = {
   connections: [],
+  party: [],
 };
 
 const connections = createSlice({

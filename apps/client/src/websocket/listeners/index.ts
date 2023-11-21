@@ -38,16 +38,11 @@ export const setupUserConnectionListeners = (
   });
 };
 
-// export const setupConnectionListners = (socket: Socket) => {
-//   socket.on('connections', (connections: { count: number }) => {
-//     console.log('Connections:', connections);
-//   });
-// };
-
 export const setupRollerListeners = (
   socket: Socket,
   setRolls: (arg0: RollerState) => void
 ) => {
+  // TODO: Replace any with actual type
   socket.on('roll', (message: any) => {
     console.log('Roll:', message);
     const rollMessage: RollerState = message;
