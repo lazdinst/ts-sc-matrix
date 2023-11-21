@@ -19,13 +19,11 @@ const Roller: React.FC = () => {
   const { playerOne, playerTwo, loading, error } = useSelector(
     (state: RootState) => state.roller
   );
-  const { connections } = useSelector(
-    (state: RootState) => state.connections.connections
-  );
 
   const server = useSelector(
     (state: { server: ServerStatusState }) => state.server
   );
+
   const websocket = useSelector(
     (state: { websocket: WebSocketState }) => state.websocket
   );

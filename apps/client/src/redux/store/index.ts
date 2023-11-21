@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 
 import * as reducers from '../slices';
+import socketMiddleware from '../middleware/socketMiddleware';
 
 const rootReducer = combineReducers({
   ...reducers,
@@ -9,6 +10,8 @@ const rootReducer = combineReducers({
 
 const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(socketMiddleware()),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

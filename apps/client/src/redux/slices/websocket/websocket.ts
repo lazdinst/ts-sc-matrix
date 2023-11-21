@@ -1,12 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, Dispatch } from '@reduxjs/toolkit';
 
 interface WebSocketState {
   connected: boolean;
+  test: boolean;
   messages: string[];
 }
 
 const initialState: WebSocketState = {
   connected: false,
+  test: false,
   messages: [],
 };
 
@@ -14,10 +16,10 @@ const websocketSlice = createSlice({
   name: 'websocket',
   initialState,
   reducers: {
-    connectWebSocket: (state) => {
+    setWebSocketConnected: (state) => {
       state.connected = true;
     },
-    disconnectWebSocket: (state) => {
+    setWebSocketDisconnected: (state) => {
       state.connected = false;
     },
     receiveWebSocketMessage: (state, action: PayloadAction<string>) => {
@@ -28,8 +30,23 @@ const websocketSlice = createSlice({
 
 export type { WebSocketState };
 export const {
-  connectWebSocket,
-  disconnectWebSocket,
+  setWebSocketConnected,
+  setWebSocketDisconnected,
   receiveWebSocketMessage,
 } = websocketSlice.actions;
+
+export const connectSocket = () => {
+  console.log('Connecting socket func: connectSocket...');
+  return (dispatch: Dispatch) => {
+    dispatch({ type: 'socket/connect' });
+  };
+};
+
+export const disconnectSocket = () => {
+  console.log('Disconnecting socket func: disconnectSocket ...');
+  return (dispatch: Dispatch) => {
+    dispatch({ type: 'socket/disconnect' });
+  };
+};
+
 export default websocketSlice.reducer;
