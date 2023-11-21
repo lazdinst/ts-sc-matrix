@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io';
+export { setupPartyListeners } from './party';
 
 export const setupConnectedClientListeners = (
   socket: Socket,

@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io-client';
 import { RollerState } from '../../redux/slices/roller/roller';
 import { User } from '../../redux/slices/user/types';
+import { ConnectedClientsType } from '../../redux/slices/connections';
 
 const emitUserToSocket = (socket: Socket, user: User) => {
   socket.emit('user-connected', user);
@@ -27,26 +28,21 @@ export const setupSocketStateListeners = (
   });
 };
 
-export const setupUserConnections = (
+export const setupUserConnectionListeners = (
   socket: Socket,
-  setConnections: (users: string[]) => void
+  setConnections: (connections: ConnectedClientsType) => void
 ) => {
-  socket.on('connections', (users: string[]) => {
-    console.log('Connections:', users);
-    setConnections(['users']);
+  socket.on('connections', (connections: ConnectedClientsType) => {
+    console.log('Connections:', connections);
+    setConnections(connections);
   });
 };
-
-// export const setupConnectionListners = (socket: Socket) => {
-//   socket.on('connections', (connections: { count: number }) => {
-//     console.log('Connections:', connections);
-//   });
-// };
 
 export const setupRollerListeners = (
   socket: Socket,
   setRolls: (arg0: RollerState) => void
 ) => {
+  // TODO: Replace any with actual type
   socket.on('roll', (message: any) => {
     console.log('Roll:', message);
     const rollMessage: RollerState = message;

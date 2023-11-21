@@ -1,4 +1,5 @@
 export { STATES } from './constants';
+export type { Command } from './types';
 export {
   default as cli,
   setCLIState,
