@@ -33,6 +33,7 @@ export const initializeSocketIO = (server: any) => {
     setupPartyListeners(io, socket);
     socket.on('user-connected', (userInfo: UserInfo) => {
       console.log('User connected:', userInfo);
+      console.log('Socket ID:', socket.id);
       connectedClients.set(socket.id, userInfo);
       console.log('Emitting to all connections', connectedClients);
       emitToAllConnections(connectedClients);
@@ -58,6 +59,7 @@ export const emitToAllConnections = (
 ) => {
   const connections = getConnections(connectedClients);
   if (connections.length > 0) {
+    console.log('Emitting to all connections', connections);
     io.sockets.emit('connections', connections);
   }
 };

@@ -28,6 +28,7 @@ export const setupSocketStateListeners = (
   socket.on('connect', () => {
     console.log('Connected...');
     dispatch(setWebSocketConnected());
+    console.log('Emitting user to socket');
     emitUserToSocket(socket, getState, dispatch);
   });
 
