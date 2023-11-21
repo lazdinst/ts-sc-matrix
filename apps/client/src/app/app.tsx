@@ -5,7 +5,7 @@ import WebSocketProvider from './containers/WebSocketProvider';
 import { validateToken } from '../redux/slices/user';
 import { fetchServerStatus } from '../redux/slices/api';
 import Router from './router';
-import Sidebar from './containers/Sidebar';
+import SideBar from './containers/SideBar';
 import Main from './components/Main';
 import Loader from './components/Loader';
 import Auth from './pages/Auth';
@@ -47,7 +47,7 @@ const App: React.FC = () => {
   return (
     <WebSocketProvider>
       <FadeWrapper>
-        <Sidebar />
+        <SideBar />
         <Main>
           <Router />
         </Main>

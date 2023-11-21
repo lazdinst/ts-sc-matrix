@@ -45,7 +45,6 @@ const MenuContainer = styled.div`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  
 `;
 
 interface MenuListProps {
@@ -89,18 +88,20 @@ const MenuItemIcon = styled.div`
   font-size: 24px;
 `;
 
-const menuItems = routes.map((route) => ({
-  icon: route.icon,
-  name: route.name,
-  route: route.path,
-})).filter((item) => ['home', 'roller'].includes(item.name.toLowerCase()));
-
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleMenuItemClick = (route: string) => {
     navigate(route);
   };
+
+  const menuItems = routes
+    .map((route) => ({
+      icon: route.icon,
+      name: route.name,
+      route: route.path,
+    }))
+    .filter((item) => ['home', 'roller'].includes(item.name.toLowerCase()));
 
   return (
     <SidebarWrapper>
@@ -111,7 +112,10 @@ const Sidebar: React.FC = () => {
       <MenuContainer>
         <MenuList>
           {menuItems.map((item, index) => (
-            <MenuItem key={index} onClick={() => handleMenuItemClick(item.route)}>
+            <MenuItem
+              key={index}
+              onClick={() => handleMenuItemClick(item.route)}
+            >
               <MenuItemIcon>
                 <Icon name={item.icon}></Icon>
               </MenuItemIcon>
@@ -119,16 +123,16 @@ const Sidebar: React.FC = () => {
           ))}
         </MenuList>
         <MenuList alignEnd>
-            <MenuItem onClick={() => handleMenuItemClick('profile')}>
-              <MenuItemIcon>
-                <Icon name='astronaut'></Icon>
-              </MenuItemIcon>
-            </MenuItem>
-            <MenuItem onClick={() => handleMenuItemClick('settings')}>
-              <MenuItemIcon>
-                <Icon name='cogs'></Icon>
-              </MenuItemIcon>
-            </MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick('profile')}>
+            <MenuItemIcon>
+              <Icon name="astronaut"></Icon>
+            </MenuItemIcon>
+          </MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick('settings')}>
+            <MenuItemIcon>
+              <Icon name="cogs"></Icon>
+            </MenuItemIcon>
+          </MenuItem>
         </MenuList>
       </MenuContainer>
     </SidebarWrapper>

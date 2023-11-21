@@ -7,25 +7,39 @@ export type Connection = {
 export type ConnectedClientsType = Connection[];
 
 interface ConnectionState {
-  connections: ConnectedClientsType;
+  lobby: ConnectedClientsType;
   party: ConnectedClientsType;
+  invite: Connection | null;
 }
 
 const initialState: ConnectionState = {
-  connections: [],
+  lobby: [],
   party: [],
+  invite: null,
 };
 
 const connections = createSlice({
   name: 'connection',
   initialState,
   reducers: {
-    setConnections(state, action: PayloadAction<ConnectedClientsType>) {
-      state.connections = action.payload;
+    updateLobby(state, action: PayloadAction<ConnectedClientsType>) {
+      state.lobby = action.payload;
+    },
+    addPendingInvite(state, action: PayloadAction<Connection>) {
+      state.invite = action.payload;
+    },
+    removePendingInvite(state) {
+      state.invite = null;
+    },
+    acceptPendingInvite(state, action: PayloadAction<ConnectedClientsType>) {
+      state.party = action.payload;
+    },
+    declinePartyInvite(state) {
+      state.party = [];
     },
   },
 });
 
-export const { setConnections } = connections.actions;
+export const { updateLobby } = connections.actions;
 
 export default connections.reducer;

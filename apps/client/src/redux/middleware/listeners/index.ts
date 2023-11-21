@@ -6,7 +6,7 @@ import {
   setWebSocketConnected,
   setWebSocketDisconnected,
 } from '../../slices/websocket';
-import { setConnections } from '../../slices/connections';
+import { updateLobby } from '../../slices/connections';
 import { setRolls } from '../../slices/roller/roller';
 import { emitUserToSocket } from '../emitters';
 
@@ -49,7 +49,7 @@ export const setupUserConnectionListeners = (
 ) => {
   socket.on('connections', (connections: ConnectedClientsType) => {
     console.log('Connections:', connections);
-    dispatch(setConnections(connections));
+    dispatch(updateLobby(connections));
   });
 };
 

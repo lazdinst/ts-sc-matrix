@@ -1,2 +1,2 @@
 export type { Connection, ConnectedClientsType } from './connections';
-export { default as connections, setConnections } from './connections';
+export { default as connections, updateLobby } from './connections';
