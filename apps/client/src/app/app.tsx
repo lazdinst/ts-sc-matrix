@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store';
-import WebSocketProvider from '../websocket';
+import WebSocketProvider from './containers/WebSocketProvider';
 import { validateToken } from '../redux/slices/user';
 import { fetchServerStatus } from '../redux/slices/api';
 import Router from './router';

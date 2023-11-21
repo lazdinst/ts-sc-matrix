@@ -1,12 +1,16 @@
 import websocket, {
-  connectWebSocket,
-  disconnectWebSocket,
+  setWebSocketConnected,
+  setWebSocketDisconnected,
   receiveWebSocketMessage,
+  connectSocket,
+  disconnectSocket,
 } from './websocket';
 
 export {
   websocket,
-  connectWebSocket,
-  disconnectWebSocket,
+  setWebSocketConnected,
+  setWebSocketDisconnected,
   receiveWebSocketMessage,
+  connectSocket,
+  disconnectSocket,
 };

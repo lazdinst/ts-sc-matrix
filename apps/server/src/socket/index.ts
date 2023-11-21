@@ -34,6 +34,7 @@ export const initializeSocketIO = (server: any) => {
     socket.on('user-connected', (userInfo: UserInfo) => {
       console.log('User connected:', userInfo);
       connectedClients.set(socket.id, userInfo);
+      console.log('Emitting to all connections', connectedClients);
       emitToAllConnections(connectedClients);
     });
 
@@ -56,8 +57,7 @@ export const emitToAllConnections = (
   connectedClients: Map<string, UserInfo>
 ) => {
   const connections = getConnections(connectedClients);
-  if (connections.length > 1) {
-    console.log('emitting');
+  if (connections.length > 0) {
     io.sockets.emit('connections', connections);
   }
 };
