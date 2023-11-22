@@ -1,9 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Roller from '../pages/Roller';
-import Settings from '../pages/Settings';
-import Profile from '../pages/Profile';
-import Home from '../pages/Home';
+import { Home, Roller, Settings, Profile } from '../pages';
 
 export const routes = [
   {
