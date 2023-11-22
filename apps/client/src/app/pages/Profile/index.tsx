@@ -8,14 +8,12 @@ const ProfileWrapper = styled.div`
   height: 100%;
 `;
 
-class Profile extends React.Component {
-  render() {
-    return (
-      <ProfileWrapper>
-        <UserProfile />
-      </ProfileWrapper>
-    );
-  }
-}
+const Profile: React.FC = () => {
+  return (
+    <ProfileWrapper>
+      <UserProfile />
+    </ProfileWrapper>
+  );
+};
 
 export default Profile;
