@@ -3,13 +3,14 @@ import {
   PlayerConnection,
   ClientLobbyType,
   PartyType,
+  PartyInviteType,
   PlayerInvite,
 } from './types';
 
 interface ConnectionState {
   lobby: ClientLobbyType;
   party: PartyType | null;
-  invite: PlayerInvite | null;
+  invite: PartyInviteType | null;
   outbox: PlayerInvite | null;
 }
 
@@ -27,19 +28,26 @@ const connections = createSlice({
     updateLobby(state, action: PayloadAction<ClientLobbyType>) {
       state.lobby = action.payload;
     },
-    addPendingInvite(state, action: PayloadAction<PlayerInvite>) {
+    addPendingInvite(state, action: PayloadAction<PartyInviteType>) {
       state.invite = action.payload;
     },
     removePendingInvite(state) {
       state.invite = null;
     },
-    acceptPendingInvite(state, action: PayloadAction<ClientLobbyType>) {
+    createPartyFromInvite(state, action: PayloadAction<PartyType>) {
       state.party = action.payload;
     },
-    updateOutbox(state, action: PayloadAction<PlayerInvite>) {
+    updateOutbox(state, action: PayloadAction<PlayerConnection>) {
       state.outbox = action.payload;
     },
+    clearOutbox(state) {
+      state.outbox = [];
+    },
     declinePartyInvite(state) {
+      state.party = [];
+      state.invite = null;
+    },
+    leaveParty(state) {
       state.party = [];
     },
   },
@@ -49,9 +57,11 @@ export const {
   updateLobby,
   addPendingInvite,
   removePendingInvite,
-  acceptPendingInvite,
+  createPartyFromInvite,
   declinePartyInvite,
   updateOutbox,
+  clearOutbox,
+  leaveParty,
 } = connections.actions;
 
 export const sendPartyInvite = (player: PlayerConnection) => {
@@ -72,6 +82,13 @@ export const sendDeclinePartyInvite = () => {
   console.log('Sending Decline Party invite...');
   return (dispatch: Dispatch) => {
     dispatch({ type: 'connections/decline-invite' });
+  };
+};
+
+export const sendLeaveParty = () => {
+  console.log('Sending Leave Party...');
+  return (dispatch: Dispatch) => {
+    dispatch({ type: 'connections/leave-party' });
   };
 };
 

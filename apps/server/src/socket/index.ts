@@ -3,13 +3,17 @@ import {
   setupConnectedClientListeners,
   setupPartyListeners,
 } from './listeners';
-import { PlayerConnection, ClientLobbyType } from './types';
+import { PlayerConnection, ClientLobbyType, ClientPartiesType } from './types';
 
 const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 
 let io: SocketIoServer;
 
 export const clientLobby: ClientLobbyType = new Map<string, PlayerConnection>();
+export const clientParties: ClientPartiesType = new Map<
+  string,
+  PlayerConnection[]
+>();
 
 export const initializeSocketIO = (server: any) => {
   io = new SocketIoServer(server, {
@@ -20,29 +24,22 @@ export const initializeSocketIO = (server: any) => {
       credentials: true,
     },
   });
-
-  console.log('io Server Created');
   // Listeners
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
 
     setupConnectedClientListeners(socket, clientLobby);
     setupPartyListeners(io, socket);
-    socket.on('user-connected', (userInfo: PlayerConnection) => {
-      console.log('User connected:', userInfo);
-      console.log('Socket ID:', socket.id);
-      clientLobby.set(socket.id, userInfo);
-      console.log('Emitting to all connections', clientLobby);
+    socket.on('user-connected', (player: PlayerConnection) => {
+      clientLobby.set(socket.id, player);
       emitLobbyToAllClients(clientLobby);
     });
 
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
       clientLobby.delete(socket.id);
+      // TODO: Clean up clientParties by disbanding any parties that the client was in
       emitLobbyToAllClients(clientLobby);
-    });
-    socket.on('roll', () => {
-      console.log('Rolled');
     });
   });
 

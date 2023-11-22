@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import {
-  addPendingInvite,
-  removePendingInvite,
-  acceptPendingInvite,
-  declinePartyInvite,
   PlayerConnection,
-  sendAcceptPartyInvite,
-  updateOutbox,
   sendPartyInvite,
+  sendAcceptPartyInvite,
+  sendDeclinePartyInvite,
+  sendLeaveParty,
 } from '../../../redux/slices/connections';
 
 const PartyManager: React.FC = () => {
@@ -49,7 +46,13 @@ const PartyManager: React.FC = () => {
 
   const handleDeclineInvite = () => {
     if (invite) {
-      dispatch(declinePartyInvite());
+      dispatch(sendDeclinePartyInvite());
+    }
+  };
+
+  const handleLeaveParty = () => {
+    if (party) {
+      dispatch(sendLeaveParty());
     }
   };
 
@@ -57,16 +60,23 @@ const PartyManager: React.FC = () => {
     <div>
       <h2>Party Manager</h2>
       <div>
+        <h3>{user?.username}</h3>
+      </div>
+      <div>
         <h3>Lobby</h3>
         <ul>
-          {lobby.map((player) => (
-            <li key={player.username}>
-              {player.username}{' '}
-              <button onClick={() => handleSendPartyInvite(player)}>
-                Invite
-              </button>
-            </li>
-          ))}
+          {lobby
+            .filter((player) => player.id !== user?.id)
+            .map((player) => (
+              <li key={player.username}>
+                {player.username}
+                {player.id !== user?.id ? (
+                  <button onClick={() => handleSendPartyInvite(player)}>
+                    Invite
+                  </button>
+                ) : null}
+              </li>
+            ))}
         </ul>
       </div>
       <div>
@@ -75,6 +85,11 @@ const PartyManager: React.FC = () => {
           {party &&
             party.map((player) => <li key={player.id}>{player.username}</li>)}
         </ul>
+        <div>
+          {party?.length ? (
+            <button onClick={handleLeaveParty}>Leave Party</button>
+          ) : null}
+        </div>
       </div>
       {invite && (
         <div>

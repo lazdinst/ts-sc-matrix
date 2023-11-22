@@ -1,10 +1,14 @@
 import { Socket } from 'socket.io-client';
 import {
   updateLobby,
+  clearOutbox,
   addPendingInvite,
+  removePendingInvite,
+  createPartyFromInvite,
   ClientLobbyType,
-  PlayerConnection,
-  PlayerInvite,
+  PartyInviteType,
+  PartyType,
+  leaveParty,
 } from '../../slices/connections';
 
 export const setupLobbyListeners = (
@@ -23,10 +27,27 @@ export const setupPartyListeners = (
   getState: () => any,
   dispatch: (arg0: any) => void
 ) => {
-  socket.on('party-invite', (invite: PlayerInvite) => {
+  socket.on('send-party-invite', (invite: PartyInviteType) => {
     const user = getState().user.user;
     console.log('user:', user);
     console.log('party-invite:', invite);
     dispatch(addPendingInvite(invite));
+  });
+
+  socket.on('accept-party-invite', (party: PartyType) => {
+    console.log('Client: accept-party-invite:', party);
+    dispatch(removePendingInvite());
+    dispatch(createPartyFromInvite(party));
+  });
+
+  socket.on('decline-party-invite', (party: PartyType) => {
+    console.log('Client: decline-party-invite:', party);
+    dispatch(removePendingInvite());
+    dispatch(clearOutbox());
+  });
+
+  socket.on('leave-party', (party: PartyType) => {
+    console.log('Client: leave-party:', party);
+    dispatch(leaveParty());
   });
 };
