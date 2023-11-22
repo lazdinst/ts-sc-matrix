@@ -94,10 +94,10 @@ export const registerUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const registeredUser: User = {
-        id: response.data.user._id,
+        _id: response.data.user._id,
         username: response.data.user.username,
       };
-      if (!registeredUser.id) throw new Error('User ID not found');
+      if (!registeredUser._id) throw new Error('User ID not found');
       if (!registeredUser.username) throw new Error('Username not found');
 
       dispatch(register(registeredUser));
@@ -123,10 +123,10 @@ export const loginUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const authenticatedUser: User = {
-        id: response.data.user._id,
+        _id: response.data.user._id,
         username: response.data.user.username,
       };
-      if (!authenticatedUser.id) throw new Error('User ID not found');
+      if (!authenticatedUser._id) throw new Error('User ID not found');
       if (!authenticatedUser.username) throw new Error('Username not found');
 
       dispatch(login(authenticatedUser));
@@ -148,7 +148,7 @@ export const validateToken = () => {
         token,
       });
       const authenticatedUser: User = {
-        id: response.data.id,
+        _id: response.data._id,
         username: response.data.username,
       };
 
