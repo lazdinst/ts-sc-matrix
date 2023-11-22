@@ -4,14 +4,13 @@ import {
   ClientLobbyType,
   PartyType,
   PartyInviteType,
-  PlayerInvite,
 } from './types';
 
 interface ConnectionState {
   lobby: ClientLobbyType;
   party: PartyType | null;
   invite: PartyInviteType | null;
-  outbox: PlayerInvite | null;
+  outbox: PartyType | null;
 }
 
 const initialState: ConnectionState = {
@@ -37,7 +36,7 @@ const connections = createSlice({
     createPartyFromInvite(state, action: PayloadAction<PartyType>) {
       state.party = action.payload;
     },
-    updateOutbox(state, action: PayloadAction<PlayerConnection>) {
+    updateOutbox(state, action: PayloadAction<PartyType>) {
       state.outbox = action.payload;
     },
     clearOutbox(state) {

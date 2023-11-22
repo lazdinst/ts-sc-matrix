@@ -1,12 +1,9 @@
 import { Socket } from 'socket.io-client';
 import { RollerState } from '../../slices/roller/roller';
-import { User } from '../../slices/user/types';
-import { ConnectedClientsType } from '../../slices/connections';
 import {
   setWebSocketConnected,
   setWebSocketDisconnected,
 } from '../../slices/websocket';
-import { updateLobby  } from '../../slices/connections';
 import { setRolls } from '../../slices/roller/roller';
 import { emitUserToSocket } from '../emitters';
 
@@ -58,4 +55,3 @@ export const setupRollerListeners = (
     dispatch(setRolls(rollMessage));
   });
 };
-
