@@ -36,7 +36,7 @@ export const units = [
   },
   {
     race: 'protoss',
-    name: 'pheonix',
+    name: 'phoenix',
     mins: '125',
     gas: '50',
     type: 'air_support',
@@ -78,7 +78,7 @@ export const units = [
   },
   {
     race: 'protoss',
-    name: 'colosus',
+    name: 'colossus',
     mins: '125',
     gas: '50',
     type: 'gnd_mass',

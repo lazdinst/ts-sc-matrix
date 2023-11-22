@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Player } from '../../../redux/slices/roller/roller';
-import { getSymbolImageByRace, parseUnitName } from '../../utils';
+import {
+  getSymbolImageByRace,
+  parseUnitName,
+  getUnitTypeDisplayName,
+} from '../../utils';
 import minerals from '../../../assets/images/minerals.gif';
 import vespene from '../../../assets/images/vespene.gif';
 import { UnitTypes } from '../../../redux/slices/roller/roller';
@@ -65,29 +69,6 @@ function splitPlayer(name: string) {
   } else {
     return name;
   }
-}
-
-function getUnitTypeDisplayName(type: UnitTypes) {
-  const unitTypeDisplayNameMap = {
-    core: 'core',
-    harass: 'harass',
-    caster: 'caster',
-    gnd_mass: 'ground massive',
-    air_support: 'air support',
-    devastator: 'devastator',
-    air_mass: 'air massive',
-    unknown: 'unknown',
-  };
-
-  function capitalizeWords(type: string) {
-    return type
-      .split(' ')
-      .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
-      .join(' ');
-  }
-
-  const displayName = capitalizeWords(unitTypeDisplayNameMap[type]);
-  return displayName;
 }
 
 const CardComponent: React.FC<CardComponentProps> = ({ player }) => {
