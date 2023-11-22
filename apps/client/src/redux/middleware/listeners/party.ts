@@ -38,6 +38,7 @@ export const setupPartyListeners = (
     console.log('Client: accept-party-invite:', party);
     dispatch(removePendingInvite());
     dispatch(createPartyFromInvite(party));
+    dispatch(clearOutbox());
   });
 
   socket.on('decline-party-invite', (party: PartyType) => {
