@@ -56,6 +56,8 @@ const PartyManager: React.FC = () => {
     }
   };
 
+  const ids = party?.map((player) => player.id);
+
   return (
     <div>
       <h2>Party Manager</h2>
@@ -67,6 +69,7 @@ const PartyManager: React.FC = () => {
         <ul>
           {lobby
             .filter((player) => player.id !== user?.id)
+            .filter((player) => !ids?.includes(player.id))
             .map((player) => (
               <li key={player.username}>
                 {player.username}
@@ -91,10 +94,10 @@ const PartyManager: React.FC = () => {
           ) : null}
         </div>
       </div>
-      {invite && (
+      {invite && invite.sender.id !== user?.id && (
         <div>
           <h3>Party Invitation</h3>
-          <p>{JSON.stringify(invite)}wants to party with you.</p>
+          <p>{JSON.stringify(invite)}</p>
           <button onClick={handleAcceptInvite}>Accept</button>
           <button onClick={handleDeclineInvite}>Decline</button>
         </div>

@@ -27,6 +27,8 @@ const Roller: React.FC = () => {
     (state: { websocket: WebSocketState }) => state.websocket
   );
 
+  const party = useSelector((state: RootState) => state.connections.party);
+
   const handleRollButtonClick = () => {
     if (server.connected && websocket.connected) {
       dispatch(executeNewRoll());
@@ -46,26 +48,30 @@ const Roller: React.FC = () => {
         alignItems="center"
         gap="16px"
       >
-        <Section
-          justifyContent="space-evenly"
-          alignItems="center"
-          gap="16px"
-          width="100%"
-          padding="3rem 0rem"
-        >
-          {playerOne && <PlayerCard player={playerOne} />}
-          <PlayerCard player={playerTwo} />
-        </Section>
-        <Section justifyContent="center" height="100%">
-          <Button
-            isLoading={loading}
-            onClick={handleRollButtonClick}
-            disabled={loading}
-            variant="primary"
-          >
-            Roll
-          </Button>
-        </Section>
+        {party?.length ? (
+          <>
+            <Section
+              justifyContent="space-evenly"
+              alignItems="center"
+              gap="16px"
+              width="100%"
+              padding="3rem 0rem"
+            >
+              {playerOne && <PlayerCard player={playerOne} />}
+              <PlayerCard player={playerTwo} />
+            </Section>
+            <Section justifyContent="center" height="100%">
+              <Button
+                isLoading={loading}
+                onClick={handleRollButtonClick}
+                disabled={loading}
+                variant="primary"
+              >
+                Roll
+              </Button>
+            </Section>
+          </>
+        ) : null}
       </Page>
     </>
   );
