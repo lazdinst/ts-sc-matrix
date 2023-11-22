@@ -4,7 +4,7 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-import { connectedClients } from '../socket';
+import { clientLobby } from '../socket';
 
 const router = express.Router();
 const sessions = new Map();
@@ -28,8 +28,8 @@ function generateSessionId() {
 
 router.get('/connections', async (req, res) => {
   try {
-    console.log(connectedClients);
-    const users = Array.from(connectedClients.entries());
+    console.log(clientLobby);
+    const users = Array.from(clientLobby.entries());
     res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -109,7 +109,7 @@ router.post('/login', async (req, res) => {
 
     let isUserLoggedIn = false;
 
-    for (const userInfo of connectedClients.values()) {
+    for (const userInfo of clientLobby.values()) {
       if (userInfo.username === username) {
         isUserLoggedIn = true;
         break;

@@ -1,7 +1,5 @@
-export type ClientLobbyType = Map<string, PlayerConnection>;
-export type ClientPartiesType = Map<string, PartyType>;
+export type ClientLobbyType = PlayerConnection[];
 
-// apps/server/src/socket/types.ts
 export type PlayerConnection = {
   id: string;
   username: string;

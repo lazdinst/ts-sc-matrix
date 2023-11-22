@@ -11,8 +11,7 @@ import {
   Card,
   SecondarySidebar,
 } from '../../components';
-import GameHistory from '../../containers/GameHistory';
-import PlayerCard from '../../containers/PlayerCard';
+import { GameHistory, PlayerCard, PartyManager } from '../../containers';
 
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -38,6 +37,7 @@ const Roller: React.FC = () => {
     <>
       <SecondarySidebar>
         <GameHistory gameHistory={[]} />
+        <PartyManager />
       </SecondarySidebar>
       <Page
         id="roller-page"

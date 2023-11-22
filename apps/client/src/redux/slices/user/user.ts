@@ -97,8 +97,10 @@ export const registerUser =
         id: response.data.user.id,
         username: response.data.user.username,
       };
-      dispatch(register(registeredUser));
+      if (!registeredUser.id) throw new Error('User ID not found');
+      if (!registeredUser.username) throw new Error('Username not found');
 
+      dispatch(register(registeredUser));
       dispatch(setRegistrationError(null));
       return response;
     } catch (error) {
@@ -121,9 +123,12 @@ export const loginUser =
       const token = response.data.token;
       setAuthTokenLocalStorage(token);
       const authenticatedUser: User = {
-        id: response.data.user.id,
+        id: response.data.user._id,
         username: response.data.user.username,
       };
+      if (!authenticatedUser.id) throw new Error('User ID not found');
+      if (!authenticatedUser.username) throw new Error('Username not found');
+
       dispatch(login(authenticatedUser));
       dispatch(setRegistrationError(null));
       return response;

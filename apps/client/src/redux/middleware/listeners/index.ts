@@ -1,14 +1,13 @@
 import { Socket } from 'socket.io-client';
 import { RollerState } from '../../slices/roller/roller';
-import { User } from '../../slices/user/types';
-import { ConnectedClientsType } from '../../slices/connections';
 import {
   setWebSocketConnected,
   setWebSocketDisconnected,
 } from '../../slices/websocket';
-import { setConnections } from '../../slices/connections';
 import { setRolls } from '../../slices/roller/roller';
 import { emitUserToSocket } from '../emitters';
+
+import { setupPartyListeners, setupLobbyListeners } from './party';
 
 export const inilializeSocketListeners = (
   socket: Socket,
@@ -16,8 +15,9 @@ export const inilializeSocketListeners = (
   dispatch: (arg0: any) => void
 ) => {
   setupSocketStateListeners(socket, getState, dispatch);
-  setupUserConnectionListeners(socket, getState, dispatch);
+  setupLobbyListeners(socket, getState, dispatch);
   setupRollerListeners(socket, getState, dispatch);
+  setupPartyListeners(socket, getState, dispatch);
 };
 
 export const setupSocketStateListeners = (
@@ -28,6 +28,7 @@ export const setupSocketStateListeners = (
   socket.on('connect', () => {
     console.log('Connected...');
     dispatch(setWebSocketConnected());
+    console.log('Emitting user to socket');
     emitUserToSocket(socket, getState, dispatch);
   });
 
@@ -38,17 +39,6 @@ export const setupSocketStateListeners = (
 
   socket.on('error', (error: Error) => {
     console.error('WebSocket error:', error);
-  });
-};
-
-export const setupUserConnectionListeners = (
-  socket: Socket,
-  getState: () => any,
-  dispatch: (arg0: any) => void
-) => {
-  socket.on('connections', (connections: ConnectedClientsType) => {
-    console.log('Connections:', connections);
-    dispatch(setConnections(connections));
   });
 };
 

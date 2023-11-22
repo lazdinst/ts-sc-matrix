@@ -3,15 +3,16 @@ import {
   setupConnectedClientListeners,
   setupPartyListeners,
 } from './listeners';
-import { UserInfo, ConnectedClientsType } from './types';
+import { PlayerConnection, ClientLobbyType, ClientPartiesType } from './types';
 
 const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 
 let io: SocketIoServer;
 
-export const connectedClients: ConnectedClientsType = new Map<
+export const clientLobby: ClientLobbyType = new Map<string, PlayerConnection>();
+export const clientParties: ClientPartiesType = new Map<
   string,
-  UserInfo
+  PlayerConnection[]
 >();
 
 export const initializeSocketIO = (server: any) => {
@@ -23,28 +24,22 @@ export const initializeSocketIO = (server: any) => {
       credentials: true,
     },
   });
-
-  console.log('io Server Created');
   // Listeners
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
 
-    setupConnectedClientListeners(socket, connectedClients);
+    setupConnectedClientListeners(socket, clientLobby);
     setupPartyListeners(io, socket);
-    socket.on('user-connected', (userInfo: UserInfo) => {
-      console.log('User connected:', userInfo);
-      connectedClients.set(socket.id, userInfo);
-      console.log('Emitting to all connections', connectedClients);
-      emitToAllConnections(connectedClients);
+    socket.on('user-connected', (player: PlayerConnection) => {
+      clientLobby.set(socket.id, player);
+      emitLobbyToAllClients(clientLobby);
     });
 
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
-      connectedClients.delete(socket.id);
-      emitToAllConnections(connectedClients);
-    });
-    socket.on('roll', () => {
-      console.log('Rolled');
+      clientLobby.delete(socket.id);
+      // TODO: Clean up clientParties by disbanding any parties that the client was in
+      emitLobbyToAllClients(clientLobby);
     });
   });
 
@@ -53,18 +48,19 @@ export const initializeSocketIO = (server: any) => {
   });
 };
 
-export const emitToAllConnections = (
-  connectedClients: Map<string, UserInfo>
+export const emitLobbyToAllClients = (
+  clientLobby: Map<string, PlayerConnection>
 ) => {
-  const connections = getConnections(connectedClients);
-  if (connections.length > 0) {
-    io.sockets.emit('connections', connections);
+  const lobby = getLobby(clientLobby);
+  if (lobby.length > 0) {
+    console.log('Emitting to all lobby', lobby);
+    io.sockets.emit('client-lobby', lobby);
   }
 };
 
-export const getConnections = (connectedClients: Map<string, UserInfo>) => {
-  return Array.from(connectedClients.entries()).map((connection) => {
-    return connection[1];
+export const getLobby = (clientLobby: Map<string, PlayerConnection>) => {
+  return Array.from(clientLobby.entries()).map((client) => {
+    return client[1];
   });
 };
 
