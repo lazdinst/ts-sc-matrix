@@ -11,12 +11,14 @@ interface ConnectionState {
   lobby: ConnectedClientsType;
   party: ConnectedClientsType;
   invite: PlayerConnection | null;
+  outbox: ConnectedClientsType;
 }
 
 const initialState: ConnectionState = {
   lobby: [],
   party: [],
   invite: null,
+  outbox: [],
 };
 
 const connections = createSlice({
@@ -35,13 +37,30 @@ const connections = createSlice({
     acceptPendingInvite(state, action: PayloadAction<ConnectedClientsType>) {
       state.party = action.payload;
     },
+    updateOutbox(state, action: PayloadAction<ConnectedClientsType>) {
+      state.outbox = action.payload;
+    },
     declinePartyInvite(state) {
       state.party = [];
     },
   },
 });
 
-export const { updateLobby, addPendingInvite, removePendingInvite, acceptPendingInvite, declinePartyInvite } = connections.actions;
+export const {
+  updateLobby,
+  addPendingInvite,
+  removePendingInvite,
+  acceptPendingInvite,
+  declinePartyInvite,
+  updateOutbox,
+} = connections.actions;
+
+export const sendPartyInvite = (player: PlayerConnection) => {
+  console.log('Sending Party invite...');
+  return (dispatch: Dispatch) => {
+    dispatch({ type: 'connections/send-invite', payload: player });
+  };
+};
 
 export const sendAcceptPartyInvite = (player: PlayerConnection) => {
   console.log('Sending Accept Party invite...');
