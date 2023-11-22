@@ -1,2 +1,2 @@
-export type { Connection, ConnectedClientsType } from './connections';
-export { default as connections, updateLobby } from './connections';
+export type { PlayerConnection, ConnectedClientsType } from './connections';
+export { default as connections, updateLobby,  addPendingInvite, removePendingInvite, acceptPendingInvite, declinePartyInvite } from './connections';

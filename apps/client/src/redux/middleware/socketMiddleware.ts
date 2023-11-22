@@ -30,6 +30,14 @@ const socketMiddleware = (): Middleware => {
           socket = null;
         }
       }
+
+      if(action.type === 'connections/accept-invite') {
+        const player = action.payload;
+        if(player) {
+          console.log('Ready to emitt accept invite')
+        }
+      }
+
       return next(action);
     };
 };

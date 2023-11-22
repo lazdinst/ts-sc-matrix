@@ -6,9 +6,11 @@ import {
   setWebSocketConnected,
   setWebSocketDisconnected,
 } from '../../slices/websocket';
-import { updateLobby } from '../../slices/connections';
+import { updateLobby  } from '../../slices/connections';
 import { setRolls } from '../../slices/roller/roller';
 import { emitUserToSocket } from '../emitters';
+
+import { setupPartyListeners, setupLobbyListeners } from './party';
 
 export const inilializeSocketListeners = (
   socket: Socket,
@@ -16,8 +18,9 @@ export const inilializeSocketListeners = (
   dispatch: (arg0: any) => void
 ) => {
   setupSocketStateListeners(socket, getState, dispatch);
-  setupUserConnectionListeners(socket, getState, dispatch);
+  setupLobbyListeners(socket, getState, dispatch);
   setupRollerListeners(socket, getState, dispatch);
+  setupPartyListeners(socket, getState, dispatch);
 };
 
 export const setupSocketStateListeners = (
@@ -42,17 +45,6 @@ export const setupSocketStateListeners = (
   });
 };
 
-export const setupUserConnectionListeners = (
-  socket: Socket,
-  getState: () => any,
-  dispatch: (arg0: any) => void
-) => {
-  socket.on('connections', (connections: ConnectedClientsType) => {
-    console.log('Connections:', connections);
-    dispatch(updateLobby(connections));
-  });
-};
-
 export const setupRollerListeners = (
   socket: Socket,
   getState: () => any,
@@ -66,3 +58,4 @@ export const setupRollerListeners = (
     dispatch(setRolls(rollMessage));
   });
 };
+
