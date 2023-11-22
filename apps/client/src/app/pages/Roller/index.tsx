@@ -12,7 +12,7 @@ import {
   SecondarySidebar,
 } from '../../components';
 import { GameHistory, PlayerCard, PartyManager } from '../../containers';
-
+import CharacterRoll from '../../containers/CharacterRoll';
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { playerOne, playerTwo, loading, error } = useSelector(
@@ -50,16 +50,7 @@ const Roller: React.FC = () => {
       >
         {party?.length ? (
           <>
-            <Section
-              justifyContent="space-evenly"
-              alignItems="center"
-              gap="16px"
-              width="100%"
-              padding="3rem 0rem"
-            >
-              {playerOne && <PlayerCard player={playerOne} />}
-              <PlayerCard player={playerTwo} />
-            </Section>
+            <CharacterRoll />
             <Section justifyContent="center" height="100%">
               <Button
                 isLoading={loading}
@@ -72,6 +63,13 @@ const Roller: React.FC = () => {
             </Section>
           </>
         ) : null}
+        <Section
+          justifyContent="space-evenly"
+          alignItems="center"
+          gap="16px"
+          width="100%"
+          padding="3rem 0rem"
+        ></Section>
       </Page>
     </>
   );

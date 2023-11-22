@@ -1,3 +1,3 @@
-import roller, { executeNewRoll, setRolls } from './roller';
-
+import roller, { executeNewRoll, setRolls, UnitTypes } from './roller';
+export type { UnitTypes };
 export { roller, executeNewRoll, setRolls };
