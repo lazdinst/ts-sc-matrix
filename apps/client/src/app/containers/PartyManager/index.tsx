@@ -16,6 +16,7 @@ const PartyManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const lobby = useSelector((state: RootState) => state.connections.lobby);
+  const outbox = useSelector((state: RootState) => state.connections.outbox);
   const invite = useSelector((state: RootState) => state.connections.invite);
   const party = useSelector((state: RootState) => state.connections.party);
 
@@ -42,8 +43,7 @@ const PartyManager: React.FC = () => {
 
   const handleAcceptInvite = () => {
     if (invite) {
-      dispatch(acceptPendingInvite([...party, invite]));
-      dispatch(removePendingInvite());
+      dispatch(sendAcceptPartyInvite());
     }
   };
 
@@ -72,19 +72,19 @@ const PartyManager: React.FC = () => {
       <div>
         <h3>Party</h3>
         <ul>
-          {party.map((player) => (
-            <li key={player._id}>{player.username}</li>
-          ))}
+          {party &&
+            party.map((player) => <li key={player.id}>{player.username}</li>)}
         </ul>
       </div>
       {invite && (
         <div>
           <h3>Party Invitation</h3>
-          <p>You have received an invitation from {invite.username}.</p>
+          <p>{JSON.stringify(invite)}wants to party with you.</p>
           <button onClick={handleAcceptInvite}>Accept</button>
           <button onClick={handleDeclineInvite}>Decline</button>
         </div>
       )}
+      {outbox && <div>Outbox: {JSON.stringify(outbox)}</div>}
     </div>
   );
 };

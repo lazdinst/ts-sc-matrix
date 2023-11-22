@@ -1,43 +1,42 @@
 import { createSlice, PayloadAction, Dispatch } from '@reduxjs/toolkit';
-
-export type PlayerConnection = {
-  _id: string;
-  username: string;
-};
-
-export type ConnectedClientsType = PlayerConnection[];
+import {
+  PlayerConnection,
+  ClientLobbyType,
+  PartyType,
+  PlayerInvite,
+} from './types';
 
 interface ConnectionState {
-  lobby: ConnectedClientsType;
-  party: ConnectedClientsType;
-  invite: PlayerConnection | null;
-  outbox: ConnectedClientsType;
+  lobby: ClientLobbyType;
+  party: PartyType | null;
+  invite: PlayerInvite | null;
+  outbox: PlayerInvite | null;
 }
 
 const initialState: ConnectionState = {
   lobby: [],
   party: [],
   invite: null,
-  outbox: [],
+  outbox: null,
 };
 
 const connections = createSlice({
   name: 'connection',
   initialState,
   reducers: {
-    updateLobby(state, action: PayloadAction<ConnectedClientsType>) {
+    updateLobby(state, action: PayloadAction<ClientLobbyType>) {
       state.lobby = action.payload;
     },
-    addPendingInvite(state, action: PayloadAction<PlayerConnection>) {
+    addPendingInvite(state, action: PayloadAction<PlayerInvite>) {
       state.invite = action.payload;
     },
     removePendingInvite(state) {
       state.invite = null;
     },
-    acceptPendingInvite(state, action: PayloadAction<ConnectedClientsType>) {
+    acceptPendingInvite(state, action: PayloadAction<ClientLobbyType>) {
       state.party = action.payload;
     },
-    updateOutbox(state, action: PayloadAction<ConnectedClientsType>) {
+    updateOutbox(state, action: PayloadAction<PlayerInvite>) {
       state.outbox = action.payload;
     },
     declinePartyInvite(state) {
@@ -62,10 +61,10 @@ export const sendPartyInvite = (player: PlayerConnection) => {
   };
 };
 
-export const sendAcceptPartyInvite = (player: PlayerConnection) => {
+export const sendAcceptPartyInvite = () => {
   console.log('Sending Accept Party invite...');
   return (dispatch: Dispatch) => {
-    dispatch({ type: 'connections/accept-invite', payload: player });
+    dispatch({ type: 'connections/accept-invite' });
   };
 };
 

@@ -3,16 +3,13 @@ import {
   setupConnectedClientListeners,
   setupPartyListeners,
 } from './listeners';
-import { UserInfo, ConnectedClientsType } from './types';
+import { PlayerConnection, ClientLobbyType } from './types';
 
 const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || '').split(',');
 
 let io: SocketIoServer;
 
-export const connectedClients: ConnectedClientsType = new Map<
-  string,
-  UserInfo
->();
+export const clientLobby: ClientLobbyType = new Map<string, PlayerConnection>();
 
 export const initializeSocketIO = (server: any) => {
   io = new SocketIoServer(server, {
@@ -29,20 +26,20 @@ export const initializeSocketIO = (server: any) => {
   io.on('connection', (socket: Socket) => {
     console.log('New Client Connected: ', socket.id);
 
-    setupConnectedClientListeners(socket, connectedClients);
+    setupConnectedClientListeners(socket, clientLobby);
     setupPartyListeners(io, socket);
-    socket.on('user-connected', (userInfo: UserInfo) => {
+    socket.on('user-connected', (userInfo: PlayerConnection) => {
       console.log('User connected:', userInfo);
       console.log('Socket ID:', socket.id);
-      connectedClients.set(socket.id, userInfo);
-      console.log('Emitting to all connections', connectedClients);
-      emitToAllConnections(connectedClients);
+      clientLobby.set(socket.id, userInfo);
+      console.log('Emitting to all connections', clientLobby);
+      emitLobbyToAllClients(clientLobby);
     });
 
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
-      connectedClients.delete(socket.id);
-      emitToAllConnections(connectedClients);
+      clientLobby.delete(socket.id);
+      emitLobbyToAllClients(clientLobby);
     });
     socket.on('roll', () => {
       console.log('Rolled');
@@ -54,19 +51,19 @@ export const initializeSocketIO = (server: any) => {
   });
 };
 
-export const emitToAllConnections = (
-  connectedClients: Map<string, UserInfo>
+export const emitLobbyToAllClients = (
+  clientLobby: Map<string, PlayerConnection>
 ) => {
-  const connections = getConnections(connectedClients);
-  if (connections.length > 0) {
-    console.log('Emitting to all connections', connections);
-    io.sockets.emit('connections', connections);
+  const lobby = getLobby(clientLobby);
+  if (lobby.length > 0) {
+    console.log('Emitting to all lobby', lobby);
+    io.sockets.emit('client-lobby', lobby);
   }
 };
 
-export const getConnections = (connectedClients: Map<string, UserInfo>) => {
-  return Array.from(connectedClients.entries()).map((connection) => {
-    return connection[1];
+export const getLobby = (clientLobby: Map<string, PlayerConnection>) => {
+  return Array.from(clientLobby.entries()).map((client) => {
+    return client[1];
   });
 };
 

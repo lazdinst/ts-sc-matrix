@@ -1,4 +1,9 @@
-export type { PlayerConnection, ConnectedClientsType } from './connections';
+export type {
+  PlayerConnection,
+  PartyInviteType,
+  ClientLobbyType,
+  PartyType,
+} from './types';
 export {
   default as connections,
   updateLobby,
