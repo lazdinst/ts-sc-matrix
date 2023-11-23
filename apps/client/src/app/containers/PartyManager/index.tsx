@@ -133,6 +133,7 @@ const PartyManager: React.FC = () => {
   const lobby = useSelector((state: RootState) => state.connections.lobby);
   const invite = useSelector((state: RootState) => state.connections.invite);
   const party = useSelector((state: RootState) => state.connections.party);
+  const outbox = useSelector((state: RootState) => state.connections.outbox);
 
   const handleSendPartyInvite = (player: PlayerConnection) => {
     if (!player) {
@@ -232,6 +233,23 @@ const PartyManager: React.FC = () => {
             </Button>
             <Button variant="error" size="small" onClick={handleDeclineInvite}>
               Decline
+            </Button>
+          </PartyInviteActions>
+        </PartyInviteContainer>
+      )}
+      {invite && invite.sender.id === user?.id && (
+        <PartyInviteContainer>
+          <PartyActionMessage>
+            Request Sent:
+            <span>
+              {` ${invite.recipient?.username
+                .charAt(0)
+                .toUpperCase()}${invite.recipient?.username.slice(1)}`}
+            </span>
+          </PartyActionMessage>
+          <PartyInviteActions>
+            <Button variant="error" size="small" onClick={handleDeclineInvite}>
+              Cancel
             </Button>
           </PartyInviteActions>
         </PartyInviteContainer>
