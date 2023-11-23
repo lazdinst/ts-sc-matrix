@@ -1,10 +1,9 @@
 import { Socket } from 'socket.io-client';
-import { RollerState } from '../../slices/roller/roller';
 import {
   setWebSocketConnected,
   setWebSocketDisconnected,
 } from '../../slices/websocket';
-import { setRolls } from '../../slices/roller/roller';
+import { setPlayerRolls } from '../../slices/roller/roller';
 import { emitUserToSocket } from '../emitters';
 
 import { setupPartyListeners, setupLobbyListeners } from './party';
@@ -48,10 +47,14 @@ export const setupRollerListeners = (
   dispatch: (arg0: any) => void
 ) => {
   // TODO: Replace any with actual type
-  socket.on('roll', (message: any) => {
-    console.log('Roll:', message);
-    const rollMessage: RollerState = message;
-    console.log('rollMessage:', rollMessage);
-    dispatch(setRolls(rollMessage));
+  socket.on('roll', (players: any) => {
+    const party = getState().connections.party;
+    console.log('party:', party);
+    console.log('Roll:', players);
+
+    players[0].name = party[0].username;
+    players[1].name = party[1].username;
+    console.log('players:', players);
+    dispatch(setPlayerRolls(players));
   });
 };

@@ -22,7 +22,7 @@ import {
 } from '../../components/Card';
 import minerals from '../../../assets/images/minerals.gif';
 import vespene from '../../../assets/images/vespene.gif';
-
+import styled from 'styled-components';
 import {
   getSymbolImageByRace,
   parseUnitName,
@@ -30,11 +30,42 @@ import {
   getUnitImage,
 } from '../../utils';
 
-const CharacterRoll: React.FC = () => {
-  const playerOne = useSelector((state: RootState) => state.roller.playerOne);
-  const playerTwo = useSelector((state: RootState) => state.roller.playerTwo);
-  const players = [playerOne, playerTwo];
+const raceColors: {
+  zerg: string;
+  terran: string;
+  protoss: string;
+} = {
+  zerg: '#8400ff',
+  terran: '#ff0000',
+  protoss: '#0004ff',
+};
 
+interface PlayerNameHeaderProps {
+  textShadow?: string;
+}
+
+const PlayerNameHeader = styled.div<PlayerNameHeaderProps>`
+  text-align: center;
+  font-family: 'eurostile';
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 500;
+  font-size: 2rem;
+  text-shadow: 0 0 1.25rem
+    ${(props) =>
+      props.textShadow ? props.textShadow : props.theme.colors.accentColor};
+  margin: 10px 0;
+`;
+
+const CharacterRoll: React.FC = () => {
+  const players = useSelector((state: RootState) => state.roller.players);
+
+  const getRaceColor = (race: string) => {
+    if (!race) return;
+
+    const result = (raceColors as any)[race]; // Use type assertion
+    return result;
+  };
   return (
     <>
       {players.map((player) => {
@@ -45,9 +76,9 @@ const CharacterRoll: React.FC = () => {
                 src={getSymbolImageByRace(player.race).symbol}
                 alt={player.race}
               />
-              <CardSubHeader>
+              <PlayerNameHeader textShadow={getRaceColor(player.race)}>
                 <h3>{player.name}</h3>
-              </CardSubHeader>
+              </PlayerNameHeader>
             </CharacterSquare>
             {player.units.map((unit, index) => (
               <CharacterSquare key={unit._id}>

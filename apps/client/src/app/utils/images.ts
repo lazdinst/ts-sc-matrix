@@ -49,7 +49,6 @@ import archon from '../../assets/images/units/archon.png';
 import carrier from '../../assets/images/units/carrier.png';
 
 export function getUnitImage(unit: string): string {
-  console.log(unit);
   switch (unit) {
     // Zerg units
     case 'zergling':

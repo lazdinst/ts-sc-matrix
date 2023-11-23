@@ -7,12 +7,6 @@ import {
 import axios from 'axios';
 import { API_URL } from '../../../config';
 
-const defaultPlayerRoll = {
-  name: '',
-  race: '',
-  units: [],
-};
-
 export interface Unit {
   _id: string;
   race: string;
@@ -40,19 +34,17 @@ export interface Player {
   units: Unit[];
 }
 
-export interface Roll {
-  playerOne: Player;
-  playerTwo: Player;
+export interface PlayerRollsType {
+  players: Player[];
 }
 
 export interface RollerState {
   loading: boolean;
   error: string | null;
-  playerOne: Player;
-  playerTwo: Player;
+  players: Player[];
 }
 
-export interface RollerState extends Roll {
+export interface RollerState extends PlayerRollsType {
   loading: boolean;
   error: string | null;
 }
@@ -60,8 +52,7 @@ export interface RollerState extends Roll {
 const initialState: RollerState = {
   loading: false,
   error: null,
-  playerOne: defaultPlayerRoll,
-  playerTwo: defaultPlayerRoll,
+  players: [],
 };
 
 export const executeNewRoll = createAsyncThunk(
@@ -73,17 +64,20 @@ export const executeNewRoll = createAsyncThunk(
   }
 );
 
-export const setRolls = createAction<Roll>('roller/setRolls');
+export const setPlayerRolls = createAction<PlayerRollsType>(
+  'roller/setPlayerRolls'
+);
 
 const rollerSlice = createSlice({
   name: 'roller',
   initialState,
   reducers: {
-    setRolls: (state, action: PayloadAction<Roll>) => {
+    setPlayerRolls: (state, action: PayloadAction<any>) => {
+      console.log('action.payload.players', action.payload);
+      const players = action.payload;
       return {
         ...state,
-        playerOne: action.payload.playerOne,
-        playerTwo: action.payload.playerTwo,
+        players: action.payload,
       };
     },
   },
@@ -101,8 +95,7 @@ const rollerSlice = createSlice({
         state.loading = false;
         state.error =
           action.error.message || 'An error occurred while fetching rolls.';
-        state.playerOne = defaultPlayerRoll;
-        state.playerTwo = defaultPlayerRoll;
+        state.players = [];
       });
   },
 });

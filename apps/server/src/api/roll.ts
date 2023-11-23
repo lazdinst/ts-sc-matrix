@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 
   try {
     const io = getIO();
-    io.emit('roll', { playerOne, playerTwo });
+    io.emit('roll', [playerOne, playerTwo]);
 
     res.json([playerOne, playerTwo]);
   } catch (err) {
