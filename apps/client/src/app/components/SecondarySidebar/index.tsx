@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import styled, { keyframes } from "styled-components";
+import React, { ReactNode } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 const slideIn = keyframes`
   from {
@@ -13,7 +13,10 @@ const slideIn = keyframes`
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.colors.surfaces.mainBg};
   min-width: 248px;
-  animation: ${slideIn} 0.1s ease-in-out forwards; /* Apply the animation */
+  /* animation: ${slideIn} 0.1s ease-in-out forwards; */
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 `;
 
 interface SecondarySidebarProps {

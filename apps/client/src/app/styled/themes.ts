@@ -102,7 +102,7 @@ const typography = {
 const components = {
   button: {
     text: '#ededed',
-    borderRadius: '10px',
+    borderRadius: '4px',
     padding: '10px 20px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
     borderColor: '#212121',

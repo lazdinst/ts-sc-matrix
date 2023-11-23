@@ -1,8 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faCoffee, faUser, faCog, faDice, faCogs, faUserAstronaut } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, SizeProp } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCoffee,
+  faUser,
+  faCog,
+  faDice,
+  faCogs,
+  faUserAstronaut,
+  faUserPlus,
+} from '@fortawesome/free-solid-svg-icons';
 
 const iconMap: Record<string, IconDefinition> = {
   coffee: faCoffee,
@@ -11,18 +19,19 @@ const iconMap: Record<string, IconDefinition> = {
   dice: faDice,
   cogs: faCogs,
   astronaut: faUserAstronaut,
+  userPlus: faUserPlus,
 };
 
 interface IconProps {
   name: string;
+  size?: SizeProp;
 }
 
 const StyledIcon = styled(FontAwesomeIcon)`
   color: ${(props) => props.theme.colors.primary || 'inherit'};
 `;
 
-function Icon({ name }: IconProps) {
-
+function Icon({ name, size }: IconProps) {
   const iconDefinition = iconMap[name];
 
   if (!iconDefinition) {
@@ -30,7 +39,7 @@ function Icon({ name }: IconProps) {
     return null;
   }
 
-  return <StyledIcon icon={iconDefinition} />;
+  return <StyledIcon icon={iconDefinition} size={size} />;
 }
 
 export default Icon;
