@@ -12,6 +12,7 @@ export interface PopoverContentProps {
 
 const PopoverContent = styled.div<PopoverContentProps>`
   position: absolute;
+  color: ${(props) => props.theme.colors.primary};
   background-color: ${(props) => props.theme.colors.surfaces.navBg};
   border: 1px solid ${(props) => props.theme.colors.borderColor};
   border-radius: ${(props) => props.theme.components.popover.borderRadius};

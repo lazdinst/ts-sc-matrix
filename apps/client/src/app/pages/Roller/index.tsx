@@ -13,6 +13,8 @@ import {
 } from '../../components';
 import { GameHistory, PlayerCard, PartyManager } from '../../containers';
 import CharacterRoll from '../../containers/CharacterRoll';
+import UserDetailContainer from '../../containers/UserDetail';
+
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { playerOne, playerTwo, loading, error } = useSelector(
@@ -38,8 +40,13 @@ const Roller: React.FC = () => {
   return (
     <>
       <SecondarySidebar>
-        <GameHistory gameHistory={[]} />
-        <PartyManager />
+        <div>
+          <GameHistory gameHistory={[]} />
+        </div>
+        <div id="footer">
+          <PartyManager />
+          <UserDetailContainer />
+        </div>
       </SecondarySidebar>
       <Page
         id="roller-page"
@@ -51,7 +58,7 @@ const Roller: React.FC = () => {
         {party?.length ? (
           <>
             <CharacterRoll />
-            <Section justifyContent="center" height="100%">
+            <Section justifyContent="center">
               <Button
                 isLoading={loading}
                 onClick={handleRollButtonClick}
@@ -63,13 +70,6 @@ const Roller: React.FC = () => {
             </Section>
           </>
         ) : null}
-        <Section
-          justifyContent="space-evenly"
-          alignItems="center"
-          gap="16px"
-          width="100%"
-          padding="3rem 0rem"
-        ></Section>
       </Page>
     </>
   );

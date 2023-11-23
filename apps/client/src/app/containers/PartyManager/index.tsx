@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import {
@@ -8,23 +8,128 @@ import {
   sendDeclinePartyInvite,
   sendLeaveParty,
 } from '../../../redux/slices/connections';
+import Icon from '../../components/Icon';
+import styled, { keyframes } from 'styled-components';
+import Button from '../../components/Button';
+
+const slideInFromBottom = keyframes`
+  from {
+    /* transform: translateY(100%); */
+    opacity: 0;
+  }
+  to {
+    /* transform: translateY(0%); */
+    opacity: 1;
+  }
+`;
+
+const PartyManagerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background-color: ${(props) => props.theme.colors.surfaces.sectionBg};
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+`;
+
+const PartyManagerHeader = styled.div`
+  font-family: 'eurostile';
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
+`;
+
+const LobbyContainer = styled.div`
+  display: flex;
+`;
+
+const LobbyUserContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.5rem;
+  &:hover {
+    background-color: ${(props) => props.theme.colors.surfaces.sectionBg};
+  }
+`;
+
+const LobbyUsername = styled.div`
+  display: flex;
+  text-align: center;
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.1rem;
+  font-family: 'eurostile';
+`;
+
+const LobbyUserAction = styled.div`
+  display: flex;
+  & > svg {
+    &:hover {
+      color: ${(props) => props.theme.colors.statusColors.success};
+      cursor: pointer;
+    }
+    &:active {
+      transform: translateY(2px);
+    }
+  }
+`;
+
+const PartyInviteContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  animation: ${slideInFromBottom} 0.5s ease-in-out;
+  padding: 0.25rem;
+`;
+
+const PartyActionMessage = styled.div`
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.1rem;
+  color: ${(props) => props.theme.colors.primary};
+  padding: 0.5rem 0.5rem;
+  font-family: 'eurostile';
+  & > span {
+    color: ${(props) => props.theme.colors.statusColors.success};
+    font-size: 0.9rem;
+    letter-spacing: 0.05rem;
+  }
+`;
+
+const PartyInviteActions = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+`;
+
+const PartyMemberActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const PartyMemberContainer = styled.div`
+  width: 100%;
+`;
+
+const PartyMember = styled.div`
+  display: flex;
+  text-align: center;
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.1rem;
+  padding: 0.5rem 0.5rem;
+  font-family: 'eurostile';
+`;
 
 const PartyManager: React.FC = () => {
   const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const lobby = useSelector((state: RootState) => state.connections.lobby);
-  const outbox = useSelector((state: RootState) => state.connections.outbox);
   const invite = useSelector((state: RootState) => state.connections.invite);
   const party = useSelector((state: RootState) => state.connections.party);
-
-  // State to track the selected user to invite to the party
-  const [selectedUser, setSelectedUser] = useState<PlayerConnection | null>(
-    null
-  );
-
-  const handleInviteClick = (user: PlayerConnection) => {
-    setSelectedUser(user);
-  };
 
   const handleSendPartyInvite = (player: PlayerConnection) => {
     if (!player) {
@@ -59,51 +164,68 @@ const PartyManager: React.FC = () => {
   const ids = party?.map((player) => player.id);
 
   return (
-    <div>
-      <h2>Party Manager</h2>
-      <div>
-        <h3>{user?.username}</h3>
-      </div>
-      <div>
-        <h3>Lobby</h3>
-        <ul>
-          {lobby
+    <PartyManagerContainer>
+      {party?.length ? null : <PartyManagerHeader>Lobby</PartyManagerHeader>}
+      <LobbyContainer>
+        {party &&
+          lobby
             .filter((player) => player.id !== user?.id)
             .filter((player) => !ids?.includes(player.id))
             .map((player) => (
-              <li key={player.username}>
-                {player.username}
-                {player.id !== user?.id ? (
-                  <button onClick={() => handleSendPartyInvite(player)}>
-                    Invite
-                  </button>
-                ) : null}
-              </li>
+              <LobbyUserContainer key={player.username.toUpperCase()}>
+                <LobbyUsername>
+                  {`${player?.username
+                    .charAt(0)
+                    .toUpperCase()}${player?.username.slice(1)}`}
+                </LobbyUsername>
+                <LobbyUserAction onClick={() => handleSendPartyInvite(player)}>
+                  <Icon name="userPlus" size="sm" />
+                </LobbyUserAction>
+              </LobbyUserContainer>
             ))}
-        </ul>
-      </div>
-      <div>
-        <h3>Party</h3>
-        <ul>
-          {party &&
-            party.map((player) => <li key={player.id}>{player.username}</li>)}
-        </ul>
-        <div>
-          {party?.length ? (
-            <button onClick={handleLeaveParty}>Leave Party</button>
-          ) : null}
-        </div>
-      </div>
+      </LobbyContainer>
+      {party?.length ? (
+        <PartyInviteContainer>
+          <PartyManagerHeader>Party</PartyManagerHeader>
+          <PartyMemberContainer>
+            {party?.map((player) => (
+              <PartyMember key={player.id}>
+                {`${player?.username
+                  .charAt(0)
+                  .toUpperCase()}${player?.username.slice(1)}`}
+              </PartyMember>
+            ))}
+          </PartyMemberContainer>
+          <PartyMemberActions>
+            {party?.length ? (
+              <Button variant="error" onClick={handleLeaveParty}>
+                Leave Party
+              </Button>
+            ) : null}
+          </PartyMemberActions>
+        </PartyInviteContainer>
+      ) : null}
       {invite && invite.sender.id !== user?.id && (
-        <div>
-          <h3>Party Invitation</h3>
-          <p>{JSON.stringify(invite)}</p>
-          <button onClick={handleAcceptInvite}>Accept</button>
-          <button onClick={handleDeclineInvite}>Decline</button>
-        </div>
+        <PartyInviteContainer>
+          <PartyActionMessage>
+            Invitation From:
+            <span>
+              {` ${invite.sender?.username
+                .charAt(0)
+                .toUpperCase()}${invite.sender?.username.slice(1)}`}
+            </span>
+          </PartyActionMessage>
+          <PartyInviteActions>
+            <Button variant="success" onClick={handleAcceptInvite}>
+              Accept
+            </Button>
+            <Button variant="error" onClick={handleDeclineInvite}>
+              Decline
+            </Button>
+          </PartyInviteActions>
+        </PartyInviteContainer>
       )}
-      {outbox && <div>Outbox: {JSON.stringify(outbox)}</div>}
-    </div>
+    </PartyManagerContainer>
   );
 };
 
