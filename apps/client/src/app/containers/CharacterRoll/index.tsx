@@ -4,6 +4,10 @@ import { RootState } from '../../../redux/store';
 import {
   CharacterGridContainer,
   CharacterSquare,
+  CharacterSquareImage,
+  CharacterRaceImage,
+  PlayerNameHeader,
+  getRaceColor,
 } from '../../components/CharacterGrid';
 import {
   Card,
@@ -22,7 +26,7 @@ import {
 } from '../../components/Card';
 import minerals from '../../../assets/images/minerals.gif';
 import vespene from '../../../assets/images/vespene.gif';
-
+import styled from 'styled-components';
 import {
   getSymbolImageByRace,
   parseUnitName,
@@ -31,9 +35,7 @@ import {
 } from '../../utils';
 
 const CharacterRoll: React.FC = () => {
-  const playerOne = useSelector((state: RootState) => state.roller.playerOne);
-  const playerTwo = useSelector((state: RootState) => state.roller.playerTwo);
-  const players = [playerOne, playerTwo];
+  const players = useSelector((state: RootState) => state.roller.players);
 
   return (
     <>
@@ -41,17 +43,20 @@ const CharacterRoll: React.FC = () => {
         return (
           <CharacterGridContainer>
             <CharacterSquare>
-              <img
+              <CharacterRaceImage
                 src={getSymbolImageByRace(player.race).symbol}
                 alt={player.race}
               />
-              <CardSubHeader>
-                <h3>{player.name}</h3>
-              </CardSubHeader>
+              <PlayerNameHeader textShadow={getRaceColor(player.race)}>
+                {player.name}
+              </PlayerNameHeader>
             </CharacterSquare>
             {player.units.map((unit, index) => (
               <CharacterSquare key={unit._id}>
-                <img src={getUnitImage(unit.name)} alt={unit.name} />
+                <CharacterSquareImage
+                  src={getUnitImage(unit.name)}
+                  alt={unit.name}
+                />
                 <UnitWrapper id="unit-wrapper" key={`${unit.name}${unit._id}`}>
                   <UnitDetails>
                     <UnitName>

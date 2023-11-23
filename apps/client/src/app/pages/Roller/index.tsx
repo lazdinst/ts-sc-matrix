@@ -17,9 +17,7 @@ import UserDetailContainer from '../../containers/UserDetail';
 
 const Roller: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { playerOne, playerTwo, loading, error } = useSelector(
-    (state: RootState) => state.roller
-  );
+  const { players, loading } = useSelector((state: RootState) => state.roller);
 
   const server = useSelector(
     (state: { server: ServerStatusState }) => state.server
@@ -57,7 +55,7 @@ const Roller: React.FC = () => {
       >
         {party?.length ? (
           <>
-            <CharacterRoll />
+            {players?.length ? <CharacterRoll /> : null}
             <Section justifyContent="center">
               <Button
                 isLoading={loading}
