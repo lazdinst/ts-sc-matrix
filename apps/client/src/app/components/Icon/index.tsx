@@ -10,6 +10,8 @@ import {
   faCogs,
   faUserAstronaut,
   faUserPlus,
+  faUserMinus,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 
 const iconMap: Record<string, IconDefinition> = {
@@ -20,6 +22,8 @@ const iconMap: Record<string, IconDefinition> = {
   cogs: faCogs,
   astronaut: faUserAstronaut,
   userPlus: faUserPlus,
+  userMinus: faUserMinus,
+  users: faUsers,
 };
 
 interface IconProps {

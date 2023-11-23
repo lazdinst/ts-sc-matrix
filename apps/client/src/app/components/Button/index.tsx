@@ -3,10 +3,24 @@ import styled, { css } from 'styled-components';
 interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'success' | 'error' | 'warning';
   isLoading?: boolean;
+  size?: 'small' | 'medium' | 'large';
 }
 
 const Button = styled.button<ButtonProps>`
-  /* padding: 20px 100px 18px 100px; */
+  padding: ${(props) => {
+    const { size } = props;
+
+    switch (size) {
+      case 'small':
+        return '8px 16px';
+      case 'medium':
+        return '12px 24px';
+      case 'large':
+        return '16px 32px';
+      default:
+        return 'inherit';
+    }
+  }};
   border: none;
   font-size: 16px;
   font-family: 'eurostile';
@@ -16,6 +30,10 @@ const Button = styled.button<ButtonProps>`
   transition: all 0.1s ease-in-out;
   box-shadow: ${(props) => props.theme.components.button.boxShadow || 'none'};
   cursor: pointer;
+
+  & > svg {
+    margin-right: 0.5rem;
+  }
 
   &::before {
     content: '';

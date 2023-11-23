@@ -95,6 +95,8 @@ const UnitContainer = styled.div`
 const UnitWrapper = styled.div`
   display: flex;
   margin: 0.25rem 0.5rem;
+  flex-direction: column;
+  width: 85%;
 `;
 
 const UnitDetails = styled.div`
@@ -152,9 +154,17 @@ const UnitResources = styled.div`
   align-items: center;
   min-width: 64px;
   font-family: 'eurostile';
+  font-size: 1rem;
 `;
 
 const UnitResourceImg = styled.img`
+  margin-right: 6px;
+`;
+
+const UnitResourceText = styled.span`
+  font-size: 1rem;
+  font-weight: 600;
+  color: ${(props) => props.theme.colors.primary};
   margin-right: 6px;
 `;
 
@@ -173,4 +183,5 @@ export {
   UnitActions,
   UnitWrapper,
   UnitType,
+  UnitResourceText,
 };
