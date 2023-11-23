@@ -38,6 +38,9 @@ const PartyManagerHeader = styled.div`
   font-weight: 500;
   font-size: 1rem;
   letter-spacing: 0.1rem;
+  & > svg {
+    margin-right: 0.25rem;
+  }
 `;
 
 const LobbyContainer = styled.div`
@@ -59,7 +62,7 @@ const LobbyUsername = styled.div`
   text-align: center;
   color: ${(props) => props.theme.colors.primary};
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   letter-spacing: 0.1rem;
   font-family: 'eurostile';
 `;
@@ -118,7 +121,7 @@ const PartyMember = styled.div`
   text-align: center;
   color: ${(props) => props.theme.colors.primary};
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   letter-spacing: 0.1rem;
   padding: 0.5rem 0.5rem;
   font-family: 'eurostile';
@@ -165,7 +168,12 @@ const PartyManager: React.FC = () => {
 
   return (
     <PartyManagerContainer>
-      {party?.length ? null : <PartyManagerHeader>Lobby</PartyManagerHeader>}
+      {party?.length ? null : (
+        <PartyManagerHeader>
+          <Icon name="users" size="1x" />
+          Lobby
+        </PartyManagerHeader>
+      )}
       <LobbyContainer>
         {party &&
           lobby
@@ -186,7 +194,10 @@ const PartyManager: React.FC = () => {
       </LobbyContainer>
       {party?.length ? (
         <PartyInviteContainer>
-          <PartyManagerHeader>Party</PartyManagerHeader>
+          <PartyManagerHeader>
+            <Icon name="users" size="1x" />
+            Party
+          </PartyManagerHeader>
           <PartyMemberContainer>
             {party?.map((player) => (
               <PartyMember key={player.id}>
@@ -198,8 +209,8 @@ const PartyManager: React.FC = () => {
           </PartyMemberContainer>
           <PartyMemberActions>
             {party?.length ? (
-              <Button variant="error" onClick={handleLeaveParty}>
-                Leave Party
+              <Button variant="error" size="small" onClick={handleLeaveParty}>
+                Leave
               </Button>
             ) : null}
           </PartyMemberActions>
@@ -216,10 +227,10 @@ const PartyManager: React.FC = () => {
             </span>
           </PartyActionMessage>
           <PartyInviteActions>
-            <Button variant="success" onClick={handleAcceptInvite}>
+            <Button variant="success" size="small" onClick={handleAcceptInvite}>
               Accept
             </Button>
-            <Button variant="error" onClick={handleDeclineInvite}>
+            <Button variant="error" size="small" onClick={handleDeclineInvite}>
               Decline
             </Button>
           </PartyInviteActions>

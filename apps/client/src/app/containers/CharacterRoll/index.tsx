@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import {
   CharacterGridContainer,
-  CharacterSquare,
+  CharacterRaceSquare,
+  CharacterUnitSquare,
   CharacterSquareImage,
   CharacterRaceImage,
   PlayerNameHeader,
@@ -17,6 +18,7 @@ import {
   UnitContainer,
   UnitDetails,
   UnitName,
+  UnitResourceText,
   UnitResources,
   UnitResourceImg,
   ShadowColor,
@@ -39,35 +41,40 @@ const CharacterRoll: React.FC = () => {
 
   return (
     <>
-      {players.map((player) => {
+      {players.map((player, idx) => {
         return (
-          <CharacterGridContainer>
-            <CharacterSquare>
+          <CharacterGridContainer
+            key={player.name}
+            margin={idx === 0 ? '120px' : null}
+          >
+            <CharacterRaceSquare race={player.race}>
               <CharacterRaceImage
                 src={getSymbolImageByRace(player.race).symbol}
                 alt={player.race}
               />
-              <PlayerNameHeader textShadow={getRaceColor(player.race)}>
+              <PlayerNameHeader race={player.race}>
                 {player.name}
               </PlayerNameHeader>
-            </CharacterSquare>
+            </CharacterRaceSquare>
+
             {player.units.map((unit, index) => (
-              <CharacterSquare key={unit._id}>
-                <CharacterSquareImage
-                  src={getUnitImage(unit.name)}
-                  alt={unit.name}
-                />
-                <UnitWrapper id="unit-wrapper" key={`${unit.name}${unit._id}`}>
-                  <UnitDetails>
-                    <UnitName>
-                      <span>{parseUnitName(unit.name)}</span>
-                      <UnitType type={unit.type}>
-                        {getUnitTypeDisplayName(unit.type)}
-                      </UnitType>
-                    </UnitName>
-                  </UnitDetails>
+              <CharacterUnitSquare key={`${player.name}${unit._id}`}>
+                <CharacterSquareImage src={getUnitImage(unit.name)} />
+                <UnitWrapper>
+                  <UnitName>
+                    <span>{parseUnitName(unit.name)}</span>
+                    <UnitType type={unit.type}>
+                      {getUnitTypeDisplayName(unit.type)}
+                    </UnitType>
+                  </UnitName>
+                  <UnitResources>
+                    <UnitResourceImg src={minerals} alt="mins" />
+                    <UnitResourceText>{unit.mins}</UnitResourceText>
+                    <UnitResourceImg src={vespene} alt="vespene" />
+                    {unit.gas}
+                  </UnitResources>
                 </UnitWrapper>
-              </CharacterSquare>
+              </CharacterUnitSquare>
             ))}
           </CharacterGridContainer>
         );

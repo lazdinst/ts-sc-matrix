@@ -53,6 +53,11 @@ export interface Theme extends SharedTheme {
     secondary: string;
     accentColor: string;
     borderColor: string;
+    races: {
+      zerg: string;
+      terran: string;
+      protoss: string;
+    };
     statusColors: {
       success: string;
       error: string;
@@ -142,6 +147,11 @@ const sharedTheme = {
   colors: {
     accentColor: accentColor,
     statusColors: statusColors,
+    races: {
+      zerg: '#6f35dc',
+      terran: '#dc3545',
+      protoss: '#007bff',
+    },
   },
 };
 
