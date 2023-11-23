@@ -58,7 +58,7 @@ const Roller: React.FC = () => {
         {party?.length ? (
           <>
             <CharacterRoll />
-            <Section justifyContent="center" height="100%">
+            <Section justifyContent="center">
               <Button
                 isLoading={loading}
                 onClick={handleRollButtonClick}
@@ -70,13 +70,6 @@ const Roller: React.FC = () => {
             </Section>
           </>
         ) : null}
-        <Section
-          justifyContent="space-evenly"
-          alignItems="center"
-          gap="16px"
-          width="100%"
-          padding="3rem 0rem"
-        ></Section>
       </Page>
     </>
   );
