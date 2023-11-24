@@ -1,20 +1,56 @@
 import styled from 'styled-components';
 
-export const CharacterGridContainer = styled.div`
-  display: flex;
+interface CharacterGridContainerProps {
+  margin?: string | null;
+}
 
+export const CharacterGridContainer = styled.div<CharacterGridContainerProps>`
+  display: flex;
+  margin-left: ${(props) => props.margin || '0'};
   gap: 1rem;
 
   @media (max-width: 800px) {
     grid-template-columns: repeat(2, 1fr);
   }
 `;
+interface CharacterRaceSquareProps {
+  race?: string;
+}
+export const CharacterRaceSquare = styled.div<CharacterRaceSquareProps>`
+  box-shadow: 10px 2px 100px rgba(0, 0, 0, 0.2);
+  background-color: ${(props) =>
+    props.theme.colors.surfaces.neutral600 || 'inherit'};
+  background-image: linear-gradient(
+    45deg,
+    ${(props) =>
+      props.race
+        ? props.theme.colors.races[props.race]
+        : props.theme.colors.accentColor},
+    ${(props) => props.theme.colors.surfaces.neutral900 || 'inherit'}
+  );
+  color: ${(props) => props.theme.colors.primary || 'inherit'};
 
-export const CharacterSquare = styled.div`
-  border-radius: 4px;
+  min-height: 225px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  h2 {
+    text-align: center;
+    @media (max-width: 800px) {
+      font-size: 1rem;
+    }
+  }
+  clip-path: polygon(19% 0%, 100% 0%, 81% 100%, 0% 100%);
+  margin-right: -64px;
+`;
+
+export const CharacterUnitSquare = styled.div`
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
   background-color: ${(props) =>
-    props.theme.colors.surfaces.navBg || 'inherit'};
+    props.theme.colors.surfaces.neutral600 || 'inherit'};
   color: ${(props) => props.theme.colors.primary || 'inherit'};
 
   min-height: 225px;
@@ -30,6 +66,9 @@ export const CharacterSquare = styled.div`
       font-size: 1rem;
     }
   }
+  position: relative;
+  clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+  margin-right: -64px;
 `;
 
 export const CharacterRaceImage = styled.img`
@@ -38,9 +77,17 @@ export const CharacterRaceImage = styled.img`
   padding: 1rem 0rem;
 `;
 
-export const CharacterSquareImage = styled.img`
-  width: 152px;
-  height: 152px;
+interface CharacterSquareImageProps {
+  src: string;
+}
+
+export const CharacterSquareImage = styled.div<CharacterSquareImageProps>`
+  width: 100%;
+  height: 100%;
+
+  background-image: url(${(props) => props.src || 'inherit'});
+  background-position: 50% 25%;
+  background-size: cover;
 `;
 
 export const getRaceColor = (race: string) => {
@@ -60,7 +107,7 @@ export const getRaceColor = (race: string) => {
 };
 
 interface PlayerNameHeaderProps {
-  textShadow?: string;
+  race?: string;
 }
 
 export const PlayerNameHeader = styled.div<PlayerNameHeaderProps>`
@@ -70,8 +117,10 @@ export const PlayerNameHeader = styled.div<PlayerNameHeaderProps>`
   color: #fff;
   font-weight: 500;
   font-size: 2rem;
+  margin: 10px 0;
   text-shadow: 0 0 1.25rem
     ${(props) =>
-      props.textShadow ? props.textShadow : props.theme.colors.accentColor};
-  margin: 10px 0;
+      props.race
+        ? props.theme.colors.races[props.race]
+        : props.theme.colors.accentColor};
 `;

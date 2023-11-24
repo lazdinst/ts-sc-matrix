@@ -10,6 +10,7 @@ import {
   Section,
   Card,
   SecondarySidebar,
+  Icon,
 } from '../../components';
 import { GameHistory, PlayerCard, PartyManager } from '../../containers';
 import CharacterRoll from '../../containers/CharacterRoll';
@@ -62,8 +63,9 @@ const Roller: React.FC = () => {
                 onClick={handleRollButtonClick}
                 disabled={loading}
                 variant="primary"
+                size="large"
               >
-                Roll
+                <Icon name="dice" /> Roll
               </Button>
             </Section>
           </>

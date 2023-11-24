@@ -53,6 +53,11 @@ export interface Theme extends SharedTheme {
     secondary: string;
     accentColor: string;
     borderColor: string;
+    races: {
+      zerg: string;
+      terran: string;
+      protoss: string;
+    };
     statusColors: {
       success: string;
       error: string;
@@ -64,6 +69,15 @@ export interface Theme extends SharedTheme {
       mainBg: string;
       sectionBg: string;
       articleBg: string;
+      neutral100: string;
+      neutral200: string;
+      neutral300: string;
+      neutral400: string;
+      neutral500: string;
+      neutral600: string;
+      neutral700: string;
+      neutral800: string;
+      neutral900: string;
     };
   };
 }
@@ -133,6 +147,11 @@ const sharedTheme = {
   colors: {
     accentColor: accentColor,
     statusColors: statusColors,
+    races: {
+      zerg: '#6f35dc',
+      terran: '#dc3545',
+      protoss: '#007bff',
+    },
   },
 };
 
@@ -150,6 +169,15 @@ export const darkTheme: Theme = {
       mainBg: '#2b2d31',
       sectionBg: '#202225',
       articleBg: '#36393f',
+      neutral100: 'rgb(72, 72, 72)',
+      neutral200: 'rgb(64, 64, 64)',
+      neutral300: 'rgb(56, 56, 56)',
+      neutral400: 'rgb(48, 48, 48)',
+      neutral500: 'rgb(40, 40, 40)',
+      neutral600: 'rgb(32, 32, 32)',
+      neutral700: 'rgb(24, 24, 24)',
+      neutral800: 'rgb(16, 16, 16)',
+      neutral900: 'rgb(8, 8, 8)',
     },
   },
 };
@@ -168,6 +196,15 @@ export const lightTheme: Theme = {
       mainBg: '#f0f0f0',
       sectionBg: '#ffffff',
       articleBg: '#f0f0f0',
+      neutral100: '#121212',
+      neutral200: '#282828',
+      neutral300: '#3f3f3f',
+      neutral400: '#575757',
+      neutral500: '#717171',
+      neutral600: '#8b8b8b',
+      neutral700: '#616161',
+      neutral800: '#424242',
+      neutral900: '#212121',
     },
   },
 };
