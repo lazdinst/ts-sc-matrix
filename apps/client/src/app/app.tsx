@@ -26,6 +26,11 @@ const App: React.FC = () => {
   useEffect(() => {
     dispatch(fetchServerStatus());
     dispatch(validateToken());
+
+    // Keep Alive Render
+    const interval = setInterval(() => dispatch(fetchServerStatus()), 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (!connected) {
