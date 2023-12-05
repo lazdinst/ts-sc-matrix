@@ -9,10 +9,12 @@ import { API_URL } from '../../../config';
 
 export interface Unit {
   _id: string;
+  index: number;
   race: string;
   name: string;
   mins: number;
   gas: number;
+  supply: number;
   type: UnitTypes;
   __v: number;
 }
