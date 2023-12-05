@@ -18,7 +18,6 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     // Delete all current units
     await Unit.deleteMany({});
-    console.log(units);
     // Insert the new units
     const insertedUnits = await Unit.insertMany(units); // Assuming data.units is available
     res.json(insertedUnits);
