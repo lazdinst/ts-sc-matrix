@@ -5,6 +5,7 @@ export interface IUnit extends Document {
   name: string;
   mins: number;
   gas: number;
+  supply: number;
   type: string;
 }
 
@@ -23,6 +24,10 @@ const unitSchema: Schema<IUnit> = new Schema<IUnit>({
     required: true,
   },
   gas: {
+    type: Number,
+    required: true,
+  },
+  supply: {
     type: Number,
     required: true,
   },

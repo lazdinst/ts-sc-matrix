@@ -47,6 +47,7 @@ import tempest from '../../assets/images/units/tempest.png';
 import colossus from '../../assets/images/units/colossus.png';
 import archon from '../../assets/images/units/archon.png';
 import carrier from '../../assets/images/units/carrier.png';
+import disruptor from '../../assets/images/units/disruptor.png';
 
 export function getUnitImage(unit: string): string {
   switch (unit) {
@@ -119,6 +120,8 @@ export function getUnitImage(unit: string): string {
       return sentry;
     case 'immortal':
       return immortal;
+    case 'disruptor':
+      return disruptor;
     case 'phoenix':
       return phoenix;
     case 'high_templar':
